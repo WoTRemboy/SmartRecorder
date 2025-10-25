@@ -120,3 +120,6 @@ iOSInjectionProject/
 Packages
 xcuserdata
 # *.xcodeproj
+
+### JetBrains
+.idea
