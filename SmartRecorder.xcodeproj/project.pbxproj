@@ -7,17 +7,41 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		52501DFF2EA7E5ED0054DB54 /* PlayerScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */; };
+		52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E002EA7EB450054DB54 /* NavigationBarView.swift */; };
+		52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E072EA906BA0054DB54 /* ProgressBarView.swift */; };
+		52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E092EA90CB10054DB54 /* AudioDescriptionView.swift */; };
+		52501E0D2EAA9F3F0054DB54 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E0C2EAA9F350054DB54 /* ColorExtension.swift */; };
+		52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E0E2EAAA1B20054DB54 /* ImageExtension.swift */; };
+		52501E112EAAA3830054DB54 /* TextManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E102EAAA3800054DB54 /* TextManager.swift */; };
+		52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E122EAAA4AE0054DB54 /* FontExtension.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072542E96D26E00E5DCC9 /* ContentView.swift */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerScreenView.swift; sourceTree = "<group>"; };
+		52501E002EA7EB450054DB54 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
+		52501E072EA906BA0054DB54 /* ProgressBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBarView.swift; sourceTree = "<group>"; };
+		52501E092EA90CB10054DB54 /* AudioDescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDescriptionView.swift; sourceTree = "<group>"; };
+		52501E0C2EAA9F350054DB54 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
+		52501E0E2EAAA1B20054DB54 /* ImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageExtension.swift; sourceTree = "<group>"; };
+		52501E102EAAA3800054DB54 /* TextManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextManager.swift; sourceTree = "<group>"; };
+		52501E122EAAA4AE0054DB54 /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		636072542E96D26E00E5DCC9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRecorderApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		89D1E2662EC1E44D00B1B81A /* AudiosListModule */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AudiosListModule;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		636072422E96CF6D00E5DCC9 /* Frameworks */ = {
@@ -30,6 +54,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		52501E0B2EAA9EAC0054DB54 /* PlayerModule */ = {
+			isa = PBXGroup;
+			children = (
+				52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */,
+				52501E002EA7EB450054DB54 /* NavigationBarView.swift */,
+				52501E072EA906BA0054DB54 /* ProgressBarView.swift */,
+				52501E092EA90CB10054DB54 /* AudioDescriptionView.swift */,
+			);
+			path = PlayerModule;
+			sourceTree = "<group>";
+		};
 		6360723C2E96CF6D00E5DCC9 = {
 			isa = PBXGroup;
 			children = (
@@ -49,8 +84,10 @@
 		636072562E96D26E00E5DCC9 /* SmartRecorder */ = {
 			isa = PBXGroup;
 			children = (
+				89D1E2662EC1E44D00B1B81A /* AudiosListModule */,
 				6360725A2E96D2BE00E5DCC9 /* Application */,
-				6360725B2E96D2E500E5DCC9 /* SupportingFiles */,
+				52501E0B2EAA9EAC0054DB54 /* PlayerModule */,
+				6360725B2E96D2E500E5DCC9 /* SupportFiles */,
 				636072542E96D26E00E5DCC9 /* ContentView.swift */,
 			);
 			path = SmartRecorder;
@@ -64,12 +101,16 @@
 			path = Application;
 			sourceTree = "<group>";
 		};
-		6360725B2E96D2E500E5DCC9 /* SupportingFiles */ = {
+		6360725B2E96D2E500E5DCC9 /* SupportFiles */ = {
 			isa = PBXGroup;
 			children = (
+				52501E102EAAA3800054DB54 /* TextManager.swift */,
+				52501E122EAAA4AE0054DB54 /* FontExtension.swift */,
+				52501E0E2EAAA1B20054DB54 /* ImageExtension.swift */,
+				52501E0C2EAA9F350054DB54 /* ColorExtension.swift */,
 				636072532E96D26E00E5DCC9 /* Assets.xcassets */,
 			);
-			path = SupportingFiles;
+			path = SupportFiles;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -86,6 +127,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				89D1E2662EC1E44D00B1B81A /* AudiosListModule */,
 			);
 			name = SmartRecorder;
 			packageProductDependencies = (
@@ -144,8 +188,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */,
+				52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */,
 				636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */,
+				52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */,
+				52501E112EAAA3830054DB54 /* TextManager.swift in Sources */,
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
+				52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */,
+				52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */,
+				52501DFF2EA7E5ED0054DB54 /* PlayerScreenView.swift in Sources */,
+				52501E0D2EAA9F3F0054DB54 /* ColorExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
