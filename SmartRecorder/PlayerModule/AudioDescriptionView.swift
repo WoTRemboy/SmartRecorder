@@ -19,7 +19,7 @@ struct AudioDescriptionView: View {
                         .foregroundColor(.SupportColors.lightBlue.opacity(0.3))
                     
                     Text("Apr 1, 2025")
-                        .font(.system(size: 12.5))
+                        .font(Font.caption())
                         .foregroundColor(.SupportColors.blue)
                     
                 }
@@ -28,13 +28,13 @@ struct AudioDescriptionView: View {
                         .frame(width: 63, height: 26)
                         .foregroundColor(.SupportColors.lightBlue.opacity(0.3))
                     Text("9:41 AM")
-                        .font(.system(size: 12.5))
+                        .font(Font.caption())
                         .foregroundColor(.SupportColors.blue)
                 }
             }
             
             Text("Исследования конкурентов и организация взаимодействий")
-                .font(.system(size: 20, weight: .bold))
+                .font(Font.title())
                 .foregroundColor(.SupportColors.blue)
                 .lineLimit(2)
                 .padding(.bottom)

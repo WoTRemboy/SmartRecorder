@@ -120,3 +120,6 @@ iOSInjectionProject/
 Packages
 xcuserdata
 # *.xcodeproj
+
+### Local developer files
+SmartRecorder/local

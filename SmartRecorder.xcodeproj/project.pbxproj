@@ -15,6 +15,10 @@
 		52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E0E2EAAA1B20054DB54 /* ImageExtension.swift */; };
 		52501E112EAAA3830054DB54 /* TextManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E102EAAA3800054DB54 /* TextManager.swift */; };
 		52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E122EAAA4AE0054DB54 /* FontExtension.swift */; };
+		52501E162EB24AC40054DB54 /* RecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E152EB24AC40054DB54 /* RecorderView.swift */; };
+		52501E1A2EB783090054DB54 /* StartRecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E192EB783090054DB54 /* StartRecView.swift */; };
+		52501E1C2EB783980054DB54 /* StopRecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E1B2EB783980054DB54 /* StopRecView.swift */; };
+		52501E1E2EB7876B0054DB54 /* SaveSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072542E96D26E00E5DCC9 /* ContentView.swift */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
@@ -29,11 +33,23 @@
 		52501E0E2EAAA1B20054DB54 /* ImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageExtension.swift; sourceTree = "<group>"; };
 		52501E102EAAA3800054DB54 /* TextManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextManager.swift; sourceTree = "<group>"; };
 		52501E122EAAA4AE0054DB54 /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
+		52501E152EB24AC40054DB54 /* RecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderView.swift; sourceTree = "<group>"; };
+		52501E192EB783090054DB54 /* StartRecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartRecView.swift; sourceTree = "<group>"; };
+		52501E1B2EB783980054DB54 /* StopRecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopRecView.swift; sourceTree = "<group>"; };
+		52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSheetView.swift; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		636072542E96D26E00E5DCC9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRecorderApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		52501E242EBC02B20054DB54 /* local */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = local;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		636072422E96CF6D00E5DCC9 /* Frameworks */ = {
@@ -57,6 +73,17 @@
 			path = PlayerModule;
 			sourceTree = "<group>";
 		};
+		52501E142EB24A8B0054DB54 /* RecorderModule */ = {
+			isa = PBXGroup;
+			children = (
+				52501E152EB24AC40054DB54 /* RecorderView.swift */,
+				52501E192EB783090054DB54 /* StartRecView.swift */,
+				52501E1B2EB783980054DB54 /* StopRecView.swift */,
+				52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */,
+			);
+			path = RecorderModule;
+			sourceTree = "<group>";
+		};
 		6360723C2E96CF6D00E5DCC9 = {
 			isa = PBXGroup;
 			children = (
@@ -77,9 +104,11 @@
 			isa = PBXGroup;
 			children = (
 				6360725A2E96D2BE00E5DCC9 /* Application */,
+				52501E142EB24A8B0054DB54 /* RecorderModule */,
 				52501E0B2EAA9EAC0054DB54 /* PlayerModule */,
 				6360725B2E96D2E500E5DCC9 /* SupportFiles */,
 				636072542E96D26E00E5DCC9 /* ContentView.swift */,
+				52501E242EBC02B20054DB54 /* local */,
 			);
 			path = SmartRecorder;
 			sourceTree = "<group>";
@@ -118,6 +147,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				52501E242EBC02B20054DB54 /* local */,
 			);
 			name = SmartRecorder;
 			packageProductDependencies = (
@@ -177,15 +209,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */,
+				52501E162EB24AC40054DB54 /* RecorderView.swift in Sources */,
 				52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */,
 				636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */,
 				52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */,
 				52501E112EAAA3830054DB54 /* TextManager.swift in Sources */,
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
+				52501E1E2EB7876B0054DB54 /* SaveSheetView.swift in Sources */,
 				52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */,
 				52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */,
+				52501E1A2EB783090054DB54 /* StartRecView.swift in Sources */,
 				52501DFF2EA7E5ED0054DB54 /* PlayerScreenView.swift in Sources */,
 				52501E0D2EAA9F3F0054DB54 /* ColorExtension.swift in Sources */,
+				52501E1C2EB783980054DB54 /* StopRecView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

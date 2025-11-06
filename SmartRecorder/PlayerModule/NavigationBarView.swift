@@ -23,7 +23,7 @@ struct NavigationBarView: View {
                 
             } label: {
                 Label(Texts.NavigationBar.location, systemImage: "location.fill")
-                    .font(.system(size: 20, weight: .regular))
+                    .font(Font.title2())
             }
 
             Spacer()

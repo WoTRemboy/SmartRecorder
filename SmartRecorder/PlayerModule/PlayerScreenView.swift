@@ -8,14 +8,22 @@
 import SwiftUI
 
 struct PlayerScreenView: View {
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+    
     var body: some View {
-        VStack {
-            NavigationBarView()
-            Spacer()
-            AudioDescriptionView()
-            ProgressBarView()
+        ZStack {
+//      есть баг с жидким стеклом при переключении на темную            тему
+//            colorScheme == .dark ? nil :                                    Color.BackgroundColors.primary
+//                    .ignoresSafeArea(.all)
+            VStack {
+                NavigationBarView()
+                Spacer()
+                AudioDescriptionView()
+                ProgressBarView()
+            }
         }
-        .background(Color.BackgroundColors.primary)
+        .background(Color.BackgroundColors.primary
+            .ignoresSafeArea(.all))
     }
 }
 

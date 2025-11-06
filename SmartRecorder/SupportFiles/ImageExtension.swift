@@ -12,5 +12,6 @@ extension Image {
         static let chevronDown = Image(systemName: "chevron.down")
         static let location = Image(systemName: "location.fill")
         static let squareAndArrowUp =  Image(systemName: "square.and.arrow.up")
+        
     }
 }
