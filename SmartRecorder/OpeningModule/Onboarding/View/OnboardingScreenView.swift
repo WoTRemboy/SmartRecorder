@@ -16,6 +16,10 @@ struct OnboardingScreenView: View {
     /// Current page tracker for the pager.
     @StateObject private var page: Page = .first()
     
+    @State private var draw: Bool = false
+    
+    @Namespace private var namespace
+    
     internal var body: some View {
         if viewModel.skipOnboarding {
             PlayerScreenView()
@@ -24,7 +28,7 @@ struct OnboardingScreenView: View {
                 skipButton
                 content
                 progressCircles
-                actionButton
+                actionButtons
             }
             .onChange(of: page.index) { _, newValue in
                 withAnimation {
@@ -32,28 +36,18 @@ struct OnboardingScreenView: View {
                 }
             }
             .background(Color.BackgroundColors.primary)
+            .task {
+                viewModel.triggerDrawOnSymbol(0)
+            }
+            .onChange(of: page.index) { oldValue, newValue in
+                viewModel.triggerDrawOnSymbol(newValue)
+            }
         }
     }
     
-    @ViewBuilder
     private var skipButton: some View {
-        if viewModel.buttonType != .getLocationPermission {
-            Button {
-                withAnimation {
-                    page.update(.moveToLast)
-                }
-            } label: {
-                Text(Texts.OnboardingPage.skip)
-                    .foregroundStyle(Color.LabelColors.primary)
-            }
-            .buttonStyle(.glass)
-            .frame(height: 20)
-            
-            .padding(.horizontal)
-            .padding(.top)
-        } else {
-            Color.clear
-                .frame(height: 20)
+        OnboardingSkipButton(viewModel: viewModel) {
+            page.update(.moveToLast)
         }
     }
     
@@ -62,10 +56,7 @@ struct OnboardingScreenView: View {
               data: viewModel.pages,
               id: \.self) { index in
             VStack(spacing: 16) {
-                viewModel.steps[index].image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 250, height: 250)
+                animatedImage(for: index)
                 
                 Text(viewModel.steps[index].name)
                     .font(.largeTitle())
@@ -87,6 +78,21 @@ struct OnboardingScreenView: View {
               .horizontal()
     }
     
+    @ViewBuilder
+    private func animatedImage(for index: Int) -> some View {
+        if viewModel.steps[index].drawOn {
+            viewModel.steps[index].image
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(Color.SupportColors.blue)
+                .frame(width: 250, height: 250)
+                .transition(.symbolEffect(.drawOn.individually))
+        } else {
+            Color.clear
+                .frame(width: 250, height: 250)
+        }
+    }
+    
     private var progressCircles: some View {
         HStack {
             ForEach(viewModel.pages, id: \.self) { step in
@@ -106,33 +112,14 @@ struct OnboardingScreenView: View {
         .frame(maxWidth: .infinity)
     }
     
-    private var actionButton: some View {
-        Button {
-            switch viewModel.buttonType {
-            case .nextPage, .getMicrophonePermission:
-                withAnimation {
-                    page.update(.next)
-                }
-            case .getLocationPermission:
-                withAnimation {
-                    viewModel.transferToMainPage()
-                }
+    private var actionButtons: some View {
+        OnboardingActionButtonsView(
+            viewModel: viewModel,
+            namespace: namespace) {
+            withAnimation {
+                page.update(.next)
             }
-        } label: {
-            Text(viewModel.buttonType.title)
-                .contentTransition(.numericText())
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
-        .buttonStyle(.glassProminent)
-        
-        .foregroundStyle(Color.white)
-        .tint(Color.SupportColors.lightBlue)
-        
-        .frame(height: 50)
-        .frame(maxWidth: .infinity)
-        
-        .padding(.horizontal)
-        .padding(.vertical, 30)
     }
 }
 

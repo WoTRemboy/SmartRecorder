@@ -39,4 +39,18 @@ final class OnboardingViewModel: ObservableObject {
     internal func transferToMainPage() {
         skipOnboarding.toggle()
     }
+    
+    /// Draws the "drawOn" symbol effect asynchronously for the given page index.
+    internal func drawOnSymbol(_ index: Int) async {
+        try? await Task.sleep(for: .seconds(0.5))
+        steps[index].drawOn = true
+    }
+    
+    /// Starts a new asynchronous task to trigger the drawOnSymbol function.
+    /// This allows async invocation from synchronous contexts such as onChange handlers.
+    internal func triggerDrawOnSymbol(_ index: Int) {
+        Task {
+            await drawOnSymbol(index)
+        }
+    }
 }

@@ -21,6 +21,8 @@
 		63009A7C2EBFA6EE00FD5220 /* OnboardingScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */; };
 		63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */; };
 		63009A822EBFDE3600FD5220 /* AppIconComposer.icon in Resources */ = {isa = PBXBuildFile; fileRef = 63009A812EBFDE3600FD5220 /* AppIconComposer.icon */; };
+		63009A852EBFEDA100FD5220 /* OnboardingActionButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A842EBFEDA100FD5220 /* OnboardingActionButtonsView.swift */; };
+		63009A872EBFF02600FD5220 /* OnboardingSkipButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A862EBFF02600FD5220 /* OnboardingSkipButton.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
 /* End PBXBuildFile section */
@@ -39,6 +41,8 @@
 		63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreenView.swift; sourceTree = "<group>"; };
 		63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		63009A812EBFDE3600FD5220 /* AppIconComposer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIconComposer.icon; sourceTree = "<group>"; };
+		63009A842EBFEDA100FD5220 /* OnboardingActionButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingActionButtonsView.swift; sourceTree = "<group>"; };
+		63009A862EBFF02600FD5220 /* OnboardingSkipButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSkipButton.swift; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRecorderApp.swift; sourceTree = "<group>"; };
@@ -98,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */,
+				63009A832EBFED8400FD5220 /* Subviews */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -117,6 +122,15 @@
 				636072532E96D26E00E5DCC9 /* Assets.xcassets */,
 			);
 			path = Assets;
+			sourceTree = "<group>";
+		};
+		63009A832EBFED8400FD5220 /* Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				63009A842EBFEDA100FD5220 /* OnboardingActionButtonsView.swift */,
+				63009A862EBFF02600FD5220 /* OnboardingSkipButton.swift */,
+			);
+			path = Subviews;
 			sourceTree = "<group>";
 		};
 		6360723C2E96CF6D00E5DCC9 = {
@@ -243,9 +257,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63009A872EBFF02600FD5220 /* OnboardingSkipButton.swift in Sources */,
 				63009A7C2EBFA6EE00FD5220 /* OnboardingScreenView.swift in Sources */,
 				52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */,
 				52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */,
+				63009A852EBFEDA100FD5220 /* OnboardingActionButtonsView.swift in Sources */,
 				63009A762EBFA41C00FD5220 /* OnboardingScreenModel.swift in Sources */,
 				63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */,
 				52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */,

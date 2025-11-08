@@ -20,18 +20,34 @@ final class Texts {
         static let skip = "Пропустить"
         static let next = "Далее"
         static let permission = "Разрешить"
+        static let skipPermission = "Позже"
         
-        static let firstTitle = "Умный микрофон"
-        static let firstDescription = "Ваш диктофон может гораздо больше, чем просто записывать."
-        static let secondTitle = "Сводка записи"
-        static let secondDescription = "ИИ проведет расшифровку записей и создаст сводку."
-        static let thirdTitle = "Микрофон"
-        static let thirdDescription = "Разрешите доступ к микрофону, чтобы записывать встречи."
-        static let fourthTitle = "Местоположение"
-        static let fourthDescription = "Позволит сохранять информацию о месте записи заметки."
+        enum FirstPage {
+            static let title = "Умный микрофон"
+            static let description = "Ваш диктофон может гораздо больше, чем просто записывать."
+        }
+        enum SecondPage {
+            static let title = "Сводка записи"
+            static let description = "ИИ проведет расшифровку записей и создаст сводку."
+        }
+        enum ThirdPage {
+            static let title = "Микрофон"
+            static let description = "Разрешите доступ к микрофону, чтобы записывать встречи."
+        }
+        enum FourthPage {
+            static let title = "Местоположение"
+            static let description = "Позволит сохранять информацию о месте записи заметки."
+        }
     }
     
     enum UserDefaults {
-        static let skipOnboarding = "SkipOnboardingView"
+        static let skipOnboarding = "SkipOnboardingStage"
+    }
+    
+    enum GlassEffectId {
+        enum Onboarding {
+            static let permission = "OnboardingPermissionGlassEffect"
+            static let skipPermission = "OnboardingSkipPermissionGlassEffect"
+        }
     }
 }

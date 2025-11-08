@@ -11,24 +11,25 @@ struct OnboardingStep {
     let name: String
     let description: String
     let image: Image
+    var drawOn: Bool = false
 }
 
 extension OnboardingStep {
     static func stepsSetup() -> [OnboardingStep] {
-        let first = OnboardingStep(name: Texts.OnboardingPage.firstTitle,
-                                   description: Texts.OnboardingPage.firstDescription,
+        let first = OnboardingStep(name: Texts.OnboardingPage.FirstPage.title,
+                                   description: Texts.OnboardingPage.FirstPage.description,
                                    image: .OnboardingPage.first)
         
-        let second = OnboardingStep(name: Texts.OnboardingPage.secondTitle,
-                                    description: Texts.OnboardingPage.secondDescription,
+        let second = OnboardingStep(name: Texts.OnboardingPage.SecondPage.title,
+                                    description: Texts.OnboardingPage.SecondPage.description,
                                     image: .OnboardingPage.second)
         
-        let third = OnboardingStep(name: Texts.OnboardingPage.thirdTitle,
-                                   description: Texts.OnboardingPage.thirdDescription,
+        let third = OnboardingStep(name: Texts.OnboardingPage.ThirdPage.title,
+                                   description: Texts.OnboardingPage.ThirdPage.description,
                                    image: .OnboardingPage.third)
         
-        let fourth = OnboardingStep(name: Texts.OnboardingPage.fourthTitle,
-                                    description: Texts.OnboardingPage.fourthDescription,
+        let fourth = OnboardingStep(name: Texts.OnboardingPage.FourthPage.title,
+                                    description: Texts.OnboardingPage.FourthPage.description,
                                     image: .OnboardingPage.fourth)
         
         return [first, second, third, fourth]
