@@ -11,6 +11,7 @@ extension Color {
     enum LabelColors {
         static let primary = Color("LabelPrimary")
         static let secondary = Color("LabelSecondary")
+        static let disable = Color("LabelDisable")
         static let blue = Color("LabelBlue")
         static let purple = Color("LabelPurple")
     }

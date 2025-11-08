@@ -16,6 +16,10 @@
 		52501E112EAAA3830054DB54 /* TextManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E102EAAA3800054DB54 /* TextManager.swift */; };
 		52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E122EAAA4AE0054DB54 /* FontExtension.swift */; };
 		63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A712EBF9DB500FD5220 /* SplashScreenView.swift */; };
+		63009A762EBFA41C00FD5220 /* OnboardingScreenModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A752EBFA41700FD5220 /* OnboardingScreenModel.swift */; };
+		63009A7A2EBFA6DB00FD5220 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 63009A792EBFA6DB00FD5220 /* SwiftUIPager */; };
+		63009A7C2EBFA6EE00FD5220 /* OnboardingScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */; };
+		63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072542E96D26E00E5DCC9 /* ContentView.swift */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
@@ -31,6 +35,9 @@
 		52501E102EAAA3800054DB54 /* TextManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextManager.swift; sourceTree = "<group>"; };
 		52501E122EAAA4AE0054DB54 /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
 		63009A712EBF9DB500FD5220 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
+		63009A752EBFA41700FD5220 /* OnboardingScreenModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreenModel.swift; sourceTree = "<group>"; };
+		63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreenView.swift; sourceTree = "<group>"; };
+		63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		636072542E96D26E00E5DCC9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -42,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63009A7A2EBFA6DB00FD5220 /* SwiftUIPager in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,8 +71,43 @@
 			isa = PBXGroup;
 			children = (
 				63009A712EBF9DB500FD5220 /* SplashScreenView.swift */,
+				63009A732EBFA3F400FD5220 /* Onboarding */,
 			);
 			path = OpeningModule;
+			sourceTree = "<group>";
+		};
+		63009A732EBFA3F400FD5220 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				63009A742EBFA40F00FD5220 /* Model */,
+				63009A772EBFA4D800FD5220 /* View */,
+				63009A7D2EBFA73D00FD5220 /* ViewModel */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		63009A742EBFA40F00FD5220 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				63009A752EBFA41700FD5220 /* OnboardingScreenModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		63009A772EBFA4D800FD5220 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		63009A7D2EBFA73D00FD5220 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		6360723C2E96CF6D00E5DCC9 = {
@@ -132,6 +175,7 @@
 			);
 			name = SmartRecorder;
 			packageProductDependencies = (
+				63009A792EBFA6DB00FD5220 /* SwiftUIPager */,
 			);
 			productName = SmartRecorder;
 			productReference = 636072452E96CF6D00E5DCC9 /* SmartRecorder.app */;
@@ -161,6 +205,9 @@
 			);
 			mainGroup = 6360723C2E96CF6D00E5DCC9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				63009A782EBFA6DB00FD5220 /* XCRemoteSwiftPackageReference "SwiftUIPager" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 636072462E96CF6D00E5DCC9 /* Products */;
 			projectDirPath = "";
@@ -187,9 +234,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63009A7C2EBFA6EE00FD5220 /* OnboardingScreenView.swift in Sources */,
 				52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */,
 				52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */,
+				63009A762EBFA41C00FD5220 /* OnboardingScreenModel.swift in Sources */,
 				636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */,
+				63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */,
 				52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */,
 				63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */,
 				52501E112EAAA3830054DB54 /* TextManager.swift in Sources */,
@@ -436,6 +486,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		63009A782EBFA6DB00FD5220 /* XCRemoteSwiftPackageReference "SwiftUIPager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/fermoya/SwiftUIPager.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		63009A792EBFA6DB00FD5220 /* SwiftUIPager */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 63009A782EBFA6DB00FD5220 /* XCRemoteSwiftPackageReference "SwiftUIPager" */;
+			productName = SwiftUIPager;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6360723D2E96CF6D00E5DCC9 /* Project object */;
 }

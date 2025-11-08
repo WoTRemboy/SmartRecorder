@@ -9,7 +9,15 @@ import SwiftUI
 
 extension Image {
     enum Onboarding {
-        static let logo = Image(systemName: "chevron.down")
+        static let logo = Image("SplashScreenLogo")
+    }
+    
+    enum OnboardingPage {
+        static let first = Image(systemName: "wave.3.right")
+        static let second = Image(systemName: "list.bullet")
+        static let third = Image(systemName: "microphone.circle")
+        static let fourth = Image(systemName: "location.circle")
+        static let fifth = Image(systemName: "checkmark")
     }
     
     enum NavigationBar {
