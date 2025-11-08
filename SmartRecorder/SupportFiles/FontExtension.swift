@@ -7,6 +7,10 @@
 import SwiftUI
 
 extension Font {
+    static func largeTitle() -> Font? {
+        Font.system(size: 35, weight: .bold)
+    }
+    
     static func body() -> Font? {
         Font.system(size: 14)
     }
