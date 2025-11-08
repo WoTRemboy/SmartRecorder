@@ -8,6 +8,10 @@
 import SwiftUI
 
 extension Image {
+    enum Onboarding {
+        static let logo = Image(systemName: "chevron.down")
+    }
+    
     enum NavigationBar {
         static let chevronDown = Image(systemName: "chevron.down")
         static let location = Image(systemName: "location.fill")
