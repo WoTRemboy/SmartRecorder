@@ -20,8 +20,8 @@
 		63009A7A2EBFA6DB00FD5220 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 63009A792EBFA6DB00FD5220 /* SwiftUIPager */; };
 		63009A7C2EBFA6EE00FD5220 /* OnboardingScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */; };
 		63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */; };
+		63009A822EBFDE3600FD5220 /* AppIconComposer.icon in Resources */ = {isa = PBXBuildFile; fileRef = 63009A812EBFDE3600FD5220 /* AppIconComposer.icon */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
-		636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072542E96D26E00E5DCC9 /* ContentView.swift */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
 /* End PBXBuildFile section */
 
@@ -38,9 +38,9 @@
 		63009A752EBFA41700FD5220 /* OnboardingScreenModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreenModel.swift; sourceTree = "<group>"; };
 		63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreenView.swift; sourceTree = "<group>"; };
 		63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
+		63009A812EBFDE3600FD5220 /* AppIconComposer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIconComposer.icon; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		636072542E96D26E00E5DCC9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRecorderApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -110,6 +110,15 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		63009A802EBFDDFF00FD5220 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				63009A812EBFDE3600FD5220 /* AppIconComposer.icon */,
+				636072532E96D26E00E5DCC9 /* Assets.xcassets */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
 		6360723C2E96CF6D00E5DCC9 = {
 			isa = PBXGroup;
 			children = (
@@ -133,7 +142,7 @@
 				63009A702EBF9DA600FD5220 /* OpeningModule */,
 				52501E0B2EAA9EAC0054DB54 /* PlayerModule */,
 				6360725B2E96D2E500E5DCC9 /* SupportFiles */,
-				636072542E96D26E00E5DCC9 /* ContentView.swift */,
+				63009A802EBFDDFF00FD5220 /* Assets */,
 			);
 			path = SmartRecorder;
 			sourceTree = "<group>";
@@ -153,7 +162,6 @@
 				52501E122EAAA4AE0054DB54 /* FontExtension.swift */,
 				52501E0E2EAAA1B20054DB54 /* ImageExtension.swift */,
 				52501E0C2EAA9F350054DB54 /* ColorExtension.swift */,
-				636072532E96D26E00E5DCC9 /* Assets.xcassets */,
 			);
 			path = SupportFiles;
 			sourceTree = "<group>";
@@ -224,6 +232,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */,
+				63009A822EBFDE3600FD5220 /* AppIconComposer.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,7 +247,6 @@
 				52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */,
 				52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */,
 				63009A762EBFA41C00FD5220 /* OnboardingScreenModel.swift in Sources */,
-				636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */,
 				63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */,
 				52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */,
 				63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */,
@@ -373,7 +381,7 @@
 		636072512E96CF6F00E5DCC9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconComposer;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -420,7 +428,7 @@
 		636072522E96CF6F00E5DCC9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconComposer;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

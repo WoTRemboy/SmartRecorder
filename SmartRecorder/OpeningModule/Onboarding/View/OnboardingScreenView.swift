@@ -18,7 +18,7 @@ struct OnboardingScreenView: View {
     
     internal var body: some View {
         if viewModel.skipOnboarding {
-            ContentView()
+            PlayerScreenView()
         } else {
             VStack(alignment: .trailing) {
                 skipButton
@@ -31,6 +31,7 @@ struct OnboardingScreenView: View {
                     viewModel.setupCurrentStep(newValue: newValue)
                 }
             }
+            .background(Color.BackgroundColors.primary)
         }
     }
     
@@ -43,7 +44,7 @@ struct OnboardingScreenView: View {
                 }
             } label: {
                 Text(Texts.OnboardingPage.skip)
-                    .foregroundStyle(Color.LabelColors.secondary)
+                    .foregroundStyle(Color.LabelColors.primary)
             }
             .buttonStyle(.glass)
             .frame(height: 20)
@@ -74,6 +75,7 @@ struct OnboardingScreenView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
             }
+            .foregroundStyle(Color.LabelColors.primary)
             .tag(index)
         }
               .interactive(scale: 0.8)

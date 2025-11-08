@@ -41,7 +41,7 @@ struct SplashScreenView: View {
     // MARK: - Main vontent
     
     private var content: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: 16) {
             Image.Onboarding.logo
                 .resizable()
                 .frame(width: 300, height: 300)
