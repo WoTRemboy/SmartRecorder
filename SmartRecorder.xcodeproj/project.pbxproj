@@ -20,7 +20,6 @@
 		63009A7A2EBFA6DB00FD5220 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 63009A792EBFA6DB00FD5220 /* SwiftUIPager */; };
 		63009A7C2EBFA6EE00FD5220 /* OnboardingScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */; };
 		63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */; };
-		63009A822EBFDE3600FD5220 /* AppIconComposer.icon in Resources */ = {isa = PBXBuildFile; fileRef = 63009A812EBFDE3600FD5220 /* AppIconComposer.icon */; };
 		63009A852EBFEDA100FD5220 /* OnboardingActionButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A842EBFEDA100FD5220 /* OnboardingActionButtonsView.swift */; };
 		63009A872EBFF02600FD5220 /* OnboardingSkipButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A862EBFF02600FD5220 /* OnboardingSkipButton.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
@@ -31,6 +30,7 @@
 		63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DD72EC0BFC700104B95 /* ProfileView.swift */; };
 		63FD4DDA2EC0C34000104B95 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DD92EC0C33E00104B95 /* RootView.swift */; };
 		63FD4DDC2EC0C3ED00104B95 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DDB2EC0C3EA00104B95 /* ContentView.swift */; };
+		63FD4DE02EC0D43B00104B95 /* AppIconComposer.icon in Resources */ = {isa = PBXBuildFile; fileRef = 63FD4DDF2EC0D43B00104B95 /* AppIconComposer.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +46,6 @@
 		63009A752EBFA41700FD5220 /* OnboardingScreenModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreenModel.swift; sourceTree = "<group>"; };
 		63009A7B2EBFA6E900FD5220 /* OnboardingScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreenView.swift; sourceTree = "<group>"; };
 		63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
-		63009A812EBFDE3600FD5220 /* AppIconComposer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIconComposer.icon; sourceTree = "<group>"; };
 		63009A842EBFEDA100FD5220 /* OnboardingActionButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingActionButtonsView.swift; sourceTree = "<group>"; };
 		63009A862EBFF02600FD5220 /* OnboardingSkipButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSkipButton.swift; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -58,6 +57,7 @@
 		63FD4DD72EC0BFC700104B95 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		63FD4DD92EC0C33E00104B95 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		63FD4DDB2EC0C3EA00104B95 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		63FD4DDF2EC0D43B00104B95 /* AppIconComposer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIconComposer.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,7 +130,7 @@
 		63009A802EBFDDFF00FD5220 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				63009A812EBFDE3600FD5220 /* AppIconComposer.icon */,
+				63FD4DDF2EC0D43B00104B95 /* AppIconComposer.icon */,
 				636072532E96D26E00E5DCC9 /* Assets.xcassets */,
 			);
 			path = Assets;
@@ -272,7 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */,
-				63009A822EBFDE3600FD5220 /* AppIconComposer.icon in Resources */,
+				63FD4DE02EC0D43B00104B95 /* AppIconComposer.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
