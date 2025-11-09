@@ -12,6 +12,12 @@ final class Texts {
         static let title = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Transono"
     }
     
+    enum Tabbar {
+        static let notes = "Записи"
+        static let recorder = "Диктофон"
+        static let profile = "Профиль"
+    }
+    
     enum NavigationBar {
         static let location = "Местоположение"
     }
