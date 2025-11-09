@@ -25,6 +25,12 @@
 		63009A872EBFF02600FD5220 /* OnboardingSkipButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A862EBFF02600FD5220 /* OnboardingSkipButton.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
+		63FD4DCD2EC0BEFC00104B95 /* TabRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DCC2EC0BEF900104B95 /* TabRouter.swift */; };
+		63FD4DCF2EC0BF7D00104B95 /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */; };
+		63FD4DD62EC0BFB800104B95 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DD52EC0BFB800104B95 /* NotesView.swift */; };
+		63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DD72EC0BFC700104B95 /* ProfileView.swift */; };
+		63FD4DDA2EC0C34000104B95 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DD92EC0C33E00104B95 /* RootView.swift */; };
+		63FD4DDC2EC0C3ED00104B95 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DDB2EC0C3EA00104B95 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +52,12 @@
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRecorderApp.swift; sourceTree = "<group>"; };
+		63FD4DCC2EC0BEF900104B95 /* TabRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabRouter.swift; sourceTree = "<group>"; };
+		63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabItems.swift; sourceTree = "<group>"; };
+		63FD4DD52EC0BFB800104B95 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
+		63FD4DD72EC0BFC700104B95 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		63FD4DD92EC0C33E00104B95 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		63FD4DDB2EC0C3EA00104B95 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,10 +165,13 @@
 			isa = PBXGroup;
 			children = (
 				6360725A2E96D2BE00E5DCC9 /* Application */,
+				63FD4DCB2EC0BEE300104B95 /* Router */,
 				63009A702EBF9DA600FD5220 /* OpeningModule */,
 				52501E0B2EAA9EAC0054DB54 /* PlayerModule */,
 				6360725B2E96D2E500E5DCC9 /* SupportFiles */,
 				63009A802EBFDDFF00FD5220 /* Assets */,
+				63FD4DD52EC0BFB800104B95 /* NotesView.swift */,
+				63FD4DD72EC0BFC700104B95 /* ProfileView.swift */,
 			);
 			path = SmartRecorder;
 			sourceTree = "<group>";
@@ -178,6 +193,17 @@
 				52501E0C2EAA9F350054DB54 /* ColorExtension.swift */,
 			);
 			path = SupportFiles;
+			sourceTree = "<group>";
+		};
+		63FD4DCB2EC0BEE300104B95 /* Router */ = {
+			isa = PBXGroup;
+			children = (
+				63FD4DCC2EC0BEF900104B95 /* TabRouter.swift */,
+				63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */,
+				63FD4DD92EC0C33E00104B95 /* RootView.swift */,
+				63FD4DDB2EC0C3EA00104B95 /* ContentView.swift */,
+			);
+			path = Router;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -258,11 +284,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				63009A872EBFF02600FD5220 /* OnboardingSkipButton.swift in Sources */,
+				63FD4DCF2EC0BF7D00104B95 /* TabItems.swift in Sources */,
+				63FD4DDC2EC0C3ED00104B95 /* ContentView.swift in Sources */,
 				63009A7C2EBFA6EE00FD5220 /* OnboardingScreenView.swift in Sources */,
+				63FD4DCD2EC0BEFC00104B95 /* TabRouter.swift in Sources */,
+				63FD4DDA2EC0C34000104B95 /* RootView.swift in Sources */,
 				52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */,
 				52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */,
 				63009A852EBFEDA100FD5220 /* OnboardingActionButtonsView.swift in Sources */,
 				63009A762EBFA41C00FD5220 /* OnboardingScreenModel.swift in Sources */,
+				63FD4DD62EC0BFB800104B95 /* NotesView.swift in Sources */,
 				63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */,
 				52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */,
 				63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */,
@@ -270,6 +301,7 @@
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
 				52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */,
 				52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */,
+				63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */,
 				52501DFF2EA7E5ED0054DB54 /* PlayerScreenView.swift in Sources */,
 				52501E0D2EAA9F3F0054DB54 /* ColorExtension.swift in Sources */,
 			);
