@@ -12,6 +12,24 @@ extension Image {
         static let logo = Image("SplashScreenLogo")
     }
     
+    enum Tabbar {
+        enum Notes {
+            static let unselected = Image("NotesTabUnselected")
+            static let selected = Image("NotesTabSelected")
+            static let system = Image(systemName: "list.bullet.rectangle")
+        }
+        enum Recorder {
+            static let unselected = Image("RecorderTabUnselected")
+            static let selected = Image("RecorderTabSelected")
+            static let system = Image(systemName: "play.circle")
+        }
+        enum Profile {
+            static let unselected = Image("ProfileTabUnselected")
+            static let selected = Image("ProfileTabSelected")
+            static let system = Image(systemName: "person")
+        }
+    }
+    
     enum OnboardingPage {
         static let first = Image(systemName: "wave.3.right")
         static let second = Image(systemName: "list.bullet")
