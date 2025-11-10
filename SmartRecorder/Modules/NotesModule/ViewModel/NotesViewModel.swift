@@ -9,14 +9,14 @@ import Foundation
 import SwiftUI
 import Combine
 
-final class AudioViewModel: ObservableObject {
+final class NotesViewModel: ObservableObject {
     @Published var selectedCategory: String = "Все"
     @Published var searchItem: String = ""
     
-    @Published var audios: [Audio] = allAudios
+    @Published var audios: [Note] = allAudios
     
-    var filteredAndSearchedAudios: [Audio] {
-        let categoryFiltered: [Audio]
+    var filteredAndSearchedAudios: [Note] {
+        let categoryFiltered: [Note]
         if selectedCategory == "Все" {
             categoryFiltered = audios
         } else {

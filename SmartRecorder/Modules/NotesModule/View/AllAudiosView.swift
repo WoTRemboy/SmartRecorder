@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct AllAudiosView: View {
+struct NotesListView: View {
     
     @StateObject private var viewModel = AudioViewModel()
     
@@ -41,5 +41,5 @@ struct AllAudiosView: View {
 }
 
 #Preview {
-    AllAudiosView()
+    NotesListView()
 }

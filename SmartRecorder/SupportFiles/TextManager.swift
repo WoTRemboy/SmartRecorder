@@ -46,6 +46,11 @@ final class Texts {
         }
     }
     
+    enum NotesPage {
+        static let title = "Мои записи"
+        static let search = "Поиск"
+    }
+    
     enum UserDefaults {
         static let skipOnboarding = "SkipOnboardingStage"
     }

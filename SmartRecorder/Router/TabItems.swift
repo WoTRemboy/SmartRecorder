@@ -14,7 +14,7 @@ struct TabItems {
     /// - Parameter isSelected: A boolean indicating whether the tab is currently selected.
     /// - Returns: A `NotesView` wrapped in a tab item.
     static func notesTab(isSelected: Bool) -> some View {
-        NotesView()
+        NotesListView()
             .tabItem {
                 Image.Tabbar.Notes.system
                     .environment(\.symbolVariants, .none)

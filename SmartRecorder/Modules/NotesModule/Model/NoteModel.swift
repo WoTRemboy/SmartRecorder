@@ -1,5 +1,5 @@
 //
-//  AudioNote.swift
+//  NoteModel.swift
 //  SmartDictophone
 //
 //  Created by Георгий Асеев on 30.10.2025.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class Audio: Identifiable, ObservableObject {
+class Note: Identifiable, ObservableObject, Equatable {
     let id = UUID()
     
     @Published var headline: String
@@ -28,4 +28,8 @@ class Audio: Identifiable, ObservableObject {
             self.category = category
             self.location = location
         }
+    
+    static func == (lhs: Note, rhs: Note) -> Bool {
+        return lhs.id == rhs.id
+    }
 }

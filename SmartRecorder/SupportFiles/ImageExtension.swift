@@ -43,4 +43,9 @@ extension Image {
         static let location = Image(systemName: "location.fill")
         static let squareAndArrowUp =  Image(systemName: "square.and.arrow.up")
     }
+    
+    enum NotesPage {
+        static let share = Image(systemName: "square.and.arrow.up")
+        static let play = Image(systemName: "play.circle.fill")
+    }
 }
