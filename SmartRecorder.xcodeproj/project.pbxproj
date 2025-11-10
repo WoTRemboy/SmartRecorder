@@ -60,6 +60,14 @@
 		63FD4DDF2EC0D43B00104B95 /* AppIconComposer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIconComposer.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		89D1E2662EC1E44D00B1B81A /* AudiosListModule */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AudiosListModule;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		636072422E96CF6D00E5DCC9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -164,6 +172,7 @@
 		636072562E96D26E00E5DCC9 /* SmartRecorder */ = {
 			isa = PBXGroup;
 			children = (
+				89D1E2662EC1E44D00B1B81A /* AudiosListModule */,
 				6360725A2E96D2BE00E5DCC9 /* Application */,
 				63FD4DCB2EC0BEE300104B95 /* Router */,
 				63009A702EBF9DA600FD5220 /* OpeningModule */,
@@ -220,6 +229,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				89D1E2662EC1E44D00B1B81A /* AudiosListModule */,
 			);
 			name = SmartRecorder;
 			packageProductDependencies = (
