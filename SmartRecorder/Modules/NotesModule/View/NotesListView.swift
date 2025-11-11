@@ -14,18 +14,20 @@ struct NotesListView: View {
     @StateObject private var viewModel = NotesViewModel()
     
     internal var body: some View {
-        VStack {
-            PickerView(selectedCategory: $viewModel.selectedCategory)
-                .padding(.bottom, 20)
-            
-            ScrollView(.vertical, showsIndicators: false) {
-                ForEach(viewModel.filteredAndSearchedAudios) { note in
-                    noteCardView(note: note)
-                }
+        ScrollView(.vertical, showsIndicators: false) {
+            ForEach(viewModel.filteredAndSearchedAudios) { note in
+                noteCardView(note: note)
+                    .padding(.horizontal)
             }
         }
-        .padding(.horizontal)
         .navigationTitle(Texts.NotesPage.title)
+        .toolbarRole(.navigationStack)
+        .toolbar {
+            ToolbarItem(placement: .largeSubtitle) {
+                PickerView(selectedCategory: $viewModel.selectedCategory)
+                    .padding(.top)
+            }
+        }
         .searchable(text: $viewModel.searchItem,
                     placement: .toolbarPrincipal,
                     prompt: Texts.NotesPage.search)
