@@ -16,6 +16,7 @@ final class Texts {
         static let notes = "Записи"
         static let recorder = "Диктофон"
         static let profile = "Профиль"
+        static let search = "Поиск"
     }
     
     enum NavigationBar {

@@ -28,6 +28,9 @@ extension Image {
             static let selected = Image("ProfileTabSelected")
             static let system = Image(systemName: "person")
         }
+        enum Search {
+            static let system = Image(systemName: "magnifyingglass")
+        }
     }
     
     enum OnboardingPage {

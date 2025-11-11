@@ -12,7 +12,7 @@ import SwiftUI
 final class AppRouter: ObservableObject {
     
     /// The currently selected tab. Defaults to `.notes`.
-    @Published internal var selectedTab: Tab = .notes
+    @Published internal var selectedTab: Tab = .recorder
     @Published internal var navigationPaths: [Tab: [Route]] = Tab.allCases.reduce(into: [:]) { $0[$1] = [] }
     
     /// The available tabs in the app.
@@ -34,6 +34,14 @@ final class AppRouter: ObservableObject {
             case .notes: return Image.Tabbar.Notes.system
             case .recorder: return Image.Tabbar.Recorder.system
             case .profile: return Image.Tabbar.Profile.system
+            }
+        }
+        
+        internal var imageName: String {
+            switch self {
+            case .notes: return "list.bullet.rectangle"
+            case .recorder: return "play.circle"
+            case .profile: return "person"
             }
         }
     }

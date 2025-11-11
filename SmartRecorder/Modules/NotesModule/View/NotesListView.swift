@@ -14,12 +14,16 @@ struct NotesListView: View {
     @StateObject private var viewModel = NotesViewModel()
     
     internal var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            ForEach(viewModel.filteredAndSearchedAudios) { note in
-                noteCardView(note: note)
-                    .padding(.horizontal)
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(viewModel.filteredAndSearchedAudios) { note in
+                    noteCardView(note: note)
+                }
             }
+            .padding(.top)
+            .animation(.bouncy(duration: 0.3), value: viewModel.filteredAndSearchedAudios)
         }
+        .background(Color.BackgroundColors.primary)
         .navigationTitle(Texts.NotesPage.title)
         .toolbarRole(.navigationStack)
         .toolbar {
@@ -31,14 +35,16 @@ struct NotesListView: View {
         .searchable(text: $viewModel.searchItem,
                     placement: .toolbarPrincipal,
                     prompt: Texts.NotesPage.search)
-        .background(Color.BackgroundColors.primary)
     }
     
     private func noteCardView(note: Note) -> some View {
-        NoteCardView(audio: note)
-            .onTapGesture {
-                appRouter.push(.notesList, in: .notes)
-            }
+        NavigationLink(destination: {
+            SingleAudioDescriptionView(audio: note)
+        }, label: {
+            NoteCardView(audio: note)
+        })
+        .padding(.horizontal)
+        .transition(.blurReplace)
     }
 }
 

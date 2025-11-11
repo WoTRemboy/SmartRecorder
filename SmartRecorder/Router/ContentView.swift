@@ -28,49 +28,26 @@ struct ContentView: View {
     /// The main body rendering a tab view with custom view models and tab routing.
     internal var body: some View {
         TabView(selection: $appRouter.selectedTab) {
-            NavigationStack(path: bindingForTab(.notes)) {
-                NotesListView()
-                    .environmentObject(appRouter)
-                    .navigationDestination(for: AppRouter.Route.self) { route in
-                        route.destinationView(in: .notes, appRouter: appRouter)
-                    }
+            Tab(AppRouter.Tab.recorder.title,
+                systemImage: AppRouter.Tab.recorder.imageName,
+                value: .recorder) {
+                TabItems.recorderTab(isSelected: appRouter.selectedTab == .recorder)
             }
-            .tabItem {
-                AppRouter.Tab.notes.image
-                    .environment(\.symbolVariants, .none)
-                Text(AppRouter.Tab.notes.title)
-            }
-            .tag(AppRouter.Tab.notes)
             
-            NavigationStack(path: bindingForTab(.recorder)) {
-                PlayerScreenView()
-                    .environmentObject(appRouter)
-                    .navigationDestination(for: AppRouter.Route.self) { route in
-                        route.destinationView(in: .recorder, appRouter: appRouter)
-                    }
+            Tab(AppRouter.Tab.profile.title,
+                systemImage: AppRouter.Tab.profile.imageName,
+                value: .profile) {
+                TabItems.profileTab(isSelected: appRouter.selectedTab == .profile)
             }
-            .tabItem {
-                AppRouter.Tab.recorder.image
-                    .environment(\.symbolVariants, .none)
-                Text(AppRouter.Tab.recorder.title)
-            }
-            .tag(AppRouter.Tab.recorder)
             
-            NavigationStack(path: bindingForTab(.profile)) {
-                ProfileView()
-                    .environmentObject(appRouter)
-                    .navigationDestination(for: AppRouter.Route.self) { route in
-                        route.destinationView(in: .profile, appRouter: appRouter)
-                    }
+            Tab(AppRouter.Tab.notes.title,
+                systemImage: AppRouter.Tab.notes.imageName,
+                value: .notes, role: .search) {
+                TabItems.notesTab(isSelected: appRouter.selectedTab == .profile)
             }
-            .tabItem {
-                AppRouter.Tab.profile.image
-                    .environment(\.symbolVariants, .none)
-                Text(AppRouter.Tab.profile.title)
-            }
-            .tag(AppRouter.Tab.profile)
         }
         .accentColor(Color.SupportColors.blue)
+        .environmentObject(appRouter)
     }
         
 }
