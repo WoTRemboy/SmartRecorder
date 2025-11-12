@@ -10,15 +10,17 @@ import SwiftUI
 struct OnboardingSkipButton: View {
     
     private var viewModel: OnboardingViewModel
+    private let show: Bool
     private let action: () -> Void
     
-    init(viewModel: OnboardingViewModel, action: @escaping () -> Void) {
+    init(viewModel: OnboardingViewModel, show: Bool, action: @escaping () -> Void) {
         self.viewModel = viewModel
+        self.show = show
         self.action = action
     }
     
     internal var body: some View {
-        if viewModel.buttonType != .getLocationPermission {
+        if show {
             skipButton
         } else {
             Color.clear
@@ -46,5 +48,5 @@ struct OnboardingSkipButton: View {
 
 #Preview {
     let viewModel = OnboardingViewModel()
-    OnboardingSkipButton(viewModel: viewModel) {}
+    OnboardingSkipButton(viewModel: viewModel, show: true) {}
 }

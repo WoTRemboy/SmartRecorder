@@ -47,7 +47,7 @@ struct OnboardingScreenView: View {
     }
     
     private var skipButton: some View {
-        OnboardingSkipButton(viewModel: viewModel) {
+        OnboardingSkipButton(viewModel: viewModel, show: !viewModel.isLastPage) {
             page.update(.moveToLast)
         }
     }
@@ -94,6 +94,16 @@ struct OnboardingScreenView: View {
         }
     }
     
+    private func image(for index: Int) -> Image {
+        if viewModel.steps[index].grantedAccess {
+            Image.OnboardingPage.fifth
+                .resizable()
+        } else {
+            viewModel.steps[index].image
+                .resizable()
+        }
+    }
+    
     private var progressCircles: some View {
         HStack {
             ForEach(viewModel.pages, id: \.self) { step in
@@ -117,10 +127,10 @@ struct OnboardingScreenView: View {
         OnboardingActionButtonsView(
             viewModel: viewModel,
             namespace: namespace) {
-            withAnimation {
-                page.update(.next)
+                withAnimation {
+                    page.update(.next)
+                }
             }
-        }
     }
 }
 

@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct OnboardingStep {
     let name: String
     let description: String
     let image: Image
     var drawOn: Bool = false
+    var grantedAccess: Bool = false
 }
 
 extension OnboardingStep {
@@ -30,24 +32,51 @@ extension OnboardingStep {
         
         let fourth = OnboardingStep(name: Texts.OnboardingPage.FourthPage.title,
                                     description: Texts.OnboardingPage.FourthPage.description,
-                                    image: .OnboardingPage.fourth)
+                                    image: .OnboardingPage.fourth,
+                                    grantedAccess: LocationService.shared.grantedAccess)
         
         return [first, second, third, fourth]
     }
 }
 
 
-enum OnboardingButtonType {
+enum OnboardingButtonType: Equatable {
     case nextPage
     case getMicrophonePermission
-    case getLocationPermission
+    case getLocationPermission(access: CLAuthorizationStatus)
     
     internal var title: String {
         switch self {
         case .nextPage:
-            Texts.OnboardingPage.next
-        case .getMicrophonePermission, .getLocationPermission:
-            Texts.OnboardingPage.permission
+            return Texts.OnboardingPage.next
+        case .getMicrophonePermission:
+            return Texts.OnboardingPage.permission
+            
+        case .getLocationPermission(let access):
+            switch access {
+            case .notDetermined:
+                return Texts.OnboardingPage.permission
+            case .authorizedAlways, .authorizedWhenInUse:
+                return Texts.OnboardingPage.begin
+            default:
+                return Texts.OnboardingPage.forbidden
+            }
         }
     }
+    
+    internal var showSkipButton: Bool {
+        switch self {
+        case .nextPage:
+            return false
+        case .getMicrophonePermission:
+            return true
+        case .getLocationPermission:
+            return true
+        }
+    }
+    
+    static func == (lhs: OnboardingButtonType, rhs: OnboardingButtonType) -> Bool {
+        return lhs.title == rhs.title
+    }
 }
+

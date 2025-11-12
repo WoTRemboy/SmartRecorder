@@ -22,6 +22,7 @@
 		63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */; };
 		63009A852EBFEDA100FD5220 /* OnboardingActionButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A842EBFEDA100FD5220 /* OnboardingActionButtonsView.swift */; };
 		63009A872EBFF02600FD5220 /* OnboardingSkipButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A862EBFF02600FD5220 /* OnboardingSkipButton.swift */; };
+		6300DD592EC3E5F600AF7DAC /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6300DD582EC3E5F600AF7DAC /* LocationService.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
 		636754ED2EC27E71004702F4 /* AudiosArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754E02EC27E71004702F4 /* AudiosArray.swift */; };
@@ -59,6 +60,8 @@
 		63009A7E2EBFA74800FD5220 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		63009A842EBFEDA100FD5220 /* OnboardingActionButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingActionButtonsView.swift; sourceTree = "<group>"; };
 		63009A862EBFF02600FD5220 /* OnboardingSkipButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSkipButton.swift; sourceTree = "<group>"; };
+		6300DD582EC3E5F600AF7DAC /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		6300DD5A2EC3E69200AF7DAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRecorderApp.swift; sourceTree = "<group>"; };
@@ -167,6 +170,14 @@
 			path = Subviews;
 			sourceTree = "<group>";
 		};
+		6300DD572EC3E5B300AF7DAC /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				6300DD582EC3E5F600AF7DAC /* LocationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		6360723C2E96CF6D00E5DCC9 = {
 			isa = PBXGroup;
 			children = (
@@ -188,10 +199,12 @@
 			children = (
 				6360725A2E96D2BE00E5DCC9 /* Application */,
 				63FD4DCB2EC0BEE300104B95 /* Router */,
+				6300DD572EC3E5B300AF7DAC /* Services */,
 				636754F52EC27E83004702F4 /* Modules */,
 				6360725B2E96D2E500E5DCC9 /* SupportFiles */,
 				63009A802EBFDDFF00FD5220 /* Assets */,
 				63FD4DD72EC0BFC700104B95 /* ProfileView.swift */,
+				6300DD5A2EC3E69200AF7DAC /* Info.plist */,
 			);
 			path = SmartRecorder;
 			sourceTree = "<group>";
@@ -408,6 +421,7 @@
 				636754FE2EC2882D004702F4 /* ProfileTabDestinationFactory.swift in Sources */,
 				52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */,
 				52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */,
+				6300DD592EC3E5F600AF7DAC /* LocationService.swift in Sources */,
 				63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */,
 				52501DFF2EA7E5ED0054DB54 /* PlayerScreenView.swift in Sources */,
 				636754F82EC2823F004702F4 /* NotesTabDestinationFactory.swift in Sources */,
@@ -547,8 +561,10 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SmartRecorder/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Transono;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allows to save information where the note was written";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -594,8 +610,10 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SmartRecorder/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Transono;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allows to save information where the note was written";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

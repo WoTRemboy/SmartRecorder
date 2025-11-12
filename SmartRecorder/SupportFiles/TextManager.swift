@@ -26,6 +26,8 @@ final class Texts {
     enum OnboardingPage {
         static let skip = "Пропустить"
         static let next = "Далее"
+        static let begin = "Начать"
+        static let forbidden = "Недоступно"
         static let permission = "Разрешить"
         static let skipPermission = "Позже"
         

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct OnboardingActionButtonsView: View {
     
@@ -23,7 +24,7 @@ struct OnboardingActionButtonsView: View {
     internal var body: some View {
         GlassEffectContainer {
             HStack(spacing: 8) {
-                if viewModel.buttonType != .nextPage {
+                if viewModel.showSkipButton {
                     skipPermissionButton
                 }
                 actionButton
@@ -35,16 +36,7 @@ struct OnboardingActionButtonsView: View {
     
     private var actionButton: some View {
         Button {
-            switch viewModel.buttonType {
-            case .nextPage, .getMicrophonePermission:
-                withAnimation {
-                    action()
-                }
-            case .getLocationPermission:
-                withAnimation {
-                    viewModel.transferToMainPage()
-                }
-            }
+            viewModel.handleActionButtonTap(externalAction: action)
         } label: {
             Text(viewModel.buttonType.title)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -61,9 +53,7 @@ struct OnboardingActionButtonsView: View {
     
     private var skipPermissionButton: some View {
         Button {
-            withAnimation {
-                action()
-            }
+            viewModel.handleSkipButtonTap(externalAction: action)
         } label: {
             Text(Texts.OnboardingPage.skipPermission)
                 .frame(maxWidth: 100, maxHeight: .infinity, alignment: .center)
