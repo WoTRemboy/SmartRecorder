@@ -13,25 +13,49 @@ struct ContentView: View {
     // MARK: - Properties
     
     /// Tab router to manage selected tab state across the app.
-    @StateObject private var router = TabRouter()
+    @StateObject private var appRouter = AppRouter()
+    @State private var search: String = ""
+    
+    private func bindingForTab(_ tab: AppRouter.Tab) -> Binding<[AppRouter.Route]> {
+        Binding(
+            get: { appRouter.navigationPaths[tab] ?? [] },
+            set: { appRouter.navigationPaths[tab] = $0 }
+        )
+    }
     
     // MARK: - Body
     
     /// The main body rendering a tab view with custom view models and tab routing.
     internal var body: some View {
-        TabView(selection: $router.selectedTab) {
-            TabItems.notesTab(isSelected: router.selectedTab == .notes)
-                .tag(TabRouter.Tab.notes)
+        TabView(selection: $appRouter.selectedTab) {
+            Tab(AppRouter.Tab.recorder.title,
+                systemImage: AppRouter.Tab.recorder.imageName,
+                value: .recorder) {
+                NavigationStack(path: bindingForTab(.recorder)) {
+                    TabItems.recorderTab(appRouter: appRouter)
+                }
+            }
             
-            TabItems.recorderTab(isSelected: router.selectedTab == .recorder)
-                .tag(TabRouter.Tab.recorder)
+            Tab(AppRouter.Tab.profile.title,
+                systemImage: AppRouter.Tab.profile.imageName,
+                value: .profile) {
+                NavigationStack(path: bindingForTab(.profile)) {
+                    TabItems.profileTab(appRouter: appRouter)
+                }
+            }
             
-            TabItems.profileTab(isSelected: router.selectedTab == .profile)
-                .tag(TabRouter.Tab.profile)
+            Tab(AppRouter.Tab.notes.title,
+                systemImage: AppRouter.Tab.notes.imageName,
+                value: .notes, role: .search) {
+                NavigationStack(path: bindingForTab(.notes)) {
+                    TabItems.notesTab(appRouter: appRouter)
+                }
+            }
         }
         .accentColor(Color.SupportColors.blue)
-        .environmentObject(router)
+        .environmentObject(appRouter)
     }
+        
 }
 
 // MARK: - Preview

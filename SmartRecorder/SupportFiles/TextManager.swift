@@ -16,6 +16,7 @@ final class Texts {
         static let notes = "Записи"
         static let recorder = "Диктофон"
         static let profile = "Профиль"
+        static let search = "Поиск"
     }
     
     enum NavigationBar {
@@ -25,6 +26,8 @@ final class Texts {
     enum OnboardingPage {
         static let skip = "Пропустить"
         static let next = "Далее"
+        static let begin = "Начать"
+        static let forbidden = "Недоступно"
         static let permission = "Разрешить"
         static let skipPermission = "Позже"
         
@@ -44,6 +47,26 @@ final class Texts {
             static let title = "Местоположение"
             static let description = "Позволит сохранять информацию о месте записи заметки."
         }
+        
+        enum LocationAlert {
+            static let title = "Доступ к местоположению запрещен"
+            static let content = "Чтобы продолжить, разрешите доступ в настройках."
+            static let settings = "Настройки"
+            static let cancel = "Отмена"
+        }
+    }
+    
+    enum NotesPage {
+        static let title = "Мои записи"
+        static let search = "Поиск"
+    }
+    
+    enum NoteFolder {
+        static let title = "Категории"
+        static let all = "Все"
+        static let work = "Работа"
+        static let study = "Учёба"
+        static let personal = "Личное"
     }
     
     enum UserDefaults {
@@ -56,4 +79,13 @@ final class Texts {
             static let skipPermission = "OnboardingSkipPermissionGlassEffect"
         }
     }
+    enum Button {
+        static let recorder = "начать запись"
+    }
+    
+    enum Caption {
+        static let message = "ознакомиться с протоколом встречи после её окончания можно в архиве записей"
+    }
 }
+
+

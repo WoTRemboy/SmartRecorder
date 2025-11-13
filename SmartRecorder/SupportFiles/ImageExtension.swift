@@ -28,6 +28,9 @@ extension Image {
             static let selected = Image("ProfileTabSelected")
             static let system = Image(systemName: "person")
         }
+        enum Search {
+            static let system = Image(systemName: "magnifyingglass")
+        }
     }
     
     enum OnboardingPage {
@@ -42,5 +45,11 @@ extension Image {
         static let chevronDown = Image(systemName: "chevron.down")
         static let location = Image(systemName: "location.fill")
         static let squareAndArrowUp =  Image(systemName: "square.and.arrow.up")
+        
+    }
+    
+    enum NotesPage {
+        static let share = Image(systemName: "square.and.arrow.up")
+        static let play = Image(systemName: "play.circle.fill")
     }
 }
