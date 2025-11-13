@@ -19,6 +19,7 @@
 		52501E1A2EB783090054DB54 /* StartRecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E192EB783090054DB54 /* StartRecView.swift */; };
 		52501E1C2EB783980054DB54 /* StopRecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E1B2EB783980054DB54 /* StopRecView.swift */; };
 		52501E1E2EB7876B0054DB54 /* SaveSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */; };
+		52501E2D2EC606CA0054DB54 /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E2C2EC606CA0054DB54 /* PlayerViewModel.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072542E96D26E00E5DCC9 /* ContentView.swift */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
@@ -37,6 +38,7 @@
 		52501E192EB783090054DB54 /* StartRecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartRecView.swift; sourceTree = "<group>"; };
 		52501E1B2EB783980054DB54 /* StopRecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopRecView.swift; sourceTree = "<group>"; };
 		52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSheetView.swift; sourceTree = "<group>"; };
+		52501E2C2EC606CA0054DB54 /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		636072542E96D26E00E5DCC9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 		52501E0B2EAA9EAC0054DB54 /* PlayerModule */ = {
 			isa = PBXGroup;
 			children = (
+				52501E2C2EC606CA0054DB54 /* PlayerViewModel.swift */,
 				52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */,
 				52501E002EA7EB450054DB54 /* NavigationBarView.swift */,
 				52501E072EA906BA0054DB54 /* ProgressBarView.swift */,
@@ -214,6 +217,7 @@
 				636072582E96D26E00E5DCC9 /* ContentView.swift in Sources */,
 				52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */,
 				52501E112EAAA3830054DB54 /* TextManager.swift in Sources */,
+				52501E2D2EC606CA0054DB54 /* PlayerViewModel.swift in Sources */,
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
 				52501E1E2EB7876B0054DB54 /* SaveSheetView.swift in Sources */,
 				52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */,
