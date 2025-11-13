@@ -37,6 +37,7 @@
 		636754FA2EC283AA004702F4 /* DestinationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754F92EC283A5004702F4 /* DestinationFactory.swift */; };
 		636754FC2EC28821004702F4 /* RecorderTabDestinationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754FB2EC28817004702F4 /* RecorderTabDestinationFactory.swift */; };
 		636754FE2EC2882D004702F4 /* ProfileTabDestinationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754FD2EC28825004702F4 /* ProfileTabDestinationFactory.swift */; };
+		63B35EF92EC53B1C003E3D89 /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B35EF82EC53B16003E3D89 /* AudioRecorderService.swift */; };
 		63FD4DCD2EC0BEFC00104B95 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DCC2EC0BEF900104B95 /* AppRouter.swift */; };
 		63FD4DCF2EC0BF7D00104B95 /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */; };
 		63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DD72EC0BFC700104B95 /* ProfileView.swift */; };
@@ -77,6 +78,7 @@
 		636754F92EC283A5004702F4 /* DestinationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationFactory.swift; sourceTree = "<group>"; };
 		636754FB2EC28817004702F4 /* RecorderTabDestinationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderTabDestinationFactory.swift; sourceTree = "<group>"; };
 		636754FD2EC28825004702F4 /* ProfileTabDestinationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTabDestinationFactory.swift; sourceTree = "<group>"; };
+		63B35EF82EC53B16003E3D89 /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
 		63FD4DCC2EC0BEF900104B95 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabItems.swift; sourceTree = "<group>"; };
 		63FD4DD72EC0BFC700104B95 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -173,6 +175,7 @@
 		6300DD572EC3E5B300AF7DAC /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				63B35EF82EC53B16003E3D89 /* AudioRecorderService.swift */,
 				6300DD582EC3E5F600AF7DAC /* LocationService.swift */,
 			);
 			path = Services;
@@ -248,7 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				636754E42EC27E71004702F4 /* NotesListView.swift */,
-				636754E52EC27E71004702F4 /* NoteCardView.swift */,
+				636754E82EC27E71004702F4 /* SingleAudioDescriptionView.swift */,
 				636754FF2EC290F3004702F4 /* Subviews */,
 			);
 			path = View;
@@ -298,7 +301,7 @@
 			children = (
 				636754E62EC27E71004702F4 /* ChipsView.swift */,
 				636754E72EC27E71004702F4 /* PickerView.swift */,
-				636754E82EC27E71004702F4 /* SingleAudioDescriptionView.swift */,
+				636754E52EC27E71004702F4 /* NoteCardView.swift */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -417,6 +420,7 @@
 				636754FA2EC283AA004702F4 /* DestinationFactory.swift in Sources */,
 				63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */,
 				52501E112EAAA3830054DB54 /* TextManager.swift in Sources */,
+				63B35EF92EC53B1C003E3D89 /* AudioRecorderService.swift in Sources */,
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
 				636754FE2EC2882D004702F4 /* ProfileTabDestinationFactory.swift in Sources */,
 				52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */,

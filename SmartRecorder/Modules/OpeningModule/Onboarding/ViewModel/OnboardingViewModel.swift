@@ -19,6 +19,8 @@ final class OnboardingViewModel: ObservableObject {
     @Published internal var currentStep = 0
     @Published internal var locationAuthorizationStatus: CLAuthorizationStatus = LocationService.shared.authorizationStatus
     
+    @Published internal var showLocationPermissionAlert: Bool = false
+    
     init() {
         LocationService.shared.$authorizationStatus
             .receive(on: DispatchQueue.main)
@@ -97,7 +99,7 @@ final class OnboardingViewModel: ObservableObject {
             case .notDetermined:
                 LocationService.shared.requestAuthorization()
             default:
-                break
+                showLocationPermissionAlert.toggle()
             }
         }
     }

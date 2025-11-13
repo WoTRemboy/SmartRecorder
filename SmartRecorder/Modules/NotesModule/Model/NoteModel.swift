@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class Note: Identifiable, ObservableObject, Equatable {
+class Note: Identifiable, ObservableObject, Equatable, Hashable {
     let id = UUID()
     
     @Published var headline: String
@@ -31,5 +31,9 @@ class Note: Identifiable, ObservableObject, Equatable {
     
     static func == (lhs: Note, rhs: Note) -> Bool {
         return lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }

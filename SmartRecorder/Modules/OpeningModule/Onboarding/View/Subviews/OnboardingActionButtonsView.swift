@@ -41,6 +41,7 @@ struct OnboardingActionButtonsView: View {
             Text(viewModel.buttonType.title)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
+        .contentTransition(.numericText())
         .buttonStyle(.glassProminent)
         .glassEffectID(Texts.GlassEffectId.Onboarding.permission, in: namespace)
         
@@ -49,6 +50,8 @@ struct OnboardingActionButtonsView: View {
         
         .frame(height: 50)
         .frame(maxWidth: .infinity)
+        
+        .animation(.easeInOut, value: viewModel.locationAuthorizationStatus)
     }
     
     private var skipPermissionButton: some View {

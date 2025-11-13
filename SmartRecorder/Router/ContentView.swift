@@ -31,19 +31,25 @@ struct ContentView: View {
             Tab(AppRouter.Tab.recorder.title,
                 systemImage: AppRouter.Tab.recorder.imageName,
                 value: .recorder) {
-                TabItems.recorderTab(isSelected: appRouter.selectedTab == .recorder)
+                NavigationStack(path: bindingForTab(.recorder)) {
+                    TabItems.recorderTab(appRouter: appRouter)
+                }
             }
             
             Tab(AppRouter.Tab.profile.title,
                 systemImage: AppRouter.Tab.profile.imageName,
                 value: .profile) {
-                TabItems.profileTab(isSelected: appRouter.selectedTab == .profile)
+                NavigationStack(path: bindingForTab(.profile)) {
+                    TabItems.profileTab(appRouter: appRouter)
+                }
             }
             
             Tab(AppRouter.Tab.notes.title,
                 systemImage: AppRouter.Tab.notes.imageName,
                 value: .notes, role: .search) {
-                TabItems.notesTab(isSelected: appRouter.selectedTab == .profile)
+                NavigationStack(path: bindingForTab(.notes)) {
+                    TabItems.notesTab(appRouter: appRouter)
+                }
             }
         }
         .accentColor(Color.SupportColors.blue)

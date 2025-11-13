@@ -43,6 +43,11 @@ struct OnboardingScreenView: View {
             .onChange(of: page.index) { oldValue, newValue in
                 viewModel.triggerDrawOnSymbol(newValue)
             }
+            .alert(Texts.OnboardingPage.LocationAlert.title, isPresented: $viewModel.showLocationPermissionAlert) {
+                        locationAlertButtons
+                    } message: {
+                        Text(Texts.OnboardingPage.LocationAlert.content)
+                    }
         }
     }
     
@@ -131,6 +136,16 @@ struct OnboardingScreenView: View {
                     page.update(.next)
                 }
             }
+    }
+    
+    @ViewBuilder
+    private var locationAlertButtons: some View {
+        Button(Texts.OnboardingPage.LocationAlert.settings) {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        }
+        Button(Texts.OnboardingPage.LocationAlert.cancel, role: .cancel) {}
     }
 }
 

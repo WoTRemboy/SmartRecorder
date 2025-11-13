@@ -47,6 +47,13 @@ final class Texts {
             static let title = "Местоположение"
             static let description = "Позволит сохранять информацию о месте записи заметки."
         }
+        
+        enum LocationAlert {
+            static let title = "Доступ к местоположению запрещен"
+            static let content = "Чтобы продолжить, разрешите доступ в настройках."
+            static let settings = "Настройки"
+            static let cancel = "Отмена"
+        }
     }
     
     enum NotesPage {

@@ -38,11 +38,11 @@ struct NotesListView: View {
     }
     
     private func noteCardView(note: Note) -> some View {
-        NavigationLink(destination: {
-            SingleAudioDescriptionView(audio: note)
-        }, label: {
+        Button {
+            appRouter.push(.noteDetails(note: note), in: .notes)
+        } label: {
             NoteCardView(audio: note)
-        })
+        }
         .padding(.horizontal)
         .transition(.blurReplace)
     }
