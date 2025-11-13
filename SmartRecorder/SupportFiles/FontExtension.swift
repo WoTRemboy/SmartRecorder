@@ -7,8 +7,8 @@
 import SwiftUI
 
 extension Font {
-    static func largeTitle() -> Font? {
-        Font.system(size: 35, weight: .bold)
+    static func largeTitle(_ weight: Font.Weight = .regular) -> Font? {
+        Font.system(size: 35, weight: weight)
     }
     
     static func subheadline() -> Font? {

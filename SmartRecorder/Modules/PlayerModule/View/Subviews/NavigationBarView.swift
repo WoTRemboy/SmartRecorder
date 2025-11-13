@@ -22,7 +22,7 @@ struct NavigationBarView: View {
             Button {
                 
             } label: {
-                Label(Texts.NavigationBar.location, systemImage: "location.fill")
+                Label(Texts.RecorderPage.location, systemImage: "location.fill")
                     .font(Font.title2())
             }
 

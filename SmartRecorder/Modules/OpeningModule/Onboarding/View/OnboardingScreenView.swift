@@ -44,10 +44,10 @@ struct OnboardingScreenView: View {
                 viewModel.triggerDrawOnSymbol(newValue)
             }
             .alert(Texts.OnboardingPage.LocationAlert.title, isPresented: $viewModel.showLocationPermissionAlert) {
-                        locationAlertButtons
-                    } message: {
-                        Text(Texts.OnboardingPage.LocationAlert.content)
-                    }
+                locationAlertButtons
+            } message: {
+                Text(Texts.OnboardingPage.LocationAlert.content)
+            }
         }
     }
     
@@ -65,7 +65,7 @@ struct OnboardingScreenView: View {
                 animatedImage(for: index)
                 
                 Text(viewModel.steps[index].name)
-                    .font(.largeTitle())
+                    .font(.largeTitle(.bold))
                     .padding(.top)
                 
                 Text(viewModel.steps[index].description)

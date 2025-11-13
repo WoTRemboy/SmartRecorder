@@ -16,8 +16,8 @@
 		52501E112EAAA3830054DB54 /* TextManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E102EAAA3800054DB54 /* TextManager.swift */; };
 		52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E122EAAA4AE0054DB54 /* FontExtension.swift */; };
 		52501E162EB24AC40054DB54 /* RecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E152EB24AC40054DB54 /* RecorderView.swift */; };
-		52501E1A2EB783090054DB54 /* StartRecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E192EB783090054DB54 /* StartRecView.swift */; };
-		52501E1C2EB783980054DB54 /* StopRecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E1B2EB783980054DB54 /* StopRecView.swift */; };
+		52501E1A2EB783090054DB54 /* RecorderStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E192EB783090054DB54 /* RecorderStartView.swift */; };
+		52501E1C2EB783980054DB54 /* RecorderStopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E1B2EB783980054DB54 /* RecorderStopView.swift */; };
 		52501E1E2EB7876B0054DB54 /* SaveSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */; };
 		52501E2D2EC606CA0054DB54 /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E2C2EC606CA0054DB54 /* PlayerViewModel.swift */; };
 		63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63009A712EBF9DB500FD5220 /* SplashScreenView.swift */; };
@@ -42,7 +42,10 @@
 		636754FA2EC283AA004702F4 /* DestinationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754F92EC283A5004702F4 /* DestinationFactory.swift */; };
 		636754FC2EC28821004702F4 /* RecorderTabDestinationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754FB2EC28817004702F4 /* RecorderTabDestinationFactory.swift */; };
 		636754FE2EC2882D004702F4 /* ProfileTabDestinationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754FD2EC28825004702F4 /* ProfileTabDestinationFactory.swift */; };
+		639E98F02EC66E140026D76B /* DateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639E98EF2EC66E140026D76B /* DateService.swift */; };
 		63D656992EC63CC200B7EF10 /* NoteFolderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656982EC63CBE00B7EF10 /* NoteFolderModel.swift */; };
+		63D656A22EC64E4500B7EF10 /* RecorderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */; };
+		63D656A42EC6531F00B7EF10 /* RecorderDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */; };
 		63FD4DCD2EC0BEFC00104B95 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DCC2EC0BEF900104B95 /* AppRouter.swift */; };
 		63FD4DCF2EC0BF7D00104B95 /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */; };
 		63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DD72EC0BFC700104B95 /* ProfileView.swift */; };
@@ -61,8 +64,8 @@
 		52501E102EAAA3800054DB54 /* TextManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextManager.swift; sourceTree = "<group>"; };
 		52501E122EAAA4AE0054DB54 /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
 		52501E152EB24AC40054DB54 /* RecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderView.swift; sourceTree = "<group>"; };
-		52501E192EB783090054DB54 /* StartRecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartRecView.swift; sourceTree = "<group>"; };
-		52501E1B2EB783980054DB54 /* StopRecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopRecView.swift; sourceTree = "<group>"; };
+		52501E192EB783090054DB54 /* RecorderStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderStartView.swift; sourceTree = "<group>"; };
+		52501E1B2EB783980054DB54 /* RecorderStopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderStopView.swift; sourceTree = "<group>"; };
 		52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSheetView.swift; sourceTree = "<group>"; };
 		52501E2C2EC606CA0054DB54 /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 		63009A712EBF9DB500FD5220 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
@@ -88,7 +91,10 @@
 		636754F92EC283A5004702F4 /* DestinationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationFactory.swift; sourceTree = "<group>"; };
 		636754FB2EC28817004702F4 /* RecorderTabDestinationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderTabDestinationFactory.swift; sourceTree = "<group>"; };
 		636754FD2EC28825004702F4 /* ProfileTabDestinationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTabDestinationFactory.swift; sourceTree = "<group>"; };
+		639E98EF2EC66E140026D76B /* DateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateService.swift; sourceTree = "<group>"; };
 		63D656982EC63CBE00B7EF10 /* NoteFolderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteFolderModel.swift; sourceTree = "<group>"; };
+		63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderViewModel.swift; sourceTree = "<group>"; };
+		63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderDetailsView.swift; sourceTree = "<group>"; };
 		63FD4DCC2EC0BEF900104B95 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabItems.swift; sourceTree = "<group>"; };
 		63FD4DD72EC0BFC700104B95 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -112,11 +118,8 @@
 		52501E0B2EAA9EAC0054DB54 /* PlayerModule */ = {
 			isa = PBXGroup;
 			children = (
-				52501E2C2EC606CA0054DB54 /* PlayerViewModel.swift */,
-				52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */,
-				52501E002EA7EB450054DB54 /* NavigationBarView.swift */,
-				52501E072EA906BA0054DB54 /* ProgressBarView.swift */,
-				52501E092EA90CB10054DB54 /* AudioDescriptionView.swift */,
+				63D6569B2EC649CA00B7EF10 /* View */,
+				63D6569A2EC649C200B7EF10 /* ViewModel */,
 			);
 			path = PlayerModule;
 			sourceTree = "<group>";
@@ -124,10 +127,8 @@
 		52501E142EB24A8B0054DB54 /* RecorderModule */ = {
 			isa = PBXGroup;
 			children = (
-				52501E152EB24AC40054DB54 /* RecorderView.swift */,
-				52501E192EB783090054DB54 /* StartRecView.swift */,
-				52501E1B2EB783980054DB54 /* StopRecView.swift */,
-				52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */,
+				63D6569D2EC649F500B7EF10 /* View */,
+				63D656A02EC64E3C00B7EF10 /* ViewModel */,
 			);
 			path = RecorderModule;
 			sourceTree = "<group>";
@@ -198,6 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				6300DD582EC3E5F600AF7DAC /* LocationService.swift */,
+				639E98EF2EC66E140026D76B /* DateService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -337,6 +339,77 @@
 			path = ProfileModule;
 			sourceTree = "<group>";
 		};
+		63D6569A2EC649C200B7EF10 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				52501E2C2EC606CA0054DB54 /* PlayerViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		63D6569B2EC649CA00B7EF10 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */,
+				63D6569C2EC649E100B7EF10 /* Subviews */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		63D6569C2EC649E100B7EF10 /* Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				52501E002EA7EB450054DB54 /* NavigationBarView.swift */,
+				52501E072EA906BA0054DB54 /* ProgressBarView.swift */,
+				52501E092EA90CB10054DB54 /* AudioDescriptionView.swift */,
+			);
+			path = Subviews;
+			sourceTree = "<group>";
+		};
+		63D6569D2EC649F500B7EF10 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				52501E152EB24AC40054DB54 /* RecorderView.swift */,
+				63D6569F2EC64A0700B7EF10 /* Subviews */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		63D6569F2EC64A0700B7EF10 /* Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				63D656A52EC65AF100B7EF10 /* RecorderStartViews */,
+				63D656A62EC65B0300B7EF10 /* RecorderStopView */,
+				52501E1D2EB7876A0054DB54 /* SaveSheetView.swift */,
+			);
+			path = Subviews;
+			sourceTree = "<group>";
+		};
+		63D656A02EC64E3C00B7EF10 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		63D656A52EC65AF100B7EF10 /* RecorderStartViews */ = {
+			isa = PBXGroup;
+			children = (
+				52501E192EB783090054DB54 /* RecorderStartView.swift */,
+				63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */,
+			);
+			path = RecorderStartViews;
+			sourceTree = "<group>";
+		};
+		63D656A62EC65B0300B7EF10 /* RecorderStopView */ = {
+			isa = PBXGroup;
+			children = (
+				52501E1B2EB783980054DB54 /* RecorderStopView.swift */,
+			);
+			path = RecorderStopView;
+			sourceTree = "<group>";
+		};
 		63FD4DCB2EC0BEE300104B95 /* Router */ = {
 			isa = PBXGroup;
 			children = (
@@ -439,6 +512,7 @@
 				63009A852EBFEDA100FD5220 /* OnboardingActionButtonsView.swift in Sources */,
 				636754ED2EC27E71004702F4 /* AudiosArray.swift in Sources */,
 				636754EE2EC27E71004702F4 /* NoteModel.swift in Sources */,
+				63D656A22EC64E4500B7EF10 /* RecorderViewModel.swift in Sources */,
 				636754EF2EC27E71004702F4 /* NotesListView.swift in Sources */,
 				636754F02EC27E71004702F4 /* NoteCardView.swift in Sources */,
 				636754FC2EC28821004702F4 /* RecorderTabDestinationFactory.swift in Sources */,
@@ -459,13 +533,15 @@
 				52501E1E2EB7876B0054DB54 /* SaveSheetView.swift in Sources */,
 				52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */,
 				52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */,
+				639E98F02EC66E140026D76B /* DateService.swift in Sources */,
 				6300DD592EC3E5F600AF7DAC /* LocationService.swift in Sources */,
 				63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */,
-				52501E1A2EB783090054DB54 /* StartRecView.swift in Sources */,
+				52501E1A2EB783090054DB54 /* RecorderStartView.swift in Sources */,
 				52501DFF2EA7E5ED0054DB54 /* PlayerScreenView.swift in Sources */,
 				636754F82EC2823F004702F4 /* NotesTabDestinationFactory.swift in Sources */,
+				63D656A42EC6531F00B7EF10 /* RecorderDetailsView.swift in Sources */,
 				52501E0D2EAA9F3F0054DB54 /* ColorExtension.swift in Sources */,
-				52501E1C2EB783980054DB54 /* StopRecView.swift in Sources */,
+				52501E1C2EB783980054DB54 /* RecorderStopView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -19,10 +19,6 @@ final class Texts {
         static let search = "Поиск"
     }
     
-    enum NavigationBar {
-        static let location = "Местоположение"
-    }
-    
     enum OnboardingPage {
         static let skip = "Пропустить"
         static let next = "Далее"
@@ -69,6 +65,12 @@ final class Texts {
         static let personal = "Личное"
     }
     
+    enum RecorderPage {
+        static let location = "Местоположение"
+        static let message = "Ознакомиться с протоколом встречи после её окончания можно в архиве записей"
+        static let range = "архиве записей"
+    }
+    
     enum UserDefaults {
         static let skipOnboarding = "SkipOnboardingStage"
     }
@@ -78,14 +80,21 @@ final class Texts {
             static let permission = "OnboardingPermissionGlassEffect"
             static let skipPermission = "OnboardingSkipPermissionGlassEffect"
         }
+        
+        enum Recorder {
+            static let timer = "RecorderTimerGlassEffect"
+            static let stop = "RecorderStopGlassEffect"
+        }
     }
+    
+    enum GeometryEffectId {
+        enum Recorder {
+            static let control = "RecorderGeometryEffect"
+        }
+    }
+    
     enum Button {
         static let recorder = "начать запись"
     }
-    
-    enum Caption {
-        static let message = "ознакомиться с протоколом встречи после её окончания можно в архиве записей"
-    }
 }
-
 

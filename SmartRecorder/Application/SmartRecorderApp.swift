@@ -13,6 +13,7 @@ struct SmartRecorderApp: App {
         WindowGroup {
             SplashScreenView()
                 .preferredColorScheme(.light)
+                .environmentObject(RecorderViewModel())
         }
     }
 }
