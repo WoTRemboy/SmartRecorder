@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "WorkshopOnboarding.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
