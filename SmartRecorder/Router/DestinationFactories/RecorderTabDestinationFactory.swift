@@ -12,7 +12,7 @@ struct RecorderTabDestinationFactory {
     static func view(for route: AppRouter.Route, appRouter: AppRouter) -> some View {
         switch route {
         case .recorder:
-            PlayerScreenView()
+            RecorderView()
         default:
             EmptyView()
         }

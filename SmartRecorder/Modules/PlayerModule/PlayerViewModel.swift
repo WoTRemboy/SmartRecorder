@@ -8,7 +8,7 @@
 import Foundation
 import AVKit
 import os
-internal import Combine
+import Combine
 
 final class PlayerDelegate: NSObject, AVAudioPlayerDelegate {
     var isPlaying = false

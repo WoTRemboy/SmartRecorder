@@ -14,7 +14,8 @@ struct NotesListView: View {
     @StateObject private var viewModel = NotesViewModel()
     
     internal var body: some View {
-        ScrollView {
+        ScrollView(.vertical, showsIndicators: false) {
+            pickerView
             LazyVStack(spacing: 16) {
                 ForEach(viewModel.filteredAndSearchedAudios) { note in
                     noteCardView(note: note)
@@ -26,25 +27,24 @@ struct NotesListView: View {
         .background(Color.BackgroundColors.primary)
         .navigationTitle(Texts.NotesPage.title)
         .toolbarRole(.navigationStack)
-        .toolbar {
-            ToolbarItem(placement: .largeSubtitle) {
-                PickerView(selectedCategory: $viewModel.selectedCategory)
-                    .padding(.top)
-            }
-        }
         .searchable(text: $viewModel.searchItem,
                     placement: .toolbarPrincipal,
                     prompt: Texts.NotesPage.search)
     }
     
+    private var pickerView: some View {
+        PickerView(selectedCategory: $viewModel.selectedCategory)
+            .padding(.top, 8)
+            .padding(.horizontal)
+    }
+    
     private func noteCardView(note: Note) -> some View {
-        Button {
-            appRouter.push(.noteDetails(note: note), in: .notes)
-        } label: {
-            NoteCardView(audio: note)
-        }
-        .padding(.horizontal)
-        .transition(.blurReplace)
+        NoteCardView(audio: note)
+            .onTapGesture {
+                appRouter.push(.noteDetails(note: note), in: .notes)
+            }
+            .padding(.horizontal)
+            .transition(.blurReplace)
     }
 }
 

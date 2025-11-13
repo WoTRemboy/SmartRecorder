@@ -12,9 +12,6 @@ struct PlayerScreenView: View {
     
     var body: some View {
         ZStack {
-//      есть баг с жидким стеклом при переключении на темную            тему
-//            colorScheme == .dark ? nil :                                    Color.BackgroundColors.primary
-//                    .ignoresSafeArea(.all)
             VStack {
                 NavigationBarView()
                 Spacer()

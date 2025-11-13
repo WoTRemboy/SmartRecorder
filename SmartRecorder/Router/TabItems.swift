@@ -25,7 +25,7 @@ struct TabItems {
     /// - Parameter isSelected: A boolean indicating whether the tab is currently selected.
     /// - Returns: A `PlayerScreenView` wrapped in a tab item.
     static func recorderTab(appRouter: AppRouter) -> some View {
-        PlayerScreenView()
+        RecorderView()
             .environmentObject(appRouter)
             .navigationDestination(for: AppRouter.Route.self) { route in
                 route.destinationView(in: .recorder, appRouter: appRouter)

@@ -9,17 +9,18 @@ import SwiftUI
 
 struct PickerView: View {
     
-    @Binding var selectedCategory: String
-    var audioCategories = ["Все", "Работа", "Учёба", "Личное"]
-    
-    
-    
-    var body: some View {
+    @Binding var selectedCategory: NoteFolder
+
+    internal var body: some View {
         Picker(selection: $selectedCategory, label: Text("Категории")) {
-            ForEach(audioCategories, id: \.self) { category in
-                Text(category)
+            ForEach(NoteFolder.allCases, id: \.self) { folder in
+                Text(folder.title)
             }
         }
         .pickerStyle(.segmented)
     }
+}
+
+#Preview {
+    PickerView(selectedCategory: .constant(.all))
 }

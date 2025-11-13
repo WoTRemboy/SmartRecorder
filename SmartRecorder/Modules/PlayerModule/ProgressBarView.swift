@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-internal import Combine
+import Combine
 
 struct ProgressBarView: View {
     @State private var viewModel = PlayerViewModel()

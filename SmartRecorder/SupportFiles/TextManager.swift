@@ -61,6 +61,14 @@ final class Texts {
         static let search = "Поиск"
     }
     
+    enum NoteFolder {
+        static let title = "Категории"
+        static let all = "Все"
+        static let work = "Работа"
+        static let study = "Учёба"
+        static let personal = "Личное"
+    }
+    
     enum UserDefaults {
         static let skipOnboarding = "SkipOnboardingStage"
     }

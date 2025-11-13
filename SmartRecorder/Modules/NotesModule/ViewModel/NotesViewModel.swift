@@ -10,17 +10,17 @@ import SwiftUI
 import Combine
 
 final class NotesViewModel: ObservableObject {
-    @Published var selectedCategory: String = "Все"
-    @Published var searchItem: String = ""
+    @Published var selectedCategory: NoteFolder = .all
+    @Published var searchItem: String = String()
     
     @Published var audios: [Note] = allAudios
     
     var filteredAndSearchedAudios: [Note] {
         let categoryFiltered: [Note]
-        if selectedCategory == "Все" {
+        if selectedCategory == .all {
             categoryFiltered = audios
         } else {
-            categoryFiltered = audios.filter { $0.category == selectedCategory }
+            categoryFiltered = audios.filter { $0.category == selectedCategory.rawValue }
         }
 
         if searchItem.isEmpty {
