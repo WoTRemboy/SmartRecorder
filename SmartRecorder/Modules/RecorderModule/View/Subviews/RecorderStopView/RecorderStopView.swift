@@ -27,12 +27,16 @@ struct RecorderStopView: View {
     }
     
     private var aqualizerView: some View {
-        Image.RecorderPage.wave
-            .resizable()
-            .scaledToFit()
-            .foregroundColor(Color.LabelColors.blue)
-            .font(Font.buttonTitle())
-            .padding(.horizontal, 70)
+        HStack(alignment: .center, spacing: 6) {
+            ForEach(Array(viewModel.amplitudes.enumerated()), id: \.offset) { idx, amp in
+                Capsule()
+                    .frame(width: 10, height: min(max(8, CGFloat(amp) * 1500), 300))
+                    .foregroundColor(Color.LabelColors.blue)
+                    .animation(.easeOut(duration: 0.08), value: amp)
+            }
+        }
+        .frame(height: 200)
+        .padding(.horizontal, 36)
     }
     
     private var controlView: some View {

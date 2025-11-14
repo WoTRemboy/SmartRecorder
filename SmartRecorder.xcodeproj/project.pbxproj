@@ -43,6 +43,7 @@
 		636754FC2EC28821004702F4 /* RecorderTabDestinationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754FB2EC28817004702F4 /* RecorderTabDestinationFactory.swift */; };
 		636754FE2EC2882D004702F4 /* ProfileTabDestinationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754FD2EC28825004702F4 /* ProfileTabDestinationFactory.swift */; };
 		639E98F02EC66E140026D76B /* DateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639E98EF2EC66E140026D76B /* DateService.swift */; };
+		639E98F42EC682AF0026D76B /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639E98F32EC682AF0026D76B /* AudioRecorderService.swift */; };
 		63D656992EC63CC200B7EF10 /* NoteFolderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656982EC63CBE00B7EF10 /* NoteFolderModel.swift */; };
 		63D656A22EC64E4500B7EF10 /* RecorderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */; };
 		63D656A42EC6531F00B7EF10 /* RecorderDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */; };
@@ -92,6 +93,7 @@
 		636754FB2EC28817004702F4 /* RecorderTabDestinationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderTabDestinationFactory.swift; sourceTree = "<group>"; };
 		636754FD2EC28825004702F4 /* ProfileTabDestinationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTabDestinationFactory.swift; sourceTree = "<group>"; };
 		639E98EF2EC66E140026D76B /* DateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateService.swift; sourceTree = "<group>"; };
+		639E98F32EC682AF0026D76B /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
 		63D656982EC63CBE00B7EF10 /* NoteFolderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteFolderModel.swift; sourceTree = "<group>"; };
 		63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderViewModel.swift; sourceTree = "<group>"; };
 		63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderDetailsView.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				6300DD582EC3E5F600AF7DAC /* LocationService.swift */,
+				639E98F32EC682AF0026D76B /* AudioRecorderService.swift */,
 				639E98EF2EC66E140026D76B /* DateService.swift */,
 			);
 			path = Services;
@@ -527,6 +530,7 @@
 				636754FA2EC283AA004702F4 /* DestinationFactory.swift in Sources */,
 				63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */,
 				52501E112EAAA3830054DB54 /* TextManager.swift in Sources */,
+				639E98F42EC682AF0026D76B /* AudioRecorderService.swift in Sources */,
 				52501E2D2EC606CA0054DB54 /* PlayerViewModel.swift in Sources */,
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
 				636754FE2EC2882D004702F4 /* ProfileTabDestinationFactory.swift in Sources */,
@@ -687,6 +691,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allows to save information where the note was written";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allows to record notes";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -738,6 +743,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allows to save information where the note was written";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allows to record notes";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

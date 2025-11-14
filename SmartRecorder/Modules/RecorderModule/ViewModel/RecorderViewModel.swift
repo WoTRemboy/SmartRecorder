@@ -10,6 +10,7 @@ import Combine
 import SwiftUI
 import CoreLocation
 import MapKit
+import AVFoundation
 
 @MainActor
 final class RecorderViewModel: ObservableObject {
@@ -22,6 +23,8 @@ final class RecorderViewModel: ObservableObject {
     @Published private(set) var locationPermissionDenied: Bool = false
     
     @Published internal var showLocationPermissionAlert: Bool = false
+    
+    @Published var amplitudes: [Float] = Array(repeating: 0, count: 16)
 
     private let locationService = LocationService.shared
     
@@ -29,6 +32,9 @@ final class RecorderViewModel: ObservableObject {
     private var recordTimerCancellable: AnyCancellable?
     private var authorizationCancellable: AnyCancellable?
     
+    private var audioRecorderService: AudioRecorderService?
+    private var amplitudeCancellable: AnyCancellable?
+
     internal var timerString: String {
         String(format: "%02d:%02d", Int(elapsedTime) / 60, Int(elapsedTime) % 60)
     }
@@ -94,6 +100,9 @@ final class RecorderViewModel: ObservableObject {
             timerTask?.cancel()
             timerTask = nil
             recordTimerCancellable?.cancel()
+            audioRecorderService?.stopRecording()
+            amplitudeCancellable?.cancel()
+            audioRecorderService = nil
         } else {
             isRecording = true
             showTimerView = false
@@ -116,6 +125,17 @@ final class RecorderViewModel: ObservableObject {
                     guard let self = self, self.isRecording else { return }
                     self.elapsedTime += 1
                 }
+            
+            let service = AudioRecorderService()
+            audioRecorderService = service
+            Task {
+                try? await service.startRecording()
+            }
+            amplitudeCancellable = service.$amplitudes
+                .receive(on: RunLoop.main)
+                .sink { [weak self] amps in
+                    self?.amplitudes = amps
+                }
         }
     }
     
@@ -123,6 +143,12 @@ final class RecorderViewModel: ObservableObject {
         timerTask?.cancel()
         recordTimerCancellable?.cancel()
         authorizationCancellable?.cancel()
+        amplitudeCancellable?.cancel()
+        if let audioRecorderService = audioRecorderService {
+            Task { @MainActor in
+                audioRecorderService.stopRecording()
+            }
+        }
     }
     
 }
