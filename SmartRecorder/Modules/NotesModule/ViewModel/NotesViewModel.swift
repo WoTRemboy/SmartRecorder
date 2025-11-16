@@ -13,10 +13,10 @@ final class NotesViewModel: ObservableObject {
     @Published var selectedCategory: NoteFolder = .all
     @Published var searchItem: String = String()
     
-    @Published var audios: [Note] = allAudios
+    @Published var audios: [NoteLocal] = allAudios
     
-    var filteredAndSearchedAudios: [Note] {
-        let categoryFiltered: [Note]
+    var filteredAndSearchedAudios: [NoteLocal] {
+        let categoryFiltered: [NoteLocal]
         if selectedCategory == .all {
             categoryFiltered = audios
         } else {

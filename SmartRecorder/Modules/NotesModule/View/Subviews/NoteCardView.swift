@@ -10,7 +10,7 @@ import SwiftUI
 struct NoteCardView: View {
     
     @State private var isEditing = false
-    @ObservedObject var audio: Note
+    @ObservedObject var audio: NoteLocal
     
     internal var body: some View {
         VStack(alignment: .leading, spacing: 8) {

@@ -48,7 +48,7 @@ final class AppRouter: ObservableObject {
     
     enum Route: Hashable {
         case notesList
-        case noteDetails(note: Note)
+        case noteDetails(note: NoteLocal)
         
         case recorder
         case profile

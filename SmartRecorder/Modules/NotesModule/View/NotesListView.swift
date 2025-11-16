@@ -38,7 +38,7 @@ struct NotesListView: View {
             .padding(.horizontal)
     }
     
-    private func noteCardView(note: Note) -> some View {
+    private func noteCardView(note: NoteLocal) -> some View {
         NoteCardView(audio: note)
             .onTapGesture {
                 appRouter.push(.noteDetails(note: note), in: .notes)

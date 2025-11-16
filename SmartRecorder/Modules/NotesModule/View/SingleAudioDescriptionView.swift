@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SingleAudioDescriptionView: View {
     
-    @ObservedObject var audio: Note
+    @ObservedObject var audio: NoteLocal
     @State private var isEditing = false
     
     var body: some View {
