@@ -22,7 +22,7 @@ struct NotesListView: View {
                 }
             }
             .padding(.top)
-            .animation(.bouncy(duration: 0.3), value: viewModel.filteredAndSearchedAudios)
+            .animation(.spring(duration: 0.3, bounce: 0.2), value: viewModel.filteredAndSearchedAudios)
         }
         .background(Color.BackgroundColors.primary)
         .navigationTitle(Texts.NotesPage.title)
@@ -38,8 +38,8 @@ struct NotesListView: View {
             .padding(.horizontal)
     }
     
-    private func noteCardView(note: NoteLocal) -> some View {
-        NoteCardView(audio: note)
+    private func noteCardView(note: Note) -> some View {
+        NoteCardView(note: note)
             .onTapGesture {
                 appRouter.push(.noteDetails(note: note), in: .notes)
             }

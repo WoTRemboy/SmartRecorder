@@ -40,6 +40,22 @@ struct RecorderView: View {
         } message: {
             Text(Texts.OnboardingPage.LocationAlert.content)
         }
+        .alert(Texts.RecorderPage.SaveSheet.success, isPresented: $viewModel.showSaveSuccessAlert) {
+            saveAlertButton
+        } message: {
+            Text(Texts.RecorderPage.SaveSheet.successMessage)
+        }
+        .alert(Texts.RecorderPage.SaveSheet.failure, isPresented: $viewModel.showSaveErrorAlert) {
+            saveAlertButton
+        } message: {
+            Text(Texts.RecorderPage.SaveSheet.failureMessage)
+        }
+        .sheet(isPresented: $viewModel.showSaveSheetView) {
+            SaveSheetView()
+                .padding(.horizontal)
+                .presentationDetents([.height(450)])
+                .interactiveDismissDisabled()
+        }
     }
     
     @ViewBuilder
@@ -50,6 +66,10 @@ struct RecorderView: View {
             }
         }
         Button(Texts.OnboardingPage.LocationAlert.cancel, role: .cancel) {}
+    }
+    
+    private var saveAlertButton: some View {
+        Button(Texts.RecorderPage.SaveSheet.ok, role: .cancel) {}
     }
 }
 

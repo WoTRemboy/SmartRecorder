@@ -11,6 +11,7 @@ import SwiftUI
 import CoreLocation
 import MapKit
 import AVFoundation
+import CoreData
 
 @MainActor
 final class RecorderViewModel: ObservableObject {
@@ -20,9 +21,16 @@ final class RecorderViewModel: ObservableObject {
     @Published private(set) var elapsedTime: TimeInterval = 0
     
     @Published private(set) var streetName: String? = nil
+    @Published private(set) var cityName: String? = nil
     @Published private(set) var locationPermissionDenied: Bool = false
     
+    @Published internal var saveNoteTitle: String = ""
+    @Published private(set) var saveNoteFolder: NoteFolder = .work
+    
     @Published internal var showLocationPermissionAlert: Bool = false
+    @Published internal var showSaveSheetView: Bool = false
+    @Published internal var showSaveSuccessAlert: Bool = false
+    @Published internal var showSaveErrorAlert: Bool = false
     
     @Published var amplitudes: [Float] = Array(repeating: 0, count: 16)
 
@@ -50,6 +58,18 @@ final class RecorderViewModel: ObservableObject {
                     }
                 }
             }
+    }
+    
+    internal func isSelectedFolder(_ folder: NoteFolder) -> Bool {
+        saveNoteFolder == folder
+    }
+    
+    internal func setSaveFolder(_ folder: NoteFolder) {
+        saveNoteFolder = folder
+    }
+    
+    internal func toggleShowSaveSheetView() {
+        showSaveSheetView.toggle()
     }
     
     internal func toggleShowLocationPermissionAlert() {
@@ -87,6 +107,11 @@ final class RecorderViewModel: ObservableObject {
                 } else {
                     self.streetName = nil
                 }
+                if let cityName = mapItems.first?.addressRepresentations?.cityName {
+                    self.cityName = cityName
+                } else {
+                    self.cityName = nil
+                }
             } catch {
                 self.streetName = nil
             }
@@ -100,7 +125,12 @@ final class RecorderViewModel: ObservableObject {
             timerTask?.cancel()
             timerTask = nil
             recordTimerCancellable?.cancel()
-            audioRecorderService?.stopRecording()
+            if let service = audioRecorderService {
+                Task {
+                    await service.stopRecording()
+                    showSaveSheetView.toggle()
+                }
+            }
             amplitudeCancellable?.cancel()
             audioRecorderService = nil
         } else {
@@ -139,6 +169,48 @@ final class RecorderViewModel: ObservableObject {
         }
     }
     
+    @MainActor
+    func saveCurrentNote() async {
+        let title = saveNoteTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
+        let folderId = saveNoteFolder.rawValue
+        let filePath = audioRecorderService?.recordedFileURL()?.path
+        let now = Date()
+        let locationObj = locationService.lastKnownLocation
+        let noteLocation: Location? = {
+            guard let loc = locationObj else { return nil }
+            return Location(
+                latitude: loc.coordinate.latitude,
+                longitude: loc.coordinate.longitude,
+                cityName: cityName,
+                streetName: streetName
+            )
+        }()
+        let note = Note(
+            id: UUID(),
+            serverId: nil,
+            folderId: folderId,
+            title: title,
+            transcription: nil,
+            audioPath: filePath,
+            createdAt: now,
+            updatedAt: now,
+            location: noteLocation
+        )
+        let noteService = NoteEntityService()
+        do {
+            _ = try await noteService.create(note)
+            showSaveSheetView.toggle()
+            showSaveSuccessAlert.toggle()
+        } catch {
+            print("Failed to save note: \(error)")
+            showSaveSheetView.toggle()
+            showSaveErrorAlert.toggle()
+        }
+        saveNoteTitle = ""
+        saveNoteFolder = .work
+    }
+    
     deinit {
         timerTask?.cancel()
         recordTimerCancellable?.cancel()
@@ -146,7 +218,7 @@ final class RecorderViewModel: ObservableObject {
         amplitudeCancellable?.cancel()
         if let audioRecorderService = audioRecorderService {
             Task { @MainActor in
-                audioRecorderService.stopRecording()
+                await audioRecorderService.stopRecording()
             }
         }
     }

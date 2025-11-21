@@ -10,7 +10,11 @@ import SwiftUI
 struct NoteCardView: View {
     
     @State private var isEditing = false
-    @ObservedObject var audio: NoteLocal
+    private let note: Note
+    
+    init(note: Note) {
+        self.note = note
+    }
     
     internal var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -26,7 +30,7 @@ struct NoteCardView: View {
     
     private var titleStack: some View {
         HStack {
-            Text(audio.headline)
+            Text(note.title)
                 .font(.subheadline())
                 .foregroundStyle(Color.LabelColors.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -35,7 +39,7 @@ struct NoteCardView: View {
     }
     
     private var descriptionLabel: some View {
-        Text(audio.subheadline)
+        Text(note.transcription ?? "Transcription")
             .lineLimit(2)
             .truncationMode(.tail)
             .multilineTextAlignment(.leading)
@@ -46,8 +50,8 @@ struct NoteCardView: View {
     private var bottomStack: some View {
         GlassEffectContainer {
             HStack(alignment: .bottom) {
-                ChipsView(text: audio.date)
-                ChipsView(text: audio.time)
+                ChipsView(text: "20 npz")
+                ChipsView(text: "dsf")
                 
                 Spacer()
                 playButton
@@ -80,7 +84,15 @@ struct NoteCardView: View {
 }
 
 #Preview {
-    if let mock = allAudios.first {
-        NoteCardView(audio: mock)
-    }
+    NoteCardView(note: Note(
+        id: UUID(),
+        serverId: nil,
+        folderId: nil,
+        title: "Sample Note",
+        transcription: "This is a sample transcription for preview purposes.",
+        audioPath: nil,
+        createdAt: .now,
+        updatedAt: .now,
+        location: nil
+    ))
 }

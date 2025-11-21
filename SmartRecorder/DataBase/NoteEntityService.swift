@@ -20,7 +20,7 @@ struct NoteQuery {
 
 struct NoteFetchOptions {
     var query: NoteQuery = .init()
-    var sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(NoteEntity.updatedAt), ascending: false)]
+    var sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(NoteEntity.createdAt), ascending: false)]
     var limit: Int = 0
     var offset: Int = 0
     var includesPendingChanges: Bool = false

@@ -58,5 +58,6 @@ extension Image {
         static let location = Image(systemName: "location.fill")
         static let stopRecording = Image(systemName: "stop.fill")
         static let wave = Image(systemName: "waveform")
+        static let check = Image(systemName: "checkmark")
     }
 }

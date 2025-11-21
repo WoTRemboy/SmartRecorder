@@ -13,7 +13,7 @@ final class CoreDataStack {
 
     let container: NSPersistentContainer
 
-    private init(modelName: String = "SmartRecorder") {
+    private init(modelName: String = "DataBaseModel") {
         container = NSPersistentContainer(name: modelName)
         container.loadPersistentStores { _, error in
             if let error = error {

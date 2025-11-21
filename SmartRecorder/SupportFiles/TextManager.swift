@@ -69,6 +69,20 @@ final class Texts {
         static let location = "Местоположение"
         static let message = "Ознакомиться с протоколом встречи после её окончания можно в архиве записей"
         static let range = "архиве записей"
+        
+        enum SaveSheet {
+            static let title = "Название записи"
+            static let folder = "Добавить в папку"
+            
+            static let ok = "Хорошо"
+            static let save = "Сохранить"
+            
+            static let success = "Успешно"
+            static let successMessage = "Запись была сохранена"
+
+            static let failure = "Ошибка"
+            static let failureMessage = "Что-то пошло не так"
+        }
     }
     
     enum UserDefaults {

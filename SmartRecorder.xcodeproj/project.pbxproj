@@ -326,8 +326,8 @@
 			isa = PBXGroup;
 			children = (
 				63009A702EBF9DA600FD5220 /* OpeningModule */,
-				636754EC2EC27E71004702F4 /* NotesModule */,
 				52501E142EB24A8B0054DB54 /* RecorderModule */,
+				636754EC2EC27E71004702F4 /* NotesModule */,
 				52501E0B2EAA9EAC0054DB54 /* PlayerModule */,
 				63D656972EC63A1E00B7EF10 /* ProfileModule */,
 			);

@@ -16,6 +16,9 @@ final class AudioRecorderService: ObservableObject {
     private var isRecording = false
     private let audioQueue = DispatchQueue(label: "AudioRecorderService.queue")
     
+    private var audioFile: AVAudioFile?
+    private var fileURL: URL?
+    
     func startRecording() async throws {
         guard !isRecording else { return }
 
@@ -37,12 +40,22 @@ final class AudioRecorderService: ObservableObject {
                     let session = AVAudioSession.sharedInstance()
                     try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
                     try session.setActive(true, options: [])
-
+                    
                     let input = self.engine.inputNode
                     let inputFormat = input.inputFormat(forBus: 0)
+                    
+                    let dir = FileManager.default.temporaryDirectory
+                    let fileName = UUID().uuidString + ".m4a"
+                    let url = dir.appendingPathComponent(fileName)
+                    self.fileURL = url
+                    self.audioFile = try AVAudioFile(forWriting: url, settings: inputFormat.settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+
                     input.removeTap(onBus: 0)
                     input.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] (buffer, _) in
                         self?.processAudioBuffer(buffer)
+                        if let strongSelf = self {
+                            try? strongSelf.audioFile?.write(from: buffer)
+                        }
                     }
 
                     try self.engine.start()
@@ -62,16 +75,18 @@ final class AudioRecorderService: ObservableObject {
         }
     }
     
-    func stopRecording() {
+    func stopRecording() async {
         guard isRecording else { return }
-        Task { @MainActor in
-            self.isRecording = false
-        }
-        audioQueue.async { [weak self] in
-            guard let self = self else { return }
-            self.engine.inputNode.removeTap(onBus: 0)
-            self.engine.stop()
-            try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+        await MainActor.run { self.isRecording = false }
+        await withCheckedContinuation { cont in
+            audioQueue.async { [weak self] in
+                guard let self = self else { cont.resume(returning: ()); return }
+                self.engine.inputNode.removeTap(onBus: 0)
+                self.engine.stop()
+                try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+                self.audioFile = nil
+                cont.resume(returning: ())
+            }
         }
     }
     
@@ -103,5 +118,9 @@ final class AudioRecorderService: ObservableObject {
         DispatchQueue.main.async { [bandValues] in
             self.amplitudes = bandValues
         }
+    }
+    
+    func recordedFileURL() -> URL? {
+        return fileURL
     }
 }

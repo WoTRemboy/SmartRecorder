@@ -11,6 +11,10 @@ enum NoteFolder: String, CaseIterable {
     case study = "note_folder_study"
     case personal = "note_folder_personal"
     
+    static internal var selectCases: [NoteFolder] {
+        [.work, .study, .personal]
+    }
+    
     internal var title: String {
         switch self {
         case .all:

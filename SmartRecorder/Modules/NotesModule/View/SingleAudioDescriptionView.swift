@@ -9,24 +9,16 @@ import SwiftUI
 
 struct SingleAudioDescriptionView: View {
     
-    @ObservedObject var audio: NoteLocal
+    private let audio: Note
     @State private var isEditing = false
     
-    var body: some View {
+    init(audio: Note) {
+        self.audio = audio
+    }
+    
+    internal var body: some View {
         VStack(alignment: .leading) {
-            Text("#" + audio.category)
-                .foregroundStyle(Color.SupportColors.blue)
-            
-            if isEditing {
-                TextField("Заголовок", text: $audio.headline)
-                    .font(.title).bold()
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.vertical, 8)
-            } else {
-                Text(audio.headline)
-                    .font(.title).bold()
-            }
-                
+            headTitle
             
             HStack {
                 HStack {
@@ -35,7 +27,7 @@ struct SingleAudioDescriptionView: View {
                         .frame(width: 32, height: 32)
                         .background(.white)
                         .clipShape(Capsule())
-                    Text(audio.duration)
+                    Text("duration")
                         .font(.subheadline)
                         .padding(.trailing, 16)
                 }
@@ -45,19 +37,20 @@ struct SingleAudioDescriptionView: View {
                 
                 Spacer()
                 
-                ChipsView(text: audio.date)
+                ChipsView(text: "Date")
 
-                ChipsView(text: audio.time)
+                ChipsView(text: "Time")
 
             }
             .padding(.bottom, 24)
             
             ScrollView {
-                Text(audio.subheadline)
+                Text(audio.transcription ?? "")
             }
         }
         .padding(.horizontal, 20)
-        .navigationTitle(audio.location)
+        .navigationTitle(audio.location?.cityName ?? "City")
+        .navigationSubtitle(audio.location?.streetName ?? "Street")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup {
@@ -76,5 +69,32 @@ struct SingleAudioDescriptionView: View {
                 }
             }
         }
+    }
+    
+    private var headTitle: some View {
+        VStack(alignment: .leading) {
+            Text("#" + (audio.folderId ?? "FolderId"))
+                .foregroundStyle(Color.SupportColors.blue)
+            
+            Text(audio.title)
+                .font(.title).bold()
+        }
+    }
+}
+
+#Preview {
+    let mock = Note(
+        id: UUID(),
+        serverId: nil,
+        folderId: "12345",
+        title: "Sample Note Title",
+        transcription: "This is a sample transcription for preview purposes.",
+        audioPath: nil,
+        createdAt: .now,
+        updatedAt: .now,
+        location: Location(latitude: 0, longitude: 0, cityName: "Sample City", streetName: "Sample Street")
+    )
+    NavigationStack {
+        SingleAudioDescriptionView(audio: mock)
     }
 }
