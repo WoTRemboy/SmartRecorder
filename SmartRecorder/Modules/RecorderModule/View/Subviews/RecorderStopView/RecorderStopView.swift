@@ -30,7 +30,7 @@ struct RecorderStopView: View {
         HStack(alignment: .center, spacing: 6) {
             ForEach(Array(viewModel.amplitudes.enumerated()), id: \.offset) { idx, amp in
                 Capsule()
-                    .frame(width: 10, height: min(max(8, CGFloat(amp) * 1500), 300))
+                    .frame(width: 10, height: min(max(8, CGFloat(amp) * 1500), 200))
                     .foregroundColor(Color.LabelColors.blue)
                     .animation(.easeOut(duration: 0.08), value: amp)
             }
