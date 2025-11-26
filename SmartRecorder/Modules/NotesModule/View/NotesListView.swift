@@ -16,13 +16,27 @@ struct NotesListView: View {
     internal var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             pickerView
-            LazyVStack(spacing: 16) {
-                ForEach(viewModel.filteredAndSearchedAudios) { note in
-                    noteCardView(note: note)
+            if viewModel.filteredAndSearchedAudios.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "tray")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 96, height: 96)
+                        .foregroundStyle(.secondary)
+                    Text("Нет записей")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
                 }
+                .padding(.top, 60)
+            } else {
+                LazyVStack(spacing: 16) {
+                    ForEach(viewModel.filteredAndSearchedAudios) { note in
+                        noteCardView(note: note)
+                    }
+                }
+                .padding(.top)
+                .animation(.spring(duration: 0.3, bounce: 0.2), value: viewModel.filteredAndSearchedAudios)
             }
-            .padding(.top)
-            .animation(.spring(duration: 0.3, bounce: 0.2), value: viewModel.filteredAndSearchedAudios)
         }
         .background(Color.BackgroundColors.primary)
         .navigationTitle(Texts.NotesPage.title)

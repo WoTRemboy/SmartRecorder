@@ -34,12 +34,13 @@ struct NoteCardView: View {
                 .font(.subheadline())
                 .foregroundStyle(Color.LabelColors.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .lineLimit(1)
             shareButton
         }
     }
     
     private var descriptionLabel: some View {
-        Text(note.transcription ?? "Transcription")
+        Text(note.transcription ?? Texts.NotesPage.inProgress)
             .lineLimit(2)
             .truncationMode(.tail)
             .multilineTextAlignment(.leading)
@@ -50,8 +51,8 @@ struct NoteCardView: View {
     private var bottomStack: some View {
         GlassEffectContainer {
             HStack(alignment: .bottom) {
-                ChipsView(text: "20 npz")
-                ChipsView(text: "dsf")
+                ChipsView(text: DateService.formattedDate(note.createdAt))
+                ChipsView(text: DateService.formattedTime(note.createdAt))
                 
                 Spacer()
                 playButton
@@ -89,7 +90,7 @@ struct NoteCardView: View {
         serverId: nil,
         folderId: nil,
         title: "Sample Note",
-        transcription: "This is a sample transcription for preview purposes.",
+        transcription: nil,
         audioPath: nil,
         createdAt: .now,
         updatedAt: .now,

@@ -52,7 +52,6 @@ struct RecorderView: View {
         }
         .sheet(isPresented: $viewModel.showSaveSheetView) {
             SaveSheetView()
-                .padding(.horizontal)
                 .presentationDetents([.height(450)])
                 .interactiveDismissDisabled()
         }

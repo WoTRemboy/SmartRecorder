@@ -14,7 +14,7 @@ struct NotesTabDestinationFactory {
         case .notesList:
             NotesListView()
         case .noteDetails(let note):
-            SingleAudioDescriptionView(audio: note)
+            SingleAudioDescriptionView(note: note)
                 .environmentObject(appRouter)
         default:
             EmptyView()

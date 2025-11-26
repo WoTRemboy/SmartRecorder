@@ -20,7 +20,7 @@ struct SaveSheetView: View {
                 folderList
                 saveButton
             }
-            .padding(.top)
+            .padding([.top, .horizontal])
         }
         .scrollDisabled(true)
         .onAppear {

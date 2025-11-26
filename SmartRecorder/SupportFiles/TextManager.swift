@@ -55,6 +55,7 @@ final class Texts {
     enum NotesPage {
         static let title = "Мои записи"
         static let search = "Поиск"
+        static let inProgress = "Заметка в обработке..."
     }
     
     enum NoteFolder {

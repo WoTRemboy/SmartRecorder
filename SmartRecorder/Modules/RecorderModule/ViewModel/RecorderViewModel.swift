@@ -132,7 +132,6 @@ final class RecorderViewModel: ObservableObject {
                 }
             }
             amplitudeCancellable?.cancel()
-            audioRecorderService = nil
         } else {
             isRecording = true
             showTimerView = false
@@ -197,6 +196,7 @@ final class RecorderViewModel: ObservableObject {
             updatedAt: now,
             location: noteLocation
         )
+        audioRecorderService = nil
         let noteService = NoteEntityService()
         do {
             _ = try await noteService.create(note)
