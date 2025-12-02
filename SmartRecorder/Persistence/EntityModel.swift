@@ -8,7 +8,6 @@
 import Foundation
 import CoreData
 
-// MARK: - Domain model (optional helper)
 struct Location: Hashable, Sendable {
     var latitude: Double
     var longitude: Double
@@ -28,7 +27,16 @@ struct Note: Identifiable, Hashable {
     var location: Location?
 }
 
+struct User: Identifiable, Hashable {
+    let id: UUID
+    var email: String?
+    var firstName: String?
+    var lastName: String?
+    var username: String?
+}
+
 // MARK: - Mapping helpers
+
 extension LocationEntity {
     func toDomain() -> Location {
         Location(
@@ -79,5 +87,25 @@ extension NoteEntity {
         } else {
             self.location = nil
         }
+    }
+}
+
+extension UserEntity {
+    func toDomain() -> User {
+        User(
+            id: self.id ?? UUID(),
+            email: self.email,
+            firstName: self.firstName,
+            lastName: self.lastName,
+            username: self.username
+        )
+    }
+
+    func apply(from user: User) {
+        self.id = user.id
+        self.email = user.email
+        self.firstName = user.firstName
+        self.lastName = user.lastName
+        self.username = user.username
     }
 }
