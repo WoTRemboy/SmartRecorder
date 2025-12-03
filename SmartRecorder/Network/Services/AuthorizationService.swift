@@ -88,6 +88,20 @@ final class AuthorizationService {
                                                     refreshToken: success.refreshToken,
                                                     expiresIn: success.expiresIn))
             logger.info("Login succeeded for \(payload.email, privacy: .private). Tokens saved.")
+            
+            let user = User(
+                id: UUID(),
+                email: payload.email,
+                firstName: nil,
+                lastName: nil,
+                username: nil
+            )
+            do {
+                try await saveCurrentUser(user)
+                logger.info("Persisted current user in storage after login.")
+            } catch {
+                logger.error("Failed to persist current user after login: \(String(describing: error))")
+            }
         } else {
             if let api = try? JSONDecoder().decode(APIErrorResponse.self, from: data) {
                 logger.error("Login failed with API error. status: \(http.statusCode), message: \(api.message)")
@@ -156,3 +170,4 @@ enum ServiceError: LocalizedError {
         }
     }
 }
+

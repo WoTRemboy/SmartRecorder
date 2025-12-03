@@ -17,5 +17,6 @@ struct CardFieldsModifier: ViewModifier {
 
 #Preview {
     RoundedRectangle(cornerRadius: 20)
+        .foregroundStyle(.clear)
         .modifier(CardFieldsModifier())
 }

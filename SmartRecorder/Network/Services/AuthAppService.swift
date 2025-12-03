@@ -20,9 +20,9 @@ extension AuthorizationService {
         try await _userService.delete()
     }
 
-    /// Returns true if there is a valid (non-expired) access token in Keychain.
-    internal func isAuthorized() -> Bool {
-        TokenService.shared.hasValidAccessToken()
+    /// Returns true if there is a stored user profile in Core Data.
+    internal func isAuthorized() async -> Bool {
+        (try? await _userService.current()) != nil
     }
 
     /// Returns a bearer token string if available, for debugging or manual use.

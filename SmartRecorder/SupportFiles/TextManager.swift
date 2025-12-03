@@ -118,6 +118,38 @@ final class Texts {
             }
         }
         
+        enum Dashboard {
+            static let title = "Мой профиль"
+            static let email = "Email"
+            
+            enum Stats {
+                static let meetings = "Проведено встреч"
+                static let minutes = "Проведено минут во встречах"
+            }
+            
+            enum Cache {
+                static let title = "Очистить кэш"
+                static let desctiption = "Сейчас записи занимают"
+                static let memory = "памяти"
+                static let confirm = "Вы уверены, что хотите очистить кэш?"
+                static let action = "Очистить"
+                static let cancel = "Отмена"
+                static let success = "Кэш успешно очищен"
+            }
+            
+            enum Logout {
+                static let title = "Выйти"
+                static let confirm = "Вы уверены, что хотите выйти?"
+                static let action = "Выйти"
+                static let cancel = "Отмена"
+                static let success = "Выход выполнен"
+            }
+        }
+        
+        enum User {
+            static let title = "Мой профиль"
+        }
+        
         enum Toasts {
             static let registrationSuccess = "Готово! Аккаунт создан"
             static let loginSuccess = "Вход выполнен"

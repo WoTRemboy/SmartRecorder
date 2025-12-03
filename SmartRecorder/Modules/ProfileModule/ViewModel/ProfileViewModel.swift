@@ -1,11 +1,23 @@
 import Foundation
 import SwiftUI
 import Combine
+import UIKit
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
     
-    @Published private(set) var mode: AuthMode = .register
+    @Published internal private(set) var isAuthorized: Bool = false
+    @Published internal private(set) var nickname: String = ""
+    @Published internal private(set) var email: String = ""
+
+    @Published internal var meetingsCount: Int = 20
+    @Published internal var minutesInMeetings: Int = 120
+
+    // Audio cache stats
+    @Published internal private(set) var audioFilesCount: Int = 0
+    @Published internal private(set) var audioCacheBytes: Int64 = 0
+    
+    @Published private(set) var mode: AuthMode = .login
     @Published private(set) var isLoading = false
     
     @Published internal var login = LoginForm()
@@ -15,6 +27,60 @@ final class ProfileViewModel: ObservableObject {
     @Published internal var infoMessage: String? = nil
     
     private let authService = AuthorizationService()
+    
+    init() {
+        Task { [weak self] in
+            guard let self = self else { return }
+            let authorized = await self.authService.isAuthorized()
+            await MainActor.run { self.isAuthorized = authorized }
+            await self.loadCurrentUser()
+            await self.refreshAudioCacheStats()
+        }
+    }
+    
+    // MARK: - Derived UI data moved from View
+    
+    internal var stats: [String: Int] {
+        [
+            "meetings": meetingsCount,
+            "meetingsCount": meetingsCount,
+            "minutes": minutesInMeetings,
+            "minutesInMeetings": minutesInMeetings
+        ]
+    }
+    
+    internal func value(forKeys keys: [String]) -> Int {
+        for key in keys {
+            if let v = stats[key] { return v }
+        }
+        return 0
+    }
+    
+    internal func memoryUsageAttributed() -> AttributedString {
+        let total = formatBytes(audioCacheBytes)
+        var base = AttributedString("\(Texts.ProfilePage.Dashboard.Cache.desctiption) \(total) \(Texts.ProfilePage.Dashboard.Cache.memory)")
+        if let range = base.range(of: total) {
+            base[range].font = .system(size: UIFont.preferredFont(forTextStyle: .title3).pointSize, weight: .semibold)
+        }
+        return base
+    }
+    
+    internal func clearCacheTapped() {
+        Task {
+            await clearAudioCache()
+        }
+    }
+    
+    // Helper to format bytes as readable string
+    internal func formatBytes(_ bytes: Int64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB, .useGB]
+        formatter.countStyle = .file
+        formatter.includesUnit = true
+        return formatter.string(fromByteCount: bytes)
+    }
+    
+    // MARK: - Form state
     
     internal var canSubmit: Bool {
         switch mode {
@@ -57,6 +123,8 @@ final class ProfileViewModel: ObservableObject {
             )
             try await authService.register(payload)
             infoMessage = Texts.ProfilePage.Toasts.registrationSuccess
+            self.isAuthorized = true
+            await self.loadCurrentUser()
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -75,6 +143,8 @@ final class ProfileViewModel: ObservableObject {
             )
             try await authService.login(payload)
             infoMessage = Texts.ProfilePage.Toasts.loginSuccess
+            self.isAuthorized = true
+            await self.loadCurrentUser()
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -86,5 +156,65 @@ final class ProfileViewModel: ObservableObject {
         errorMessage = nil
         infoMessage = nil
     }
-}
+    
+    // MARK: - User & Authorization
+    
+    private func loadCurrentUser() async {
+        guard isAuthorized else { return }
+        do {
+            if let user = try await authService.currentUser() {
+                await MainActor.run {
+                    self.nickname = user.username ?? Texts.ProfilePage.FloatingFields.Nickname.placeholder
+                    self.email = user.email ?? Texts.ProfilePage.FloatingFields.Email.placeholder
+                }
+            }
+        } catch {
+            await MainActor.run { self.errorMessage = error.localizedDescription }
+        }
+    }
+    
+    internal func logoutTapped() {
+        Task { @MainActor in
+            do {
+                try TokenService.shared.clear()
+                try await authService.clearUserStorage()
+                self.isAuthorized = false
+                self.nickname = ""
+                self.email = ""
+                self.infoMessage = Texts.ProfilePage.Dashboard.Logout.success
+            } catch {
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
 
+    // MARK: - Audio cache
+    
+    @MainActor
+    internal func refreshAudioCacheStats() async {
+        let fm = FileManager.default
+        let dir = FileManager.default.temporaryDirectory
+        let urls = (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.fileSizeKey], options: [.skipsHiddenFiles])) ?? []
+        let audio = urls.filter { $0.pathExtension.lowercased() == "m4a" }
+        var total: Int64 = 0
+        for url in audio {
+            if let values = try? url.resourceValues(forKeys: [.fileSizeKey]), let size = values.fileSize {
+                total += Int64(size)
+            }
+        }
+        self.audioFilesCount = audio.count
+        self.audioCacheBytes = total
+    }
+
+    internal func clearAudioCache() async {
+        let fm = FileManager.default
+        let dir = FileManager.default.temporaryDirectory
+        let urls = (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])) ?? []
+        let audio = urls.filter { $0.pathExtension.lowercased() == "m4a" }
+        for url in audio {
+            try? fm.removeItem(at: url)
+        }
+        await refreshAudioCacheStats()
+        await MainActor.run { self.infoMessage = Texts.ProfilePage.Dashboard.Cache.success }
+    }
+}

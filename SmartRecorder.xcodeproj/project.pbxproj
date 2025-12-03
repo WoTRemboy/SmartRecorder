@@ -55,11 +55,14 @@
 		6375750E2EDFB3D0007B4FA2 /* ProfileCardFieldsModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6375750D2EDFB3D0007B4FA2 /* ProfileCardFieldsModifier.swift */; };
 		637575102EDFB433007B4FA2 /* ProfileFloatingField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6375750F2EDFB433007B4FA2 /* ProfileFloatingField.swift */; };
 		637575122EDFB646007B4FA2 /* ProfileAuthButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637575112EDFB646007B4FA2 /* ProfileAuthButton.swift */; };
-		637575142EDFB6AC007B4FA2 /* ProfileInfoToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637575132EDFB6AC007B4FA2 /* ProfileInfoToast.swift */; };
 		637575192EDFBA2E007B4FA2 /* ProfileAuthModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637575182EDFBA2B007B4FA2 /* ProfileAuthModel.swift */; };
+		6375751B2EDFC5EC007B4FA2 /* ProfileDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6375751A2EDFC5EC007B4FA2 /* ProfileDashboardView.swift */; };
 		6393F4882EDF9A4D0035561D /* AuthorizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6393F4872EDF9A4D0035561D /* AuthorizationService.swift */; };
 		639E98F02EC66E140026D76B /* DateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639E98EF2EC66E140026D76B /* DateService.swift */; };
 		639E98F42EC682AF0026D76B /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639E98F32EC682AF0026D76B /* AudioRecorderService.swift */; };
+		63C0D0462EE070B30056DE37 /* ProfileEmailCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C0D0452EE070B30056DE37 /* ProfileEmailCardView.swift */; };
+		63C0D0482EE073560056DE37 /* StatBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C0D0472EE073560056DE37 /* StatBlockView.swift */; };
+		63C0D04C2EE074E20056DE37 /* ProfileRegisterLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C0D04B2EE074E20056DE37 /* ProfileRegisterLoginView.swift */; };
 		63D656992EC63CC200B7EF10 /* NoteFolderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656982EC63CBE00B7EF10 /* NoteFolderModel.swift */; };
 		63D656A22EC64E4500B7EF10 /* RecorderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */; };
 		63D656A42EC6531F00B7EF10 /* RecorderDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */; };
@@ -123,11 +126,14 @@
 		6375750D2EDFB3D0007B4FA2 /* ProfileCardFieldsModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCardFieldsModifier.swift; sourceTree = "<group>"; };
 		6375750F2EDFB433007B4FA2 /* ProfileFloatingField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFloatingField.swift; sourceTree = "<group>"; };
 		637575112EDFB646007B4FA2 /* ProfileAuthButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthButton.swift; sourceTree = "<group>"; };
-		637575132EDFB6AC007B4FA2 /* ProfileInfoToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfoToast.swift; sourceTree = "<group>"; };
 		637575182EDFBA2B007B4FA2 /* ProfileAuthModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthModel.swift; sourceTree = "<group>"; };
+		6375751A2EDFC5EC007B4FA2 /* ProfileDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDashboardView.swift; sourceTree = "<group>"; };
 		6393F4872EDF9A4D0035561D /* AuthorizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationService.swift; sourceTree = "<group>"; };
 		639E98EF2EC66E140026D76B /* DateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateService.swift; sourceTree = "<group>"; };
 		639E98F32EC682AF0026D76B /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
+		63C0D0452EE070B30056DE37 /* ProfileEmailCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEmailCardView.swift; sourceTree = "<group>"; };
+		63C0D0472EE073560056DE37 /* StatBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatBlockView.swift; sourceTree = "<group>"; };
+		63C0D04B2EE074E20056DE37 /* ProfileRegisterLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRegisterLoginView.swift; sourceTree = "<group>"; };
 		63D656982EC63CBE00B7EF10 /* NoteFolderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteFolderModel.swift; sourceTree = "<group>"; };
 		63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderViewModel.swift; sourceTree = "<group>"; };
 		63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderDetailsView.swift; sourceTree = "<group>"; };
@@ -414,6 +420,8 @@
 			isa = PBXGroup;
 			children = (
 				63FD4DD72EC0BFC700104B95 /* ProfileView.swift */,
+				63C0D04B2EE074E20056DE37 /* ProfileRegisterLoginView.swift */,
+				6375751A2EDFC5EC007B4FA2 /* ProfileDashboardView.swift */,
 				637575062EDFADE6007B4FA2 /* Subviews */,
 			);
 			path = Views;
@@ -422,12 +430,8 @@
 		637575062EDFADE6007B4FA2 /* Subviews */ = {
 			isa = PBXGroup;
 			children = (
-				637575092EDFB367007B4FA2 /* ProfileRegistrationFields.swift */,
-				6375750B2EDFB398007B4FA2 /* ProfileLoginFields.swift */,
-				6375750F2EDFB433007B4FA2 /* ProfileFloatingField.swift */,
-				637575112EDFB646007B4FA2 /* ProfileAuthButton.swift */,
-				637575132EDFB6AC007B4FA2 /* ProfileInfoToast.swift */,
-				6375750D2EDFB3D0007B4FA2 /* ProfileCardFieldsModifier.swift */,
+				63C0D0442EE0708C0056DE37 /* RegisterLogin */,
+				63C0D0432EE070860056DE37 /* Dashboard */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -446,6 +450,27 @@
 				637575182EDFBA2B007B4FA2 /* ProfileAuthModel.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		63C0D0432EE070860056DE37 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				63C0D0452EE070B30056DE37 /* ProfileEmailCardView.swift */,
+				63C0D0472EE073560056DE37 /* StatBlockView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		63C0D0442EE0708C0056DE37 /* RegisterLogin */ = {
+			isa = PBXGroup;
+			children = (
+				637575092EDFB367007B4FA2 /* ProfileRegistrationFields.swift */,
+				6375750B2EDFB398007B4FA2 /* ProfileLoginFields.swift */,
+				6375750F2EDFB433007B4FA2 /* ProfileFloatingField.swift */,
+				637575112EDFB646007B4FA2 /* ProfileAuthButton.swift */,
+				6375750D2EDFB3D0007B4FA2 /* ProfileCardFieldsModifier.swift */,
+			);
+			path = RegisterLogin;
 			sourceTree = "<group>";
 		};
 		63D656972EC63A1E00B7EF10 /* ProfileModule */ = {
@@ -630,12 +655,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				63009A872EBFF02600FD5220 /* OnboardingSkipButton.swift in Sources */,
-				637575142EDFB6AC007B4FA2 /* ProfileInfoToast.swift in Sources */,
 				632DFAC92ED7786C003D528B /* AuthAppService.swift in Sources */,
 				63FD4DCF2EC0BF7D00104B95 /* TabItems.swift in Sources */,
 				6393F4882EDF9A4D0035561D /* AuthorizationService.swift in Sources */,
 				6375750C2EDFB398007B4FA2 /* ProfileLoginFields.swift in Sources */,
 				63FD4DDC2EC0C3ED00104B95 /* ContentView.swift in Sources */,
+				63C0D04C2EE074E20056DE37 /* ProfileRegisterLoginView.swift in Sources */,
 				63009A7C2EBFA6EE00FD5220 /* OnboardingScreenView.swift in Sources */,
 				63FD4DCD2EC0BEFC00104B95 /* AppRouter.swift in Sources */,
 				63FD4DDA2EC0C34000104B95 /* RootView.swift in Sources */,
@@ -647,6 +672,7 @@
 				637575192EDFBA2E007B4FA2 /* ProfileAuthModel.swift in Sources */,
 				636754ED2EC27E71004702F4 /* AudiosArray.swift in Sources */,
 				636754EE2EC27E71004702F4 /* NoteModel.swift in Sources */,
+				63C0D0482EE073560056DE37 /* StatBlockView.swift in Sources */,
 				63D656A22EC64E4500B7EF10 /* RecorderViewModel.swift in Sources */,
 				636754EF2EC27E71004702F4 /* NotesListView.swift in Sources */,
 				637575122EDFB646007B4FA2 /* ProfileAuthButton.swift in Sources */,
@@ -669,6 +695,7 @@
 				63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */,
 				52501E112EAAA3830054DB54 /* TextManager.swift in Sources */,
 				639E98F42EC682AF0026D76B /* AudioRecorderService.swift in Sources */,
+				63C0D0462EE070B30056DE37 /* ProfileEmailCardView.swift in Sources */,
 				52501E2D2EC606CA0054DB54 /* PlayerViewModel.swift in Sources */,
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
 				636754FE2EC2882D004702F4 /* ProfileTabDestinationFactory.swift in Sources */,
@@ -686,6 +713,7 @@
 				63D656A42EC6531F00B7EF10 /* RecorderDetailsView.swift in Sources */,
 				52501E0D2EAA9F3F0054DB54 /* ColorExtension.swift in Sources */,
 				6300694A2ECA2E19003FC115 /* PersistenceModel.xcdatamodeld in Sources */,
+				6375751B2EDFC5EC007B4FA2 /* ProfileDashboardView.swift in Sources */,
 				630069532ECA393E003FC115 /* EntityModel.swift in Sources */,
 				6300694E2ECA3168003FC115 /* CoreDataService.swift in Sources */,
 				6375750E2EDFB3D0007B4FA2 /* ProfileCardFieldsModifier.swift in Sources */,

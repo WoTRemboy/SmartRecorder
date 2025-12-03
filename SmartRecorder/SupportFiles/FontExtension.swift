@@ -38,6 +38,10 @@ extension Font {
         Font.system(size: 30, weight: .bold)
     }
     
+    static func emailTitle() -> Font? {
+        Font.system(size: 26, weight: .bold)
+    }
+    
     static func caption(_ weight: Font.Weight = .regular) -> Font? {
         Font.system(size: 12.5, weight: weight)
     }

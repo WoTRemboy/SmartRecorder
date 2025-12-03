@@ -51,7 +51,7 @@ final class AudioRecorderService: ObservableObject {
                     self.audioFile = try AVAudioFile(forWriting: url, settings: inputFormat.settings, commonFormat: .pcmFormatFloat32, interleaved: false)
 
                     input.removeTap(onBus: 0)
-                    input.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] (buffer, _) in
+                    input.installTap(onBus: 0, bufferSize: 1024, format: nil) { [weak self] (buffer, _) in
                         self?.processAudioBuffer(buffer)
                         if let strongSelf = self {
                             try? strongSelf.audioFile?.write(from: buffer)
