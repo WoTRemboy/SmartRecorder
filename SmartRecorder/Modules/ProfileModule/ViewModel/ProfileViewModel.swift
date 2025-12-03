@@ -10,8 +10,8 @@ final class ProfileViewModel: ObservableObject {
     @Published internal private(set) var nickname: String = ""
     @Published internal private(set) var email: String = ""
 
-    @Published internal var meetingsCount: Int = 20
-    @Published internal var minutesInMeetings: Int = 120
+    @Published internal var meetingsCount: Int = 8
+    @Published internal var minutesInMeetings: Int = 50
 
     // Audio cache stats
     @Published internal private(set) var audioFilesCount: Int = 0
@@ -37,9 +37,7 @@ final class ProfileViewModel: ObservableObject {
             await self.refreshAudioCacheStats()
         }
     }
-    
-    // MARK: - Derived UI data moved from View
-    
+        
     internal var stats: [String: Int] {
         [
             "meetings": meetingsCount,
@@ -166,6 +164,8 @@ final class ProfileViewModel: ObservableObject {
                 await MainActor.run {
                     self.nickname = user.username ?? Texts.ProfilePage.FloatingFields.Nickname.placeholder
                     self.email = user.email ?? Texts.ProfilePage.FloatingFields.Email.placeholder
+                    self.meetingsCount = Int(user.countRecords)
+                    self.minutesInMeetings = Int(user.countMinutes)
                 }
             }
         } catch {

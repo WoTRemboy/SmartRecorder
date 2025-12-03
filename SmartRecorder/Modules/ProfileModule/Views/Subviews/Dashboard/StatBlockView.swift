@@ -9,6 +9,8 @@ import SwiftUI
 
 struct StatBlockView: View {
     
+    @State private var displayedValue: Double = 0
+    
     private let title: String
     private let value: Int
     
@@ -23,12 +25,34 @@ struct StatBlockView: View {
                 .font(.title2(.medium))
                 .foregroundColor(Color.LabelColors.secondary)
             
-            Text("\(value)")
+            CountingNumberText(value: displayedValue)
                 .font(.system(size: 96, weight: .bold))
                 .minimumScaleFactor(0.4)
                 .lineLimit(1)
                 .foregroundColor(Color.SupportColors.purple)
                 .frame(alignment: .center)
+            
+                .onAppear {
+                    withAnimation(.easeOut(duration: 0.8)) {
+                        displayedValue = Double(value)
+                    }
+                }
+                .onChange(of: value) { _, newValue in
+                    withAnimation(.easeOut(duration: 0.8)) {
+                        displayedValue = Double(newValue)
+                    }
+                }
+        }
+    }
+    
+    private struct CountingNumberText: View, Animatable {
+        var value: Double
+        var animatableData: Double {
+            get { value }
+            set { value = newValue }
+        }
+        var body: some View {
+            Text("\(Int(value))")
         }
     }
 }

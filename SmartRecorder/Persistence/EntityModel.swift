@@ -33,6 +33,8 @@ struct User: Identifiable, Hashable {
     var firstName: String?
     var lastName: String?
     var username: String?
+    var countRecords: Int32
+    var countMinutes: Int32
 }
 
 // MARK: - Mapping helpers
@@ -97,7 +99,9 @@ extension UserEntity {
             email: self.email,
             firstName: self.firstName,
             lastName: self.lastName,
-            username: self.username
+            username: self.username,
+            countRecords: self.countRecords,
+            countMinutes: self.countMinutes
         )
     }
 
