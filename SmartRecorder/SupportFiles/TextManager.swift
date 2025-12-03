@@ -86,6 +86,49 @@ final class Texts {
         }
     }
     
+    enum ProfilePage {
+        enum Registration {
+            static let title = "Регистрация"
+            static let action = "Зарегистрироваться"
+            static let secondAction = "У меня есть аккаунт"
+        }
+        
+        enum Login {
+            static let title = "Вход"
+            static let action = "Войти"
+            static let secondAction = "Создать аккаунт"
+        }
+        
+        enum FloatingFields {
+            enum Nickname {
+                static let title = "Имя пользователя"
+                static let placeholder = "Nickname"
+            }
+            enum Email {
+                static let title = "Электронная почта"
+                static let placeholder = "email@example.com"
+            }
+            enum Password {
+                static let title = "Пароль"
+                static let placeholder = "••••••••"
+            }
+            enum PasswordConfirmation {
+                static let title = "Подтверждение пароля"
+                static let placeholder = "••••••••"
+            }
+        }
+        
+        enum Toasts {
+            static let registrationSuccess = "Готово! Аккаунт создан"
+            static let loginSuccess = "Вход выполнен"
+        }
+        
+        enum ErrorAlert {
+            static let title = "Ошибка"
+            static let ok = "Хорошо"
+        }
+    }
+    
     enum UserDefaults {
         static let skipOnboarding = "SkipOnboardingStage"
     }

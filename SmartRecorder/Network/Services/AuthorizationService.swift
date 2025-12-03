@@ -31,7 +31,7 @@ final class AuthorizationService {
         request.httpBody = try JSONEncoder().encode(payload)
 
         let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse else { throw AppError.invalidResponse }
+        guard let http = response as? HTTPURLResponse else { throw ServiceError.invalidResponse }
 
         if (200..<300).contains(http.statusCode) {
             let success = try JSONDecoder().decode(RegisterSuccessResponse.self, from: data)
@@ -59,11 +59,11 @@ final class AuthorizationService {
         } else {
             if let api = try? JSONDecoder().decode(APIErrorResponse.self, from: data) {
                 logger.error("Registration failed with API error. status: \(http.statusCode), message: \(api.message)")
-                throw AppError.api(status: http.statusCode, message: api.message)
+                throw ServiceError.apiError(statusCode: http.statusCode, message: api.message)
             } else {
                 let body = String(data: data, encoding: .utf8) ?? "<non-UTF8 body>"
                 logger.error("Registration failed with HTTP error. status: \(http.statusCode), body: \(body)")
-                throw AppError.http(status: http.statusCode, body: body)
+                throw ServiceError.httpError(statusCode: http.statusCode, body: body)
             }
         }
     }
@@ -80,7 +80,7 @@ final class AuthorizationService {
         request.httpBody = try JSONEncoder().encode(payload)
         
         let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse else { throw AppError.invalidResponse }
+        guard let http = response as? HTTPURLResponse else { throw ServiceError.invalidResponse }
         
         if (200..<300).contains(http.statusCode) {
             let success = try JSONDecoder().decode(LoginResponse.self, from: data)
@@ -91,11 +91,11 @@ final class AuthorizationService {
         } else {
             if let api = try? JSONDecoder().decode(APIErrorResponse.self, from: data) {
                 logger.error("Login failed with API error. status: \(http.statusCode), message: \(api.message)")
-                throw AppError.api(status: http.statusCode, message: api.message)
+                throw ServiceError.apiError(statusCode: http.statusCode, message: api.message)
             } else {
                 let body = String(data: data, encoding: .utf8) ?? "<non-UTF8 body>"
                 logger.error("Login failed with HTTP error. status: \(http.statusCode), body: \(body)")
-                throw AppError.http(status: http.statusCode, body: body)
+                throw ServiceError.httpError(statusCode: http.statusCode, body: body)
             }
         }
     }
@@ -135,24 +135,7 @@ final class AuthorizationService {
     }
 }
 
-// MARK: - Error Enums
-
-enum AppError: LocalizedError {
-    case invalidResponse
-    case api(status: Int, message: String)
-    case http(status: Int, body: String)
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidResponse:
-            return "Invalid server response"
-        case .api(let status, let message):
-            return "status: \(status)\nmessage: \(message)"
-        case .http(let status, let body):
-            return "HTTP \(status)\n\(body)"
-        }
-    }
-}
+// MARK: - Service Error Enum
 
 enum ServiceError: LocalizedError {
     case invalidURL
@@ -168,8 +151,8 @@ enum ServiceError: LocalizedError {
             return "Invalid server response"
         case .httpError(let status, let body):
             return "HTTP \(status)\n\(body)"
-        case .apiError(let status, let message):
-            return "status: \(status)\nmessage: \(message)"
+        case .apiError(_, let message):
+            return message
         }
     }
 }
