@@ -9,72 +9,148 @@ import SwiftUI
 
 struct SingleAudioDescriptionView: View {
     
-    @ObservedObject var audio: Note
+    @StateObject private var viewModel: NoteShareViewModel
+
     @State private var isEditing = false
+    @State private var audioDuration: TimeInterval? = nil
     
-    var body: some View {
+    private let note: Note
+    
+    init(note: Note) {
+        self.note = note
+        
+        let vm = NoteShareViewModel(note: note)
+        _viewModel = StateObject(wrappedValue: vm)
+        self._audioDuration = State(initialValue: vm.getAudioDuration(for: note))
+    }
+    
+    internal var body: some View {
         VStack(alignment: .leading) {
-            Text("#" + audio.category)
-                .foregroundStyle(Color.SupportColors.blue)
-            
-            if isEditing {
-                TextField("Заголовок", text: $audio.headline)
-                    .font(.title).bold()
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.vertical, 8)
-            } else {
-                Text(audio.headline)
-                    .font(.title).bold()
-            }
-                
+            headTitle
             
             HStack {
                 HStack {
-                    Image(systemName: "play.circle.fill")
+                    Image.NotesPage.play
                         .resizable()
                         .frame(width: 32, height: 32)
                         .background(.white)
                         .clipShape(Capsule())
-                    Text(audio.duration)
+                        .foregroundStyle(Color.SupportColors.blue)
+                    
+                    Text(viewModel.formatDuration(audioDuration))
                         .font(.subheadline)
                         .padding(.trailing, 16)
+                        .foregroundStyle(Color.LabelColors.white)
                 }
-                .foregroundStyle(Color.SupportColors.blue)
+                
                 .background(Color(Color.SupportColors.lightBlue))
                 .clipShape(Capsule())
                 
                 Spacer()
                 
-                ChipsView(text: audio.date)
-
-                ChipsView(text: audio.time)
-
+                GlassEffectContainer {
+                    HStack {
+                        ChipsView(text: DateService.formattedDate(note.createdAt))
+                        ChipsView(text: DateService.formattedTime(note.createdAt))
+                    }
+                }
+                
             }
             .padding(.bottom, 24)
             
             ScrollView {
-                Text(audio.subheadline)
+                Text(note.transcription ?? Texts.NotesPage.inProgress)
             }
         }
         .padding(.horizontal, 20)
-        .navigationTitle(audio.location)
+        .navigationTitle(note.location?.cityName ?? Texts.NotesPage.city)
+        .navigationSubtitle(note.location?.streetName ?? Texts.NotesPage.street)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup {
-                Button(action: {
-                    isEditing.toggle()
-                }) {
-                    Image(systemName: "pencil.line")
-                        .foregroundStyle(Color.SupportColors.blue)
-                }
-                
-                if let url = URL(string: "https://itmo.ru") {
-                    ShareLink(item: url) {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundStyle(Color.SupportColors.blue)
-                    }
-                }
+                shareMenu
+            }
+        }
+        .sheet(isPresented: $viewModel.isPresentingShare, onDismiss: { viewModel.shareURL = nil }) {
+            if let url = viewModel.shareURL {
+                ActivityView(activityItems: [url])
+                    .ignoresSafeArea()
+            }
+        }
+        .alert(Texts.NotesPage.error,
+               isPresented: .constant(viewModel.errorMessage != nil),
+               actions: {
+            Button(Texts.NotesPage.ok) {
+                viewModel.errorMessage = nil
+            }
+        }, message: {
+            Text(viewModel.errorMessage ?? "")
+        })
+        .overlay(alignment: .center) {
+            if viewModel.isLoading { ProgressView().progressViewStyle(.circular) }
+        }
+    }
+    
+    private var headTitle: some View {
+        VStack(alignment: .leading) {
+            Text("#" + (NoteFolder(rawValue: note.folderId ?? "")?.title ?? "FolderId"))
+                .foregroundStyle(Color.SupportColors.blue)
+            
+            Text(note.title)
+                .font(.title).bold()
+        }
+    }
+    
+    private var shareMenu: some View {
+        Menu {
+            sharePDFButton
+            shareAudioButton
+        } label: {
+            Image.NotesPage.share
+                .foregroundStyle(Color.SupportColors.blue)
+        }
+    }
+    
+    private var sharePDFButton: some View {
+        Button {
+            viewModel.sharePDF()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.pdf)
+            } icon: {
+                Image.NotesPage.pdf
+            }
+        }
+    }
+    
+    private var shareAudioButton: some View {
+        Button {
+            viewModel.shareAudio()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.audio)
+            } icon: {
+                Image.NotesPage.audio
             }
         }
     }
 }
+
+#Preview {
+    let mock = Note(
+        id: UUID(),
+        serverId: nil,
+        folderId: "note_folder_work",
+        title: "Sample Note Title",
+        transcription: nil,
+        audioPath: nil,
+        createdAt: .now,
+        updatedAt: .now,
+        duration: 20,
+        location: Location(latitude: 0, longitude: 0, cityName: "Sample City", streetName: "Sample Street")
+    )
+    NavigationStack {
+        SingleAudioDescriptionView(note: mock)
+    }
+}
+

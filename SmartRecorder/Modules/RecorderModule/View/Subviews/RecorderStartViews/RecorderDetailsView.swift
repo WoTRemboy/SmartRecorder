@@ -55,4 +55,5 @@ struct RecorderDetailsView: View {
 
 #Preview {
     RecorderDetailsView()
+        .environmentObject(RecorderViewModel())
 }

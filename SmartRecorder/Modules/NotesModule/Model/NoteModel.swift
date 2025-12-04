@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class Note: Identifiable, ObservableObject, Equatable, Hashable {
+class NoteLocal: Identifiable, ObservableObject, Equatable, Hashable {
     let id = UUID()
     
     @Published var headline: String
@@ -29,7 +29,7 @@ class Note: Identifiable, ObservableObject, Equatable, Hashable {
             self.location = location
         }
     
-    static func == (lhs: Note, rhs: Note) -> Bool {
+    static func == (lhs: NoteLocal, rhs: NoteLocal) -> Bool {
         return lhs.id == rhs.id
     }
     

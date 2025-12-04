@@ -11,40 +11,64 @@ import SwiftUI
 struct NotesListView: View {
     
     @EnvironmentObject private var appRouter: AppRouter
-    @StateObject private var viewModel = NotesViewModel()
+    @EnvironmentObject private var viewModel: NotesViewModel
     
     internal var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             pickerView
-            LazyVStack(spacing: 16) {
-                ForEach(viewModel.filteredAndSearchedAudios) { note in
-                    noteCardView(note: note)
+            if viewModel.filteredAndSearchedAudios.isEmpty {
+                VStack(spacing: 16) {
+                    Image.NotesPage.empty
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 96, height: 96)
+                        .foregroundStyle(.secondary)
+                    Text(Texts.NotesPage.empty)
+                        .font(.title2())
+                        .foregroundStyle(Color.LabelColors.secondary)
                 }
+                .padding(.top, 60)
+            } else {
+                LazyVStack(spacing: 16) {
+                    ForEach(viewModel.filteredAndSearchedAudios) { note in
+                        noteCardView(note: note)
+                    }
+                }
+                .padding(.top)
+                .animation(.spring(duration: 0.3, bounce: 0.2), value: viewModel.filteredAndSearchedAudios)
             }
-            .padding(.top)
-            .animation(.bouncy(duration: 0.3), value: viewModel.filteredAndSearchedAudios)
         }
         .background(Color.BackgroundColors.primary)
+        .animation(.spring(duration: 0.3, bounce: 0.2), value: viewModel.filteredAndSearchedAudios.isEmpty)
+        
         .navigationTitle(Texts.NotesPage.title)
         .toolbarRole(.navigationStack)
         .searchable(text: $viewModel.searchItem,
                     placement: .toolbarPrincipal,
                     prompt: Texts.NotesPage.search)
+        .onChange(of: viewModel.searchItem) { _, _ in
+            Task { await viewModel.refresh() }
+        }
+        .refreshable { await viewModel.refresh() }
     }
     
     private var pickerView: some View {
         PickerView(selectedCategory: $viewModel.selectedCategory)
             .padding(.top, 8)
             .padding(.horizontal)
+            .onChange(of: viewModel.selectedCategory) { _, _ in
+                Task { await viewModel.refresh() }
+            }
     }
     
     private func noteCardView(note: Note) -> some View {
-        NoteCardView(audio: note)
+        NoteCardView(note: note)
             .onTapGesture {
                 appRouter.push(.noteDetails(note: note), in: .notes)
             }
             .padding(.horizontal)
             .transition(.blurReplace)
+            .task { await viewModel.loadMoreIfNeeded(currentNote: note) }
     }
 }
 
@@ -52,5 +76,6 @@ struct NotesListView: View {
     NavigationStack {
         NotesListView()
             .environmentObject(AppRouter())
+            .environmentObject(NotesViewModel())
     }
 }

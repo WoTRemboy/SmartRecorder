@@ -9,8 +9,15 @@ import SwiftUI
 
 struct NoteCardView: View {
     
+    @StateObject private var viewModel: NoteShareViewModel
+    
     @State private var isEditing = false
-    @ObservedObject var audio: Note
+    private let note: Note
+    
+    init(note: Note) {
+        self.note = note
+        _viewModel = StateObject(wrappedValue: NoteShareViewModel(note: note))
+    }
     
     internal var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -22,20 +29,41 @@ struct NoteCardView: View {
         .padding(.horizontal, 24)
         .background(Color.BackgroundColors.main)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .sheet(isPresented: $viewModel.isPresentingShare, onDismiss: { viewModel.shareURL = nil }) {
+            if let url = viewModel.shareURL {
+                ActivityView(activityItems: [url])
+                    .ignoresSafeArea()
+            }
+        }
+        .alert(Texts.NotesPage.error,
+               isPresented: .constant(viewModel.errorMessage != nil),
+               actions: {
+            Button(Texts.NotesPage.ok) {
+                viewModel.errorMessage = nil
+            }
+        }, message: {
+            Text(viewModel.errorMessage ?? "")
+        })
+        .overlay(alignment: .center) {
+            if viewModel.isLoading {
+                ProgressView().progressViewStyle(.circular)
+            }
+        }
     }
     
     private var titleStack: some View {
         HStack {
-            Text(audio.headline)
+            Text(note.title)
                 .font(.subheadline())
                 .foregroundStyle(Color.LabelColors.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            shareButton
+                .lineLimit(1)
+            shareMenu
         }
     }
     
     private var descriptionLabel: some View {
-        Text(audio.subheadline)
+        Text(note.transcription ?? Texts.NotesPage.inProgress)
             .lineLimit(2)
             .truncationMode(.tail)
             .multilineTextAlignment(.leading)
@@ -46,8 +74,8 @@ struct NoteCardView: View {
     private var bottomStack: some View {
         GlassEffectContainer {
             HStack(alignment: .bottom) {
-                ChipsView(text: audio.date)
-                ChipsView(text: audio.time)
+                ChipsView(text: DateService.formattedDate(note.createdAt))
+                ChipsView(text: DateService.formattedTime(note.createdAt))
                 
                 Spacer()
                 playButton
@@ -66,9 +94,10 @@ struct NoteCardView: View {
             }
     }
     
-    private var shareButton: some View {
-        Button {
-            // Share Button Action
+    private var shareMenu: some View {
+        Menu {
+            sharePDFButton
+            shareAudioButton
         } label: {
             Image.NotesPage.share
                 .resizable()
@@ -77,10 +106,43 @@ struct NoteCardView: View {
                 .foregroundStyle(Color.SupportColors.blue)
         }
     }
+    
+    private var sharePDFButton: some View {
+        Button {
+            viewModel.sharePDF()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.pdf)
+            } icon: {
+                Image.NotesPage.pdf
+            }
+        }
+    }
+    
+    private var shareAudioButton: some View {
+        Button {
+            viewModel.shareAudio()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.audio)
+            } icon: {
+                Image.NotesPage.audio
+            }
+        }
+    }
 }
 
 #Preview {
-    if let mock = allAudios.first {
-        NoteCardView(audio: mock)
-    }
+    NoteCardView(note: Note(
+        id: UUID(),
+        serverId: nil,
+        folderId: nil,
+        title: "Sample Note",
+        transcription: nil,
+        audioPath: nil,
+        createdAt: .now,
+        updatedAt: .now,
+        duration: 20,
+        location: nil
+    ))
 }

@@ -15,6 +15,7 @@ struct ContentView: View {
     /// Tab router to manage selected tab state across the app.
     @StateObject private var appRouter = AppRouter()
     @State private var search: String = ""
+    @Environment(\.scenePhase) private var scenePhase
     
     private func bindingForTab(_ tab: AppRouter.Tab) -> Binding<[AppRouter.Route]> {
         Binding(
@@ -54,6 +55,21 @@ struct ContentView: View {
         }
         .accentColor(Color.SupportColors.blue)
         .environmentObject(appRouter)
+        
+        .task {
+            if await AuthorizationService.shared.isAuthorized() {
+                _ = await AuthorizationService.shared.refreshProfileOnLaunch()
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task {
+                    if await AuthorizationService.shared.isAuthorized() {
+                        _ = await AuthorizationService.shared.refreshProfileOnLaunch()
+                    }
+                }
+            }
+        }
     }
         
 }
@@ -61,5 +77,8 @@ struct ContentView: View {
 // MARK: - Preview
 
 #Preview {
-    ContentView().environmentObject(RecorderViewModel())
+    ContentView()
+        .environmentObject(RecorderViewModel())
+        .environmentObject(ProfileViewModel())
+        .environmentObject(NotesViewModel())
 }
