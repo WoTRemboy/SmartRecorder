@@ -94,27 +94,27 @@ final class AudioRecorderService: ObservableObject {
         let frameLength = Int(buffer.frameLength)
         guard frameLength > 0, let channelDataPointer = buffer.floatChannelData else { return }
 
-        // Use first channel
-        let channelData = channelDataPointer[0]
-        let bandCount = amplitudes.count
-        var bandValues = [Float](repeating: 0, count: bandCount)
-        let samplesPerBand = max(frameLength / bandCount, 1)
-
-        for band in 0..<bandCount {
-            let start = band * samplesPerBand
-            let end = min(start + samplesPerBand, frameLength)
-            var sum: Float = 0
-            var idx = start
-            while idx < end {
-                let sample = channelData[idx]
-                sum += sample * sample
-                idx += 1
-            }
-            let count = max(end - start, 1)
-            let rms = sqrtf(sum / Float(count))
-            bandValues[band] = rms
+        var averageAmplitude: Float = 0.0
+        for i in 0..<frameLength {
+            // absolute value so that negative samples
+            // don't cancel out positive samples
+            averageAmplitude += abs(channelDataPointer[0][i])
         }
+        averageAmplitude /= Float(frameLength)
 
+        var bandValues = [Float](repeating: 0, count: amplitudes.count)
+        for band in 0..<amplitudes.count {
+            // to add more movement
+            let linearRandomValue = Float.random(in: 0.5..<1.5)
+            let normalizedBandIdx = Float(band) / Float(amplitudes.count - 1)
+            // to add pretty round corners
+            let sinValue = sin(normalizedBandIdx * .pi)
+            // average amplitude is here to retain resemblance this is some
+            // form of actual sound analysis
+            let amplitude = averageAmplitude * (sinValue + 0.1) * linearRandomValue
+            bandValues[band] = amplitude
+        }
+        
         DispatchQueue.main.async { [bandValues] in
             self.amplitudes = bandValues
         }
