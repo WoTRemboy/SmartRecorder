@@ -12,6 +12,9 @@ import CoreLocation
 import MapKit
 import AVFoundation
 import CoreData
+import OSLog
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "SmartRecorder", category: "RecorderViewModel")
 
 @MainActor
 final class RecorderViewModel: ObservableObject {
@@ -90,6 +93,7 @@ final class RecorderViewModel: ObservableObject {
             do {
                 location = try await locationService.requestCurrentLocation()
             } catch {
+                logger.error("Failed to get current location: \(String(describing: error))")
                 self.locationPermissionDenied = true
                 return
             }
@@ -113,14 +117,34 @@ final class RecorderViewModel: ObservableObject {
                     self.cityName = nil
                 }
             } catch {
+                logger.error("Reverse geocoding failed: \(String(describing: error))")
                 self.streetName = nil
             }
         }
     }
     
+    // MARK: - Audio helpers
+    
+    private func audioDuration(for fileURL: URL) async -> TimeInterval? {
+        let asset = AVURLAsset(url: fileURL)
+        do {
+            let duration = try await asset.load(.duration)
+            let seconds = CMTimeGetSeconds(duration)
+            return seconds.isFinite ? seconds : nil
+        } catch {
+            return nil
+        }
+    }
+    
+    private func integerSeconds(from seconds: TimeInterval?) -> Int? {
+        guard let s = seconds, s.isFinite else { return nil }
+        return Int(s.rounded())
+    }
+    
     internal func toggleRecording() {
         if isRecording {
             isRecording = false
+            logger.info("Recording stop requested. elapsedTime=\(self.elapsedTime)")
             showTimerView = false
             timerTask?.cancel()
             timerTask = nil
@@ -134,6 +158,7 @@ final class RecorderViewModel: ObservableObject {
             amplitudeCancellable?.cancel()
         } else {
             isRecording = true
+            logger.info("Recording start requested")
             showTimerView = false
             elapsedTime = 0
             timerTask?.cancel()
@@ -176,6 +201,21 @@ final class RecorderViewModel: ObservableObject {
         let filePath = audioRecorderService?.recordedFileURL()?.path
         let now = Date()
         let locationObj = locationService.lastKnownLocation
+
+        let fileURL: URL? = {
+            guard let filePath = filePath else { return nil }
+            return URL(fileURLWithPath: filePath)
+        }()
+        var fileDuration: TimeInterval? = nil
+        if let url = fileURL {
+            fileDuration = await audioDuration(for: url)
+        }
+        let durationToSave: Int? = {
+            if let s = fileDuration, s.isFinite { return Int(s.rounded()) }
+            if elapsedTime > 0 { return Int(elapsedTime.rounded()) }
+            return nil
+        }()
+        
         let noteLocation: Location? = {
             guard let loc = locationObj else { return nil }
             return Location(
@@ -194,16 +234,43 @@ final class RecorderViewModel: ObservableObject {
             audioPath: filePath,
             createdAt: now,
             updatedAt: now,
+            duration: durationToSave,
             location: noteLocation
         )
         audioRecorderService = nil
         let noteService = NoteEntityService()
         do {
             _ = try await noteService.create(note)
+            logger.info("Note saved locally. title=\(title), duration=\(durationToSave ?? -1)")
+            // Fire-and-forget upload to server after local save
+            if let filePath = filePath {
+                let fileURL = URL(fileURLWithPath: filePath)
+                let place: String? = {
+                    if let loc = locationObj {
+                        return "\(loc.coordinate.latitude),\(loc.coordinate.longitude)"
+                    }
+                    return nil
+                }()
+                Task.detached {
+                    do {
+                        _ = try await RecordsService.shared.uploadRecord(
+                            fileURL: fileURL,
+                            name: title,
+                            datetime: now,
+                            category: folderId,
+                            folderId: 1,
+                            place: place
+                        )
+                        
+                    } catch {
+                        await logger.error("Upload record failed: \(String(describing: error))")
+                    }
+                }
+            }
             showSaveSheetView.toggle()
             showSaveSuccessAlert.toggle()
         } catch {
-            print("Failed to save note: \(error)")
+            logger.error("Failed to save note: \(String(describing: error))")
             showSaveSheetView.toggle()
             showSaveErrorAlert.toggle()
         }

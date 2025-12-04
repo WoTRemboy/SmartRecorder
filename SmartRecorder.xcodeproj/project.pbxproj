@@ -57,9 +57,14 @@
 		637575122EDFB646007B4FA2 /* ProfileAuthButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637575112EDFB646007B4FA2 /* ProfileAuthButton.swift */; };
 		637575192EDFBA2E007B4FA2 /* ProfileAuthModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637575182EDFBA2B007B4FA2 /* ProfileAuthModel.swift */; };
 		6375751B2EDFC5EC007B4FA2 /* ProfileDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6375751A2EDFC5EC007B4FA2 /* ProfileDashboardView.swift */; };
+		63783D4B2EE0A62000F83ADA /* RecordsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63783D4A2EE0A62000F83ADA /* RecordsService.swift */; };
+		638020732EE22FB500A2CD91 /* RecordsResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638020722EE22FAD00A2CD91 /* RecordsResponseModel.swift */; };
+		6389C72C2EE0F68900EABF54 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 6389C72B2EE0F68900EABF54 /* Alamofire */; };
 		6393F4882EDF9A4D0035561D /* AuthorizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6393F4872EDF9A4D0035561D /* AuthorizationService.swift */; };
 		639E98F02EC66E140026D76B /* DateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639E98EF2EC66E140026D76B /* DateService.swift */; };
 		639E98F42EC682AF0026D76B /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639E98F32EC682AF0026D76B /* AudioRecorderService.swift */; };
+		63B188862EE1BC140061B090 /* NoteShareViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B188852EE1BC140061B090 /* NoteShareViewModel.swift */; };
+		63B188882EE1BC180061B090 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B188872EE1BC180061B090 /* ActivityView.swift */; };
 		63C0D0462EE070B30056DE37 /* ProfileEmailCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C0D0452EE070B30056DE37 /* ProfileEmailCardView.swift */; };
 		63C0D0482EE073560056DE37 /* StatBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C0D0472EE073560056DE37 /* StatBlockView.swift */; };
 		63C0D04C2EE074E20056DE37 /* ProfileRegisterLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C0D04B2EE074E20056DE37 /* ProfileRegisterLoginView.swift */; };
@@ -128,9 +133,13 @@
 		637575112EDFB646007B4FA2 /* ProfileAuthButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthButton.swift; sourceTree = "<group>"; };
 		637575182EDFBA2B007B4FA2 /* ProfileAuthModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthModel.swift; sourceTree = "<group>"; };
 		6375751A2EDFC5EC007B4FA2 /* ProfileDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDashboardView.swift; sourceTree = "<group>"; };
+		63783D4A2EE0A62000F83ADA /* RecordsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsService.swift; sourceTree = "<group>"; };
+		638020722EE22FAD00A2CD91 /* RecordsResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsResponseModel.swift; sourceTree = "<group>"; };
 		6393F4872EDF9A4D0035561D /* AuthorizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationService.swift; sourceTree = "<group>"; };
 		639E98EF2EC66E140026D76B /* DateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateService.swift; sourceTree = "<group>"; };
 		639E98F32EC682AF0026D76B /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
+		63B188852EE1BC140061B090 /* NoteShareViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteShareViewModel.swift; sourceTree = "<group>"; };
+		63B188872EE1BC180061B090 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		63C0D0452EE070B30056DE37 /* ProfileEmailCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEmailCardView.swift; sourceTree = "<group>"; };
 		63C0D0472EE073560056DE37 /* StatBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatBlockView.swift; sourceTree = "<group>"; };
 		63C0D04B2EE074E20056DE37 /* ProfileRegisterLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRegisterLoginView.swift; sourceTree = "<group>"; };
@@ -153,6 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				63009A7A2EBFA6DB00FD5220 /* SwiftUIPager in Frameworks */,
+				6389C72C2EE0F68900EABF54 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,6 +281,7 @@
 		632DFACA2ED77F4B003D528B /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				638020722EE22FAD00A2CD91 /* RecordsResponseModel.swift */,
 				63FDC3132ED9C88B00D0AAB8 /* AuthorizationPayloadModel.swift */,
 				637575012EDFA174007B4FA2 /* AuthorizationResponseModel.swift */,
 			);
@@ -283,6 +294,7 @@
 				632DFAC82ED7786C003D528B /* AuthAppService.swift */,
 				6393F4872EDF9A4D0035561D /* AuthorizationService.swift */,
 				632DFAC62ED777A8003D528B /* TokenService.swift */,
+				63783D4A2EE0A62000F83ADA /* RecordsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -369,6 +381,7 @@
 			isa = PBXGroup;
 			children = (
 				636754EA2EC27E71004702F4 /* NotesViewModel.swift */,
+				63B188852EE1BC140061B090 /* NoteShareViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -412,6 +425,7 @@
 				636754E62EC27E71004702F4 /* ChipsView.swift */,
 				636754E72EC27E71004702F4 /* PickerView.swift */,
 				636754E52EC27E71004702F4 /* NoteCardView.swift */,
+				63B188872EE1BC180061B090 /* ActivityView.swift */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -595,6 +609,7 @@
 			name = SmartRecorder;
 			packageProductDependencies = (
 				63009A792EBFA6DB00FD5220 /* SwiftUIPager */,
+				6389C72B2EE0F68900EABF54 /* Alamofire */,
 			);
 			productName = SmartRecorder;
 			productReference = 636072452E96CF6D00E5DCC9 /* SmartRecorder.app */;
@@ -626,6 +641,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				63009A782EBFA6DB00FD5220 /* XCRemoteSwiftPackageReference "SwiftUIPager" */,
+				6389C72A2EE0F68900EABF54 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 636072462E96CF6D00E5DCC9 /* Products */;
@@ -686,6 +702,7 @@
 				636754F42EC27E71004702F4 /* NotesViewModel.swift in Sources */,
 				63D656992EC63CC200B7EF10 /* NoteFolderModel.swift in Sources */,
 				63009A762EBFA41C00FD5220 /* OnboardingScreenModel.swift in Sources */,
+				63B188862EE1BC140061B090 /* NoteShareViewModel.swift in Sources */,
 				63009A7F2EBFA74B00FD5220 /* OnboardingViewModel.swift in Sources */,
 				637575022EDFA17A007B4FA2 /* AuthorizationResponseModel.swift in Sources */,
 				632DFAC72ED777A8003D528B /* TokenService.swift in Sources */,
@@ -695,6 +712,7 @@
 				63009A722EBF9DBD00FD5220 /* SplashScreenView.swift in Sources */,
 				52501E112EAAA3830054DB54 /* TextManager.swift in Sources */,
 				639E98F42EC682AF0026D76B /* AudioRecorderService.swift in Sources */,
+				63B188882EE1BC180061B090 /* ActivityView.swift in Sources */,
 				63C0D0462EE070B30056DE37 /* ProfileEmailCardView.swift in Sources */,
 				52501E2D2EC606CA0054DB54 /* PlayerViewModel.swift in Sources */,
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
@@ -704,6 +722,7 @@
 				52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */,
 				639E98F02EC66E140026D76B /* DateService.swift in Sources */,
 				6300DD592EC3E5F600AF7DAC /* LocationService.swift in Sources */,
+				638020732EE22FB500A2CD91 /* RecordsResponseModel.swift in Sources */,
 				63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */,
 				52501E1A2EB783090054DB54 /* RecorderStartView.swift in Sources */,
 				63FDC3162ED9CB1100D0AAB8 /* UserEntityService.swift in Sources */,
@@ -717,6 +736,7 @@
 				630069532ECA393E003FC115 /* EntityModel.swift in Sources */,
 				6300694E2ECA3168003FC115 /* CoreDataService.swift in Sources */,
 				6375750E2EDFB3D0007B4FA2 /* ProfileCardFieldsModifier.swift in Sources */,
+				63783D4B2EE0A62000F83ADA /* RecordsService.swift in Sources */,
 				52501E1C2EB783980054DB54 /* RecorderStopView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -980,6 +1000,14 @@
 				minimumVersion = 2.5.0;
 			};
 		};
+		6389C72A2EE0F68900EABF54 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -987,6 +1015,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 63009A782EBFA6DB00FD5220 /* XCRemoteSwiftPackageReference "SwiftUIPager" */;
 			productName = SwiftUIPager;
+		};
+		6389C72B2EE0F68900EABF54 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6389C72A2EE0F68900EABF54 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 

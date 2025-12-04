@@ -24,6 +24,7 @@ struct Note: Identifiable, Hashable {
     var audioPath: String?
     var createdAt: Date
     var updatedAt: Date
+    var duration: Int?
     var location: Location?
 }
 
@@ -68,6 +69,7 @@ extension NoteEntity {
             audioPath: self.audioPath,
             createdAt: self.createdAt ?? .init(),
             updatedAt: self.updatedAt ?? .init(),
+            duration: Int(self.duration),
             location: self.location?.toDomain()
         )
     }
@@ -81,6 +83,12 @@ extension NoteEntity {
         self.audioPath = note.audioPath
         self.createdAt = note.createdAt
         self.updatedAt = note.updatedAt
+        
+        if let duration = note.duration {
+            self.duration = Int32(duration)
+        } else {
+            self.duration = -9
+        }
 
         if let location = note.location {
             let locationEntity = self.location ?? LocationEntity(context: self.managedObjectContext!)

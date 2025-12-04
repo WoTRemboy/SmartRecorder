@@ -56,6 +56,16 @@ final class Texts {
         static let title = "Мои записи"
         static let search = "Поиск"
         static let inProgress = "Заметка в обработке..."
+        static let empty = "Нет записей"
+        
+        static let city = "Город"
+        static let street = "Улица"
+        
+        static let pdf = "Поделиться PDF"
+        static let audio = "Поделиться аудио"
+        
+        static let error = "Ошибка"
+        static let ok = "Хорошо"
     }
     
     enum NoteFolder {

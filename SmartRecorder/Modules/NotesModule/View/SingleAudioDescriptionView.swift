@@ -6,17 +6,22 @@
 //
 
 import SwiftUI
-import AVFoundation
 
 struct SingleAudioDescriptionView: View {
     
-    private let note: Note
+    @StateObject private var viewModel: NoteShareViewModel
+
     @State private var isEditing = false
     @State private var audioDuration: TimeInterval? = nil
     
+    private let note: Note
+    
     init(note: Note) {
         self.note = note
-        self._audioDuration = State(initialValue: Self.getAudioDuration(for: note))
+        
+        let vm = NoteShareViewModel(note: note)
+        _viewModel = StateObject(wrappedValue: vm)
+        self._audioDuration = State(initialValue: vm.getAudioDuration(for: note))
     }
     
     internal var body: some View {
@@ -25,14 +30,14 @@ struct SingleAudioDescriptionView: View {
             
             HStack {
                 HStack {
-                    Image(systemName: "play.circle.fill")
+                    Image.NotesPage.play
                         .resizable()
                         .frame(width: 32, height: 32)
                         .background(.white)
                         .clipShape(Capsule())
                         .foregroundStyle(Color.SupportColors.blue)
                     
-                    Text(formatDuration(audioDuration))
+                    Text(viewModel.formatDuration(audioDuration))
                         .font(.subheadline)
                         .padding(.trailing, 16)
                         .foregroundStyle(Color.LabelColors.white)
@@ -46,7 +51,6 @@ struct SingleAudioDescriptionView: View {
                 GlassEffectContainer {
                     HStack {
                         ChipsView(text: DateService.formattedDate(note.createdAt))
-                        
                         ChipsView(text: DateService.formattedTime(note.createdAt))
                     }
                 }
@@ -59,25 +63,31 @@ struct SingleAudioDescriptionView: View {
             }
         }
         .padding(.horizontal, 20)
-        .navigationTitle(note.location?.cityName ?? "City")
-        .navigationSubtitle(note.location?.streetName ?? "Street")
+        .navigationTitle(note.location?.cityName ?? Texts.NotesPage.city)
+        .navigationSubtitle(note.location?.streetName ?? Texts.NotesPage.street)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup {
-//                Button(action: {
-//                    isEditing.toggle()
-//                }) {
-//                    Image(systemName: "pencil.line")
-//                        .foregroundStyle(Color.SupportColors.blue)
-//                }
-                
-                if let url = URL(string: "https://itmo.ru") {
-                    ShareLink(item: url) {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundStyle(Color.SupportColors.blue)
-                    }
-                }
+                shareMenu
             }
+        }
+        .sheet(isPresented: $viewModel.isPresentingShare, onDismiss: { viewModel.shareURL = nil }) {
+            if let url = viewModel.shareURL {
+                ActivityView(activityItems: [url])
+                    .ignoresSafeArea()
+            }
+        }
+        .alert(Texts.NotesPage.error,
+               isPresented: .constant(viewModel.errorMessage != nil),
+               actions: {
+            Button(Texts.NotesPage.ok) {
+                viewModel.errorMessage = nil
+            }
+        }, message: {
+            Text(viewModel.errorMessage ?? "")
+        })
+        .overlay(alignment: .center) {
+            if viewModel.isLoading { ProgressView().progressViewStyle(.circular) }
         }
     }
     
@@ -91,23 +101,38 @@ struct SingleAudioDescriptionView: View {
         }
     }
     
-    private static func getAudioDuration(for note: Note) -> TimeInterval? {
-        guard let path = note.audioPath else { return nil }
-        let url = URL(fileURLWithPath: path)
-        do {
-            let player = try AVAudioPlayer(contentsOf: url)
-            return player.duration
-        } catch {
-            print("Ошибка при получении длительности аудиофайла: \(error)")
-            return nil
+    private var shareMenu: some View {
+        Menu {
+            sharePDFButton
+            shareAudioButton
+        } label: {
+            Image.NotesPage.share
+                .foregroundStyle(Color.SupportColors.blue)
         }
     }
     
-    private func formatDuration(_ interval: TimeInterval?) -> String {
-        guard let interval = interval else { return "--:--" }
-        let minutes = Int(interval) / 60
-        let seconds = Int(interval) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+    private var sharePDFButton: some View {
+        Button {
+            viewModel.sharePDF()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.pdf)
+            } icon: {
+                Image.NotesPage.pdf
+            }
+        }
+    }
+    
+    private var shareAudioButton: some View {
+        Button {
+            viewModel.shareAudio()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.audio)
+            } icon: {
+                Image.NotesPage.audio
+            }
+        }
     }
 }
 
@@ -121,9 +146,11 @@ struct SingleAudioDescriptionView: View {
         audioPath: nil,
         createdAt: .now,
         updatedAt: .now,
+        duration: 20,
         location: Location(latitude: 0, longitude: 0, cityName: "Sample City", streetName: "Sample Street")
     )
     NavigationStack {
         SingleAudioDescriptionView(note: mock)
     }
 }
+

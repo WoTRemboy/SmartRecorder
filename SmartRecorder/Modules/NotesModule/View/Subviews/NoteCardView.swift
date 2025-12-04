@@ -9,11 +9,14 @@ import SwiftUI
 
 struct NoteCardView: View {
     
+    @StateObject private var viewModel: NoteShareViewModel
+    
     @State private var isEditing = false
     private let note: Note
     
     init(note: Note) {
         self.note = note
+        _viewModel = StateObject(wrappedValue: NoteShareViewModel(note: note))
     }
     
     internal var body: some View {
@@ -26,6 +29,26 @@ struct NoteCardView: View {
         .padding(.horizontal, 24)
         .background(Color.BackgroundColors.main)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .sheet(isPresented: $viewModel.isPresentingShare, onDismiss: { viewModel.shareURL = nil }) {
+            if let url = viewModel.shareURL {
+                ActivityView(activityItems: [url])
+                    .ignoresSafeArea()
+            }
+        }
+        .alert(Texts.NotesPage.error,
+               isPresented: .constant(viewModel.errorMessage != nil),
+               actions: {
+            Button(Texts.NotesPage.ok) {
+                viewModel.errorMessage = nil
+            }
+        }, message: {
+            Text(viewModel.errorMessage ?? "")
+        })
+        .overlay(alignment: .center) {
+            if viewModel.isLoading {
+                ProgressView().progressViewStyle(.circular)
+            }
+        }
     }
     
     private var titleStack: some View {
@@ -35,7 +58,7 @@ struct NoteCardView: View {
                 .foregroundStyle(Color.LabelColors.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .lineLimit(1)
-            shareButton
+            shareMenu
         }
     }
     
@@ -71,15 +94,40 @@ struct NoteCardView: View {
             }
     }
     
-    private var shareButton: some View {
-        Button {
-            // Share Button Action
+    private var shareMenu: some View {
+        Menu {
+            sharePDFButton
+            shareAudioButton
         } label: {
             Image.NotesPage.share
                 .resizable()
                 .scaledToFit()
                 .frame(width: 32, height: 32)
                 .foregroundStyle(Color.SupportColors.blue)
+        }
+    }
+    
+    private var sharePDFButton: some View {
+        Button {
+            viewModel.sharePDF()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.pdf)
+            } icon: {
+                Image.NotesPage.pdf
+            }
+        }
+    }
+    
+    private var shareAudioButton: some View {
+        Button {
+            viewModel.shareAudio()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.audio)
+            } icon: {
+                Image.NotesPage.audio
+            }
         }
     }
 }
@@ -94,6 +142,7 @@ struct NoteCardView: View {
         audioPath: nil,
         createdAt: .now,
         updatedAt: .now,
+        duration: 20,
         location: nil
     ))
 }

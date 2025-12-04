@@ -2,7 +2,7 @@
 //  UserEntityService.swift
 //  SmartRecorder
 //
-//  Created by Assistant on 28/11/2025.
+//  Created by Roman Tverdokhleb on 28/11/2025.
 //
 
 import Foundation

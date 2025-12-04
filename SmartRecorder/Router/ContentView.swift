@@ -80,4 +80,5 @@ struct ContentView: View {
     ContentView()
         .environmentObject(RecorderViewModel())
         .environmentObject(ProfileViewModel())
+        .environmentObject(NotesViewModel())
 }

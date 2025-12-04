@@ -15,7 +15,7 @@ struct SmartRecorderApp: App {
                 .preferredColorScheme(.light)
                 .environmentObject(RecorderViewModel())
                 .environmentObject(ProfileViewModel())
-
+                .environmentObject(NotesViewModel())
         }
     }
 }
