@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 import CoreLocation
+import AVFoundation
 
 final class OnboardingViewModel: ObservableObject {
     
@@ -20,6 +21,8 @@ final class OnboardingViewModel: ObservableObject {
     @Published internal var locationAuthorizationStatus: CLAuthorizationStatus = LocationService.shared.authorizationStatus
     
     @Published internal var showLocationPermissionAlert: Bool = false
+    @Published internal var microphoneGranted: Bool = (AVAudioApplication.shared.recordPermission == .granted)
+    @Published internal var showMicrophonePermissionAlert: Bool = false
     
     init() {
         LocationService.shared.$authorizationStatus
@@ -36,6 +39,16 @@ final class OnboardingViewModel: ObservableObject {
                 }
             }
             .store(in: &cancellables)
+        
+        Task { @MainActor in
+            let perm = AVAudioApplication.shared.recordPermission
+            self.microphoneGranted = (perm == .granted)
+            if self.steps.indices.contains(2) {
+                withAnimation {
+                    self.steps[2].grantedAccess = self.microphoneGranted
+                }
+            }
+        }
     }
     
     // MARK: - Computed Properties
@@ -53,7 +66,7 @@ final class OnboardingViewModel: ObservableObject {
         if currentStep < steps.count - 2 {
             return .nextPage
         } else if currentStep == steps.count - 2 {
-            return .getMicrophonePermission
+            return .getMicrophonePermission(access: AVAudioApplication.shared.recordPermission)
         } else {
             return .getLocationPermission(access: locationAuthorizationStatus)
         }
@@ -86,16 +99,36 @@ final class OnboardingViewModel: ObservableObject {
     
     internal func handleActionButtonTap(externalAction: @escaping () -> Void) {
         switch buttonType {
-        case .nextPage, .getMicrophonePermission:
-            withAnimation {
-                externalAction()
+        case .nextPage:
+            withAnimation { externalAction() }
+        case .getMicrophonePermission:
+            let perm = AVAudioApplication.shared.recordPermission
+            switch perm {
+            case .granted:
+                withAnimation { externalAction() }
+            case .undetermined:
+                AVAudioApplication.requestRecordPermission { [weak self] allowed in
+                    DispatchQueue.main.async {
+                        guard let self = self else { return }
+                        withAnimation {
+                            self.microphoneGranted = allowed
+                        }
+                        if self.steps.indices.contains(2) {
+                            withAnimation {
+                                self.steps[2].grantedAccess = allowed
+                            }
+                        }
+                    }
+                }
+            case .denied:
+                showMicrophonePermissionAlert.toggle()
+            @unknown default:
+                showMicrophonePermissionAlert.toggle()
             }
         case .getLocationPermission(let access):
             switch access {
             case .authorizedAlways, .authorizedWhenInUse:
-                withAnimation {
-                    self.transferToMainPage()
-                }
+                withAnimation { self.transferToMainPage() }
             case .notDetermined:
                 LocationService.shared.requestAuthorization()
             default:
@@ -107,13 +140,12 @@ final class OnboardingViewModel: ObservableObject {
     internal func handleSkipButtonTap(externalAction: @escaping () -> Void) {
         switch buttonType {
         case .getLocationPermission(_):
-            withAnimation {
-                self.transferToMainPage()
-            }
+            withAnimation { self.transferToMainPage() }
+        case .getMicrophonePermission:
+            withAnimation { externalAction() }
         default:
-            withAnimation {
-                externalAction()
-            }
+            withAnimation { externalAction() }
         }
     }
 }
+

@@ -50,6 +50,11 @@ struct OnboardingScreenView: View {
             } message: {
                 Text(Texts.OnboardingPage.LocationAlert.content)
             }
+            .alert(Texts.OnboardingPage.MicrophoneAlert.title, isPresented: $viewModel.showMicrophonePermissionAlert) {
+                microphoneAlertButtons
+            } message: {
+                Text(Texts.OnboardingPage.MicrophoneAlert.content)
+            }
         }
     }
     
@@ -148,6 +153,16 @@ struct OnboardingScreenView: View {
             }
         }
         Button(Texts.OnboardingPage.LocationAlert.cancel, role: .cancel) {}
+    }
+    
+    @ViewBuilder
+    private var microphoneAlertButtons: some View {
+        Button(Texts.OnboardingPage.MicrophoneAlert.settings) {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        }
+        Button(Texts.OnboardingPage.MicrophoneAlert.cancel, role: .cancel) {}
     }
 }
 

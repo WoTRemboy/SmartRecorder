@@ -50,6 +50,13 @@ final class Texts {
             static let settings = "Настройки"
             static let cancel = "Отмена"
         }
+        
+        enum MicrophoneAlert {
+            static let title = "Доступ к микрофону запрещен"
+            static let content = "Чтобы продолжить, разрешите доступ в настройках."
+            static let settings = "Настройки"
+            static let cancel = "Отмена"
+        }
     }
     
     enum NotesPage {
@@ -98,6 +105,7 @@ final class Texts {
         enum Toasts {
             static let uploadSuccess = "Загружено на сервер"
             static let uploadFailed = "Ошибка загрузки на сервер"
+            static let accessDenied = "Микрофон недоступен"
         }
     }
     
@@ -202,4 +210,3 @@ final class Texts {
         static let recorder = "начать\nзапись"
     }
 }
-

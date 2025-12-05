@@ -29,6 +29,7 @@ final class AudioRecorderService: ObservableObject {
         }
         guard granted else {
             await MainActor.run { self.isRecording = false }
+            Toast.shared.present(title: Texts.RecorderPage.Toasts.accessDenied)
             throw NSError(domain: "AudioRecorderService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Microphone permission not granted"])
         }
 
@@ -124,3 +125,4 @@ final class AudioRecorderService: ObservableObject {
         return fileURL
     }
 }
+
