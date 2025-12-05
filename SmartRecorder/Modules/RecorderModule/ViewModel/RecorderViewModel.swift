@@ -261,8 +261,9 @@ final class RecorderViewModel: ObservableObject {
                             folderId: 1,
                             place: place
                         )
-                        
+                        await Toast.shared.present(title: Texts.RecorderPage.Toasts.uploadSuccess)
                     } catch {
+                        await Toast.shared.present(title: Texts.RecorderPage.Toasts.uploadFailed)
                         await logger.error("Upload record failed: \(String(describing: error))")
                     }
                 }
@@ -275,7 +276,6 @@ final class RecorderViewModel: ObservableObject {
             showSaveErrorAlert.toggle()
         }
         saveNoteTitle = ""
-        saveNoteFolder = .work
     }
     
     deinit {

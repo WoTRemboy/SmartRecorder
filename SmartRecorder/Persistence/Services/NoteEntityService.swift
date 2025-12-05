@@ -170,7 +170,21 @@ final class NoteEntityService: NoteEntityServicing {
             context.perform {
                 do {
                     try block(context)
+                    // Capture changed object IDs before saving
+                    let inserted = context.insertedObjects.map { $0.objectID }
+                    let updated = context.updatedObjects.map { $0.objectID }
+                    let deleted = context.deletedObjects.map { $0.objectID }
+
                     if context.hasChanges { try context.save() }
+
+                    // Merge changes into the viewContext so UI updates immediately
+                    let changes: [AnyHashable: Any] = [
+                        NSInsertedObjectsKey: inserted,
+                        NSUpdatedObjectsKey: updated,
+                        NSDeletedObjectsKey: deleted
+                    ]
+                    NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.stack.viewContext])
+
                     cont.resume()
                 } catch {
                     cont.resume(throwing: error)

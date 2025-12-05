@@ -38,19 +38,19 @@ struct RootView<Content: View>: View {
                     let window = PassthroughWindow(windowScene: windowScene)
                     window.backgroundColor = .clear
                     
-//                    let controller = UIHostingController(rootView: AnyView(
-//                        ToastGroup().preferredColorScheme(userTheme.colorScheme)
-//                    ))
-//                    controller.view.frame = windowScene.keyWindow?.frame ?? .zero
-//                    controller.view.backgroundColor = .clear
-//                    window.rootViewController = controller
+                    let controller = UIHostingController(rootView: AnyView(
+                        ToastGroup())
+                    )
+                    controller.view.frame = windowScene.keyWindow?.frame ?? .zero
+                    controller.view.backgroundColor = .clear
+                    window.rootViewController = controller
                     
                     window.isHidden = false
                     window.isUserInteractionEnabled = true
                     window.tag = 1009
                     
                     overlayWindow = window
-//                    toastHostingController = controller
+                    toastHostingController = controller
                 }
                 
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,

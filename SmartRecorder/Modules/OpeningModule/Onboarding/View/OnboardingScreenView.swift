@@ -22,8 +22,10 @@ struct OnboardingScreenView: View {
     
     internal var body: some View {
         if viewModel.skipOnboarding {
-            ContentView()
-                .environmentObject(AppRouter())
+            RootView {
+                ContentView()
+                    .environmentObject(AppRouter())
+            }
         } else {
             VStack(alignment: .trailing) {
                 skipButton

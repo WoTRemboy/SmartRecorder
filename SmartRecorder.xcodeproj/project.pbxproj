@@ -70,6 +70,9 @@
 		63D656992EC63CC200B7EF10 /* NoteFolderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656982EC63CBE00B7EF10 /* NoteFolderModel.swift */; };
 		63D656A22EC64E4500B7EF10 /* RecorderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */; };
 		63D656A42EC6531F00B7EF10 /* RecorderDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */; };
+		63D7B8772EE301F800943B00 /* ToastModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D7B8762EE301F400943B00 /* ToastModel.swift */; };
+		63D7B87B2EE3021900943B00 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D7B87A2EE3021600943B00 /* ToastView.swift */; };
+		63D7B8802EE3027800943B00 /* ToastViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D7B87F2EE3027200943B00 /* ToastViewModel.swift */; };
 		63FD4DCD2EC0BEFC00104B95 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DCC2EC0BEF900104B95 /* AppRouter.swift */; };
 		63FD4DCF2EC0BF7D00104B95 /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */; };
 		63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FD4DD72EC0BFC700104B95 /* ProfileView.swift */; };
@@ -144,6 +147,9 @@
 		63D656982EC63CBE00B7EF10 /* NoteFolderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteFolderModel.swift; sourceTree = "<group>"; };
 		63D656A12EC64E4200B7EF10 /* RecorderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderViewModel.swift; sourceTree = "<group>"; };
 		63D656A32EC6531F00B7EF10 /* RecorderDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderDetailsView.swift; sourceTree = "<group>"; };
+		63D7B8762EE301F400943B00 /* ToastModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModel.swift; sourceTree = "<group>"; };
+		63D7B87A2EE3021600943B00 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
+		63D7B87F2EE3027200943B00 /* ToastViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastViewModel.swift; sourceTree = "<group>"; };
 		63FD4DCC2EC0BEF900104B95 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		63FD4DCE2EC0BF7C00104B95 /* TabItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabItems.swift; sourceTree = "<group>"; };
 		63FD4DD72EC0BFC700104B95 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -322,6 +328,7 @@
 				630069472ECA2DFD003FC115 /* Persistence */,
 				6300DD572EC3E5B300AF7DAC /* Services */,
 				636754F52EC27E83004702F4 /* Modules */,
+				63D7B8732EE301CF00943B00 /* Helpers */,
 				6360725B2E96D2E500E5DCC9 /* SupportFiles */,
 				63009A802EBFDDFF00FD5220 /* Assets */,
 				6300DD5A2EC3E69200AF7DAC /* Info.plist */,
@@ -565,6 +572,48 @@
 			path = RecorderStopView;
 			sourceTree = "<group>";
 		};
+		63D7B8732EE301CF00943B00 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				63D7B8742EE301E100943B00 /* InternalNotifications */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		63D7B8742EE301E100943B00 /* InternalNotifications */ = {
+			isa = PBXGroup;
+			children = (
+				63D7B8782EE301FC00943B00 /* Model */,
+				63D7B8792EE3020C00943B00 /* View */,
+				63D7B87E2EE3026900943B00 /* ViewModel */,
+			);
+			path = InternalNotifications;
+			sourceTree = "<group>";
+		};
+		63D7B8782EE301FC00943B00 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				63D7B8762EE301F400943B00 /* ToastModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		63D7B8792EE3020C00943B00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				63D7B87A2EE3021600943B00 /* ToastView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		63D7B87E2EE3026900943B00 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				63D7B87F2EE3027200943B00 /* ToastViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 		63FD4DCB2EC0BEE300104B95 /* Router */ = {
 			isa = PBXGroup;
 			children = (
@@ -678,6 +727,7 @@
 				63FD4DCD2EC0BEFC00104B95 /* AppRouter.swift in Sources */,
 				63FD4DDA2EC0C34000104B95 /* RootView.swift in Sources */,
 				52501E132EAAA4B90054DB54 /* FontExtension.swift in Sources */,
+				63D7B8772EE301F800943B00 /* ToastModel.swift in Sources */,
 				52501E162EB24AC40054DB54 /* RecorderView.swift in Sources */,
 				52501E0F2EAAA1BA0054DB54 /* ImageExtension.swift in Sources */,
 				63009A852EBFEDA100FD5220 /* OnboardingActionButtonsView.swift in Sources */,
@@ -694,6 +744,7 @@
 				636754F12EC27E71004702F4 /* ChipsView.swift in Sources */,
 				63FDC3142ED9C89000D0AAB8 /* AuthorizationPayloadModel.swift in Sources */,
 				636754F22EC27E71004702F4 /* PickerView.swift in Sources */,
+				63D7B87B2EE3021900943B00 /* ToastView.swift in Sources */,
 				6300694C2ECA2FE9003FC115 /* NoteEntityService.swift in Sources */,
 				636754F32EC27E71004702F4 /* SingleAudioDescriptionView.swift in Sources */,
 				636754F42EC27E71004702F4 /* NotesViewModel.swift in Sources */,
@@ -717,6 +768,7 @@
 				52501E1E2EB7876B0054DB54 /* SaveSheetView.swift in Sources */,
 				52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */,
 				639E98F02EC66E140026D76B /* DateService.swift in Sources */,
+				63D7B8802EE3027800943B00 /* ToastViewModel.swift in Sources */,
 				6300DD592EC3E5F600AF7DAC /* LocationService.swift in Sources */,
 				638020732EE22FB500A2CD91 /* RecordsResponseModel.swift in Sources */,
 				63FD4DD82EC0BFC700104B95 /* ProfileView.swift in Sources */,

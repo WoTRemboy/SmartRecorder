@@ -176,14 +176,32 @@ final class ProfileViewModel: ObservableObject {
     internal func logoutTapped() {
         Task { @MainActor in
             do {
+                // 1) Clear auth tokens and stored user
                 try TokenService.shared.clear()
                 try await authService.clearUserStorage()
+
+                // 2) Delete all Core Data notes
+                let noteService = NoteEntityService()
+                try await noteService.deleteAll(inFolder: nil)
+
+                // 3) Clear audio caches: temporary m4a and Documents/Audio
+                await clearAudioCache()
+                await clearDocumentsAudioDirectory()
+
+                // 4) Reset local state
                 self.isAuthorized = false
                 self.nickname = ""
                 self.email = ""
+                self.meetingsCount = 0
+                self.minutesInMeetings = 0
+                self.audioFilesCount = 0
+                self.audioCacheBytes = 0
+
                 self.infoMessage = Texts.ProfilePage.Dashboard.Logout.success
+                self.errorMessage = nil
             } catch {
                 self.errorMessage = error.localizedDescription
+                self.infoMessage = nil
             }
         }
     }
@@ -216,5 +234,23 @@ final class ProfileViewModel: ObservableObject {
         }
         await refreshAudioCacheStats()
         await MainActor.run { self.infoMessage = Texts.ProfilePage.Dashboard.Cache.success }
+    }
+
+    /// Clears downloaded audio files stored under Documents/Audio (used for offline playback/sharing).
+    internal func clearDocumentsAudioDirectory() async {
+        let fm = FileManager.default
+        do {
+            let docs = try fm.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let audioDir = docs.appendingPathComponent("Audio", isDirectory: true)
+            if fm.fileExists(atPath: audioDir.path) {
+                let urls = (try? fm.contentsOfDirectory(at: audioDir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])) ?? []
+                for url in urls where url.pathExtension.lowercased() == "m4a" {
+                    try? fm.removeItem(at: url)
+                }
+            }
+        } catch {
+            // Swallow errors silently during logout cleanup
+        }
+        await refreshAudioCacheStats()
     }
 }

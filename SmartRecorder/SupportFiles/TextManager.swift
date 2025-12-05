@@ -94,6 +94,11 @@ final class Texts {
             static let failure = "Ошибка"
             static let failureMessage = "Что-то пошло не так"
         }
+        
+        enum Toasts {
+            static let uploadSuccess = "Загружено на сервер"
+            static let uploadFailed = "Ошибка загрузки на сервер"
+        }
     }
     
     enum ProfilePage {
