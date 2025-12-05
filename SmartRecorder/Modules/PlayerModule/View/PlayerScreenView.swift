@@ -30,7 +30,7 @@ struct PlayerScreenView: View {
     internal var body: some View {
         NavigationStack {
             VStack {
-                Spacer()
+                aqualizerView
                 AudioDescriptionView(viewModel: viewModel)
                 ProgressBarView(viewModel: viewModel)
             }
@@ -67,6 +67,19 @@ struct PlayerScreenView: View {
         }, message: {
             Text(shareVM.errorMessage ?? "")
         })
+    }
+    
+    private var aqualizerView: some View {
+        HStack(alignment: .center, spacing: 6) {
+            ForEach(Array(viewModel.amplitudes.enumerated()), id: \.offset) { _, amp in
+                Capsule()
+                    .frame(width: 10, height: min(max(8, CGFloat(amp) * 800), 200))
+                    .foregroundColor(Color.LabelColors.blue)
+                    .animation(.easeOut(duration: 0.08), value: amp)
+            }
+        }
+        .frame(maxHeight: .infinity)
+        .padding(.horizontal, 36)
     }
     
     private var dismissButton: some View {
