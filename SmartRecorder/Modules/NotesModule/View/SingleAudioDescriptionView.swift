@@ -75,8 +75,12 @@ struct SingleAudioDescriptionView: View {
             Text(shareVM.errorMessage ?? "")
         })
         .overlay(alignment: .center) {
-            if shareVM.isLoading { ProgressView().progressViewStyle(.circular) }
+            if shareVM.isLoading {
+                LoadingCoverView()
+                    .transition(.opacity.combined(with: .scale))
+            }
         }
+        .animation(.easeInOut(duration: 0.2), value: shareVM.isLoading)
     }
     
     private var headTitle: some View {
@@ -150,4 +154,3 @@ struct SingleAudioDescriptionView: View {
         SingleAudioDescriptionView(note: Note.mock, namespace: Namespace().wrappedValue, viewModel: NotesViewModel())
     }
 }
-

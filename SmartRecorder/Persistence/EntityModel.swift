@@ -119,6 +119,8 @@ extension UserEntity {
         self.firstName = user.firstName
         self.lastName = user.lastName
         self.username = user.username
+        self.countMinutes = user.countMinutes
+        self.countRecords = user.countRecords
     }
 }
 

@@ -198,14 +198,12 @@ final class RecorderViewModel: ObservableObject {
         let title = saveNoteTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !title.isEmpty else { return }
         let folderId = saveNoteFolder.rawValue
-        let filePath = audioRecorderService?.recordedFileURL()?.path
+
+        let fileName = audioRecorderService?.recordedFileName()
         let now = Date()
         let locationObj = locationService.lastKnownLocation
 
-        let fileURL: URL? = {
-            guard let filePath = filePath else { return nil }
-            return URL(fileURLWithPath: filePath)
-        }()
+        let fileURL: URL? = AudioRecorderService.url(forFileName: fileName)
         var fileDuration: TimeInterval? = nil
         if let url = fileURL {
             fileDuration = await audioDuration(for: url)
@@ -225,35 +223,35 @@ final class RecorderViewModel: ObservableObject {
                 streetName: streetName
             )
         }()
+        let noteId = UUID()
         let note = Note(
-            id: UUID(),
+            id: noteId,
             serverId: nil,
             folderId: folderId,
             title: title,
             transcription: nil,
-            audioPath: filePath,
+            audioPath: fileName,
             createdAt: now,
             updatedAt: now,
             duration: durationToSave,
             location: noteLocation
         )
         audioRecorderService = nil
-        let noteService = NoteEntityService()
+        let noteService = NoteEntityService.shared
         do {
             _ = try await noteService.create(note)
             logger.info("Note saved locally. title=\(title), duration=\(durationToSave ?? -1)")
             // Fire-and-forget upload to server after local save
-            if let filePath = filePath {
-                let fileURL = URL(fileURLWithPath: filePath)
+            if let fileURL = fileURL {
                 let place: String? = {
                     if let loc = locationObj {
                         return "\(loc.coordinate.latitude),\(loc.coordinate.longitude)"
                     }
                     return nil
                 }()
-                Task.detached {
+                Task.detached { [noteId, title, now, folderId, place, fileURL] in
                     do {
-                        _ = try await RecordsService.shared.uploadRecord(
+                        let response = try await RecordsService.shared.uploadRecord(
                             fileURL: fileURL,
                             name: title,
                             datetime: now,
@@ -261,6 +259,11 @@ final class RecorderViewModel: ObservableObject {
                             folderId: 1,
                             place: place
                         )
+                        let serverId = String(response.id)
+                        if var updatedNote = try await noteService.fetch(NoteFetchOptions(query: NoteQuery(), limit: 0)).first(where: { $0.id == noteId }) {
+                            updatedNote.serverId = serverId
+                            _ = try await noteService.upsert(updatedNote)
+                        }
                         await Toast.shared.present(title: Texts.RecorderPage.Toasts.uploadSuccess)
                     } catch {
                         await Toast.shared.present(title: Texts.RecorderPage.Toasts.uploadFailed)

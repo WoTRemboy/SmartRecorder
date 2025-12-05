@@ -34,6 +34,9 @@ struct ProfileDashboardView: View {
         .safeAreaInset(edge: .bottom) {
             safeAreaInset
         }
+        .onAppear {
+            viewModel.dashboardAppeared()
+        }
     }
     
     private var statsContent: some View {

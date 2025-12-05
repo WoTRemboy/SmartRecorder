@@ -20,8 +20,14 @@ final class RecordsService {
     private static let serverDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        return formatter
+    }()
+    
+    private static let createdAtFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         return formatter
     }()
     
@@ -72,7 +78,6 @@ final class RecordsService {
         case .success(let data):
             if (200..<300).contains(http.statusCode) {
                 let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .formatted(Self.serverDateFormatter)
                 let recordResponse = try decoder.decode(RecordResponse.self, from: data)
                 logger.info("Upload succeeded with record id: \(recordResponse.id, privacy: .private)")
                 return recordResponse
@@ -124,15 +129,21 @@ final class RecordsService {
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .formatted(Self.serverDateFormatter)
                 let recordsPage = try decoder.decode(RecordsPage.self, from: data)
-                logger.info("Decoded records page: totalPages=\(recordsPage.totalPages, privacy: .public), totalElements=\(recordsPage.totalElements, privacy: .public), contentCount=\(recordsPage.content.count, privacy: .public)")
+                logger.info("Decoded records page: totalPages = \(recordsPage.totalPages, privacy: .public), totalElements = \(recordsPage.totalElements, privacy: .public), contentCount = \(recordsPage.content.count, privacy: .public)")
                 
                 // Persist to Core Data
-                let noteService = NoteEntityService()
+                let noteService = NoteEntityService.shared
                 for record in recordsPage.content {
                     let serverId = String(record.id)
                     // Try to find existing note by serverId to preserve stable UUID
                     let existing = try await noteService.fetch(NoteFetchOptions(query: NoteQuery(serverId: serverId), limit: 1))
                     let noteId = existing.first?.id ?? UUID()
+                    let audioPathToUse: String? = {
+                        if let local = existing.first?.audioPath, !local.isEmpty {
+                            return local
+                        }
+                        return String()
+                    }()
 
                     let loc: Location? = {
                         if let lat = record.latitude, let lon = record.longitude {
@@ -144,10 +155,10 @@ final class RecordsService {
                     let note = Note(
                         id: noteId,
                         serverId: serverId,
-                        folderId: record.folderId.map(String.init),
+                        folderId: record.category,
                         title: record.title ?? "",
                         transcription: record.description,
-                        audioPath: record.audioUrl,
+                        audioPath: audioPathToUse,
                         createdAt: record.createdAt ?? record.datetime ?? Date(),
                         updatedAt: record.updatedAt ?? record.datetime ?? Date(),
                         duration: Int(record.duration ?? 0),
@@ -217,7 +228,7 @@ final class RecordsService {
         case .success(let fileURL):
             logger.info("Audio saved to: \(fileURL.path(percentEncoded: false), privacy: .private)")
             // Update Core Data note with this serverId
-            let noteService = NoteEntityService()
+            let noteService = NoteEntityService.shared
             let serverId = String(recordId)
             if let existing = try await noteService.fetch(NoteFetchOptions(query: NoteQuery(serverId: serverId), limit: 1)).first {
                 var updated = existing

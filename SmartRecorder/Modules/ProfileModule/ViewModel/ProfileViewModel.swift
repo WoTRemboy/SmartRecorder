@@ -10,8 +10,8 @@ final class ProfileViewModel: ObservableObject {
     @Published internal private(set) var nickname: String = ""
     @Published internal private(set) var email: String = ""
 
-    @Published internal var meetingsCount: Int = 8
-    @Published internal var minutesInMeetings: Int = 50
+    @Published internal var meetingsCount: Int = 0
+    @Published internal var minutesInMeetings: Int = 0
 
     // Audio cache stats
     @Published internal private(set) var audioFilesCount: Int = 0
@@ -61,6 +61,13 @@ final class ProfileViewModel: ObservableObject {
             base[range].font = .system(size: UIFont.preferredFont(forTextStyle: .title3).pointSize, weight: .semibold)
         }
         return base
+    }
+    
+    internal func dashboardAppeared() {
+        Task { [weak self] in
+            guard let self = self else { return }
+            await self.refreshAudioCacheStats()
+        }
     }
     
     internal func clearCacheTapped() {
@@ -143,6 +150,9 @@ final class ProfileViewModel: ObservableObject {
             infoMessage = Texts.ProfilePage.Toasts.loginSuccess
             self.isAuthorized = true
             await self.loadCurrentUser()
+            Task {
+                _ = try await RecordsService.shared.fetchRecords(page: 0, size: 20)
+            }
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -181,7 +191,7 @@ final class ProfileViewModel: ObservableObject {
                 try await authService.clearUserStorage()
 
                 // 2) Delete all Core Data notes
-                let noteService = NoteEntityService()
+                let noteService = NoteEntityService.shared
                 try await noteService.deleteAll(inFolder: nil)
 
                 // 3) Clear audio caches: temporary m4a and Documents/Audio
@@ -254,3 +264,4 @@ final class ProfileViewModel: ObservableObject {
         await refreshAudioCacheStats()
     }
 }
+

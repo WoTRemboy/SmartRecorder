@@ -41,9 +41,6 @@ struct PlayerScreenView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     dismissButton
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    shareMenu
-                }
             }
         }
         .navigationTransition(

@@ -38,17 +38,21 @@ protocol NoteEntityServicing {
 }
 
 final class NoteEntityService: NoteEntityServicing {
+    internal static let shared = NoteEntityService()
+
     private let stack: CoreDataStack
 
-    init(stack: CoreDataStack = .shared) {
+    private init(stack: CoreDataStack = .shared) {
         self.stack = stack
     }
+    
+    private var context: NSManagedObjectContext { stack.viewContext }
 
     // MARK: - Create
     @discardableResult
     func create(_ note: Note) async throws -> Note {
-        try await performBackgroundSave { context in
-            let entity = NoteEntity(context: context)
+        try await performBackgroundSave {
+            let entity = NoteEntity(context: self.context)
             entity.apply(from: note)
         }
         // Return latest version from viewContext
@@ -58,14 +62,14 @@ final class NoteEntityService: NoteEntityServicing {
 
     // MARK: - Upsert
     func upsert(_ note: Note) async throws -> Note {
-        try await performBackgroundSave { context in
+        try await performBackgroundSave {
             let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", note.id as CVarArg)
             request.fetchLimit = 1
-            if let existing = try context.fetch(request).first {
+            if let existing = try self.context.fetch(request).first {
                 existing.apply(from: note)
             } else {
-                let entity = NoteEntity(context: context)
+                let entity = NoteEntity(context: self.context)
                 entity.apply(from: note)
             }
         }
@@ -75,8 +79,7 @@ final class NoteEntityService: NoteEntityServicing {
     // MARK: - Fetch
     func fetch(_ options: NoteFetchOptions) async throws -> [Note] {
         try await withCheckedThrowingContinuation { cont in
-            let context = stack.viewContext
-            context.perform {
+            self.context.perform {
                 do {
                     let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
                     request.predicate = Self.buildPredicate(from: options.query)
@@ -84,7 +87,7 @@ final class NoteEntityService: NoteEntityServicing {
                     request.includesPendingChanges = options.includesPendingChanges
                     if options.limit > 0 { request.fetchLimit = options.limit }
                     if options.offset > 0 { request.fetchOffset = options.offset }
-                    let objects = try context.fetch(request)
+                    let objects = try self.context.fetch(request)
                     cont.resume(returning: objects.map { $0.toDomain() })
                 } catch {
                     cont.resume(throwing: error)
@@ -95,12 +98,11 @@ final class NoteEntityService: NoteEntityServicing {
 
     func count(_ query: NoteQuery) async throws -> Int {
         try await withCheckedThrowingContinuation { cont in
-            let context = stack.viewContext
-            context.perform {
+            self.context.perform {
                 do {
                     let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
                     request.predicate = Self.buildPredicate(from: query)
-                    let count = try context.count(for: request)
+                    let count = try self.context.count(for: request)
                     cont.resume(returning: count)
                 } catch {
                     cont.resume(throwing: error)
@@ -111,20 +113,19 @@ final class NoteEntityService: NoteEntityServicing {
 
     // MARK: - Delete
     func delete(id: UUID) async throws {
-        try await performBackgroundSave { context in
+        try await performBackgroundSave {
             let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
             request.fetchLimit = 1
-            if let obj = try context.fetch(request).first {
-                context.delete(obj)
+            if let obj = try self.context.fetch(request).first {
+                self.context.delete(obj)
             }
         }
     }
 
     func deleteAll(inFolder folderId: String? = nil) async throws {
         try await withCheckedThrowingContinuation { cont in
-            let context = stack.newBackgroundContext()
-            context.perform {
+            self.context.perform {
                 do {
                     let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NoteEntity.fetchRequest()
                     fetchRequest.predicate = {
@@ -133,11 +134,11 @@ final class NoteEntityService: NoteEntityServicing {
                     }()
                     let batch = NSBatchDeleteRequest(fetchRequest: fetchRequest)
                     batch.resultType = .resultTypeObjectIDs
-                    if let result = try context.execute(batch) as? NSBatchDeleteResult,
+                    if let result = try self.context.execute(batch) as? NSBatchDeleteResult,
                        let objectIDs = result.result as? [NSManagedObjectID],
                        !objectIDs.isEmpty {
                         let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: objectIDs]
-                        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.stack.viewContext])
+                        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.context])
                     }
                     cont.resume()
                 } catch {
@@ -150,13 +151,12 @@ final class NoteEntityService: NoteEntityServicing {
     // MARK: - Helpers
     private func fetchById(_ id: UUID) async throws -> Note? {
         try await withCheckedThrowingContinuation { cont in
-            let context = stack.viewContext
-            context.perform {
+            self.context.perform {
                 do {
                     let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
                     request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
                     request.fetchLimit = 1
-                    cont.resume(returning: try context.fetch(request).first?.toDomain())
+                    cont.resume(returning: try self.context.fetch(request).first?.toDomain())
                 } catch {
                     cont.resume(throwing: error)
                 }
@@ -164,18 +164,17 @@ final class NoteEntityService: NoteEntityServicing {
         }
     }
 
-    private func performBackgroundSave(_ block: @escaping (NSManagedObjectContext) throws -> Void) async throws {
+    private func performBackgroundSave(_ block: @escaping () throws -> Void) async throws {
         try await withCheckedThrowingContinuation { cont in
-            let context = stack.newBackgroundContext()
-            context.perform {
+            self.context.perform {
                 do {
-                    try block(context)
+                    try block()
                     // Capture changed object IDs before saving
-                    let inserted = context.insertedObjects.map { $0.objectID }
-                    let updated = context.updatedObjects.map { $0.objectID }
-                    let deleted = context.deletedObjects.map { $0.objectID }
+                    let inserted = self.context.insertedObjects.map { $0.objectID }
+                    let updated = self.context.updatedObjects.map { $0.objectID }
+                    let deleted = self.context.deletedObjects.map { $0.objectID }
 
-                    if context.hasChanges { try context.save() }
+                    if self.context.hasChanges { try self.context.save() }
 
                     // Merge changes into the viewContext so UI updates immediately
                     let changes: [AnyHashable: Any] = [
@@ -183,7 +182,7 @@ final class NoteEntityService: NoteEntityServicing {
                         NSUpdatedObjectsKey: updated,
                         NSDeletedObjectsKey: deleted
                     ]
-                    NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.stack.viewContext])
+                    NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.context])
 
                     cont.resume()
                 } catch {
@@ -220,3 +219,4 @@ final class NoteEntityService: NoteEntityServicing {
         return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 }
+

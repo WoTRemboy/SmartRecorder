@@ -35,8 +35,8 @@ struct ProgressBarView: View {
         ZStack(alignment: .center) {
             Capsule()
                 .foregroundColor(.SupportColors.lightBlue)
-                .frame(width: viewModel.sliderProgress)
-                .position(x: viewModel.sliderProgress / 2.0, y: sliderHeight / 2.0)
+                .frame(width: max(sliderHeight, viewModel.sliderProgress))
+                .position(x: max(sliderHeight / 2, viewModel.sliderProgress / 2.0), y: sliderHeight / 2.0)
                 .animation(.interactiveSpring, value: viewModel.sliderProgress)
                 .zIndex(1)
             
@@ -44,7 +44,7 @@ struct ProgressBarView: View {
                 .foregroundColor(.SupportColors.lightBlue)
                 .opacity(0.0)
                 .contentShape(Circle())
-                .frame(width: 15.0, height: 15.0)
+                .frame(width: sliderHeight, height: sliderHeight)
                 .gesture(
                     DragGesture(minimumDistance: 7.5, coordinateSpace: .named("slider"))
                         .onChanged { a in

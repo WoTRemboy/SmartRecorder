@@ -33,6 +33,7 @@
 		6300DD592EC3E5F600AF7DAC /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6300DD582EC3E5F600AF7DAC /* LocationService.swift */; };
 		632DFAC72ED777A8003D528B /* TokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632DFAC62ED777A8003D528B /* TokenService.swift */; };
 		632DFAC92ED7786C003D528B /* AuthAppService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632DFAC82ED7786C003D528B /* AuthAppService.swift */; };
+		635FDF742EE343F200F3F6C5 /* LoadingCoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635FDF732EE343F200F3F6C5 /* LoadingCoverView.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
 		636754ED2EC27E71004702F4 /* AudiosArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636754E02EC27E71004702F4 /* AudiosArray.swift */; };
@@ -110,6 +111,7 @@
 		6300DD5A2EC3E69200AF7DAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		632DFAC62ED777A8003D528B /* TokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenService.swift; sourceTree = "<group>"; };
 		632DFAC82ED7786C003D528B /* AuthAppService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAppService.swift; sourceTree = "<group>"; };
+		635FDF732EE343F200F3F6C5 /* LoadingCoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCoverView.swift; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRecorderApp.swift; sourceTree = "<group>"; };
@@ -576,6 +578,7 @@
 			isa = PBXGroup;
 			children = (
 				63D7B8742EE301E100943B00 /* InternalNotifications */,
+				635FDF732EE343F200F3F6C5 /* LoadingCoverView.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -776,6 +779,7 @@
 				63FDC3162ED9CB1100D0AAB8 /* UserEntityService.swift in Sources */,
 				52501DFF2EA7E5ED0054DB54 /* PlayerScreenView.swift in Sources */,
 				636754F82EC2823F004702F4 /* NotesTabDestinationFactory.swift in Sources */,
+				635FDF742EE343F200F3F6C5 /* LoadingCoverView.swift in Sources */,
 				637575102EDFB433007B4FA2 /* ProfileFloatingField.swift in Sources */,
 				63D656A42EC6531F00B7EF10 /* RecorderDetailsView.swift in Sources */,
 				52501E0D2EAA9F3F0054DB54 /* ColorExtension.swift in Sources */,

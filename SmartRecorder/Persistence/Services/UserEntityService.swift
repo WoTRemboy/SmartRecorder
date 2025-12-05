@@ -114,7 +114,7 @@ final class UserEntityService: UserEntityServicing {
 
     func delete() async throws {
         try await withCheckedThrowingContinuation { cont in
-            let context = stack.newBackgroundContext()
+            let context = stack.viewContext
             context.perform {
                 do {
                     let fetchRequest: NSFetchRequest<NSFetchRequestResult> = UserEntity.fetchRequest()
@@ -153,7 +153,7 @@ final class UserEntityService: UserEntityServicing {
 
     private func performBackgroundSave(_ block: @escaping (NSManagedObjectContext) throws -> Void) async throws {
         try await withCheckedThrowingContinuation { cont in
-            let context = stack.newBackgroundContext()
+            let context = stack.viewContext
             context.perform {
                 do {
                     try block(context)

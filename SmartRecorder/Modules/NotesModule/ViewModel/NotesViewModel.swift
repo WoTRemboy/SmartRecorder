@@ -27,7 +27,7 @@ final class NotesViewModel: ObservableObject {
     private var totalPages: Int = 1
     private let pageSize: Int = 20
     
-    private var coreDataObserver: NSObjectProtocol?
+    private var cancellables = Set<AnyCancellable>()
 
     var filteredAndSearchedAudios: [Note] {
         let categoryFiltered: [Note]
@@ -47,20 +47,26 @@ final class NotesViewModel: ObservableObject {
         Task { await self.loadNotes() }
         Task { await self.refresh() }
         
-        coreDataObserver = NotificationCenter.default.addObserver(forName: .NSManagedObjectContextObjectsDidChange, object: CoreDataStack.shared.viewContext, queue: .main) { [weak self] _ in
-            Task { await self?.loadNotes() }
-        }
+        NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange, object: nil)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                let viewContext = CoreDataStack.shared.viewContext
+                if let context = notification.object as? NSManagedObjectContext, context != viewContext {
+                    viewContext.mergeChanges(fromContextDidSave: notification)
+                }
+                Task { await self?.loadNotes() }
+            }
+            .store(in: &cancellables)
     }
     
     internal func toggleIsShowingPlayer() {
         isShowingPlayer.toggle()
     }
 
-    private func loadNotes() async {
-        let service = NoteEntityService()
+    internal func loadNotes() async {
+        let service = NoteEntityService.shared
         do {
             let notes = try await service.fetch(NoteFetchOptions())
-            logger.debug("Fetched notes from Core Data: count=\(notes.count)")
             await MainActor.run { self.notes = notes }
         } catch {
             logger.error("Failed to fetch notes: \(String(describing: error))")
@@ -109,11 +115,4 @@ final class NotesViewModel: ObservableObject {
             await MainActor.run { self.isSyncing = false }
         }
     }
-    
-    deinit {
-        if let observer = coreDataObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-    }
 }
-

@@ -20,13 +20,11 @@ final class PlayerViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var isPlaying: Bool = false
 
-    // Slider state moved from ProgressBarView
     @Published var sliderProgress: CGFloat = 0.0
     @Published var totalWidth: CGFloat = 0.0
     @Published var sliderChangeInProgress: Bool = false
     @Published var currentTimeLabel: TimeInterval = 0.0
 
-    // Aqualizer amplitudes used by PlayerScreenView
     @Published var amplitudes: [Float] = []
 
     private let note: Note
@@ -39,35 +37,41 @@ final class PlayerViewModel: ObservableObject {
     init(note: Note) {
         self.note = note
         self.amplitudes = Array(repeating: 0, count: bandsCount)
-        // Kick off async setup without blocking UI (no backend interaction)
         isLoading = true
         Task { [weak self] in
             guard let self else { return }
-            if let path = note.audioPath, !path.isEmpty {
-                let raw = path.trimmingCharacters(in: .whitespacesAndNewlines)
-                let url: URL
-                if raw.hasPrefix("file://") {
-                    let tmp = URL(string: raw)
-                    url = URL(fileURLWithPath: tmp?.path ?? raw)
-                } else {
-                    url = URL(fileURLWithPath: raw)
-                }
+            if let url = PlayerViewModel.resolveAudioURL(for: note.audioPath) {
                 self.initializePlayer(with: url)
                 self.isLoading = false
             } else {
-                logger.critical("Audio path is missing for note: \(note.title, privacy: .private)")
+                logger.critical("Audio path is missing or invalid for note: \(note.title, privacy: .private)")
                 self.isLoading = false
             }
         }
     }
     
+    static func resolveAudioURL(for audioPath: String?) -> URL? {
+        guard let audioPath = audioPath, !audioPath.isEmpty else { return nil }
+        let trimmed = audioPath.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("/") || trimmed.hasPrefix("file://") {
+            if trimmed.hasPrefix("file://") {
+                return URL(string: trimmed)
+            } else {
+                return URL(fileURLWithPath: trimmed)
+            }
+        } else {
+            return AudioRecorderService.url(forFileName: trimmed)
+        }
+    }
+    
     private func initializePlayer(with url: URL) {
-        if !FileManager.default.fileExists(atPath: url.path) {
-            logger.error("Audio file does not exist at path: \(url.path(percentEncoded: false), privacy: .private)")
+        let filePath = url.isFileURL ? url.path : url.absoluteString
+        if !FileManager.default.fileExists(atPath: filePath) {
+            logger.error("Audio file does not exist at path: \(filePath, privacy: .private)")
             return
         }
         
-        if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+        if let attrs = try? FileManager.default.attributesOfItem(atPath: filePath),
            let size = attrs[.size] as? NSNumber {
             logger.debug("Audio file size: \(size.int64Value, privacy: .public) bytes")
         }
@@ -88,7 +92,7 @@ final class PlayerViewModel: ObservableObject {
             duration = player.duration
             startAmplitudeTimer()
         } catch {
-            logger.error("Error initializing player with path: \(url.path, privacy: .private). Error: \(String(describing: error), privacy: .private)")
+            logger.error("Error initializing player with path: \(filePath, privacy: .private). Error: \(String(describing: error), privacy: .private)")
         }
     }
     

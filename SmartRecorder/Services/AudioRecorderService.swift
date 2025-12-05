@@ -17,7 +17,16 @@ final class AudioRecorderService: ObservableObject {
     private let audioQueue = DispatchQueue(label: "AudioRecorderService.queue")
     
     private var audioFile: AVAudioFile?
-    private var fileURL: URL?
+    private var fileName: String?
+    
+    func recordedFileName() -> String? {
+        return fileName
+    }
+    
+    static func url(forFileName fileName: String?) -> URL? {
+        guard let name = fileName, !name.isEmpty else { return nil }
+        return FileManager.default.temporaryDirectory.appendingPathComponent(name)
+    }
     
     func startRecording() async throws {
         guard !isRecording else { return }
@@ -45,10 +54,9 @@ final class AudioRecorderService: ObservableObject {
                     let input = self.engine.inputNode
                     let inputFormat = input.inputFormat(forBus: 0)
                     
-                    let dir = FileManager.default.temporaryDirectory
                     let fileName = UUID().uuidString + ".m4a"
-                    let url = dir.appendingPathComponent(fileName)
-                    self.fileURL = url
+                    let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+                    self.fileName = fileName
                     self.audioFile = try AVAudioFile(forWriting: url, settings: inputFormat.settings, commonFormat: .pcmFormatFloat32, interleaved: false)
 
                     input.removeTap(onBus: 0)
@@ -97,21 +105,15 @@ final class AudioRecorderService: ObservableObject {
 
         var averageAmplitude: Float = 0.0
         for i in 0..<frameLength {
-            // absolute value so that negative samples
-            // don't cancel out positive samples
             averageAmplitude += abs(channelDataPointer[0][i])
         }
         averageAmplitude /= Float(frameLength)
 
         var bandValues = [Float](repeating: 0, count: amplitudes.count)
         for band in 0..<amplitudes.count {
-            // to add more movement
             let linearRandomValue = Float.random(in: 0.5..<1.5)
             let normalizedBandIdx = Float(band) / Float(amplitudes.count - 1)
-            // to add pretty round corners
             let sinValue = sin(normalizedBandIdx * .pi)
-            // average amplitude is here to retain resemblance this is some
-            // form of actual sound analysis
             let amplitude = averageAmplitude * (sinValue + 0.1) * linearRandomValue
             bandValues[band] = amplitude
         }
@@ -119,10 +121,6 @@ final class AudioRecorderService: ObservableObject {
         DispatchQueue.main.async { [bandValues] in
             self.amplitudes = bandValues
         }
-    }
-    
-    func recordedFileURL() -> URL? {
-        return fileURL
     }
 }
 
