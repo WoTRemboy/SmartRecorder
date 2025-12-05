@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		52501DFF2EA7E5ED0054DB54 /* PlayerScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */; };
-		52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E002EA7EB450054DB54 /* NavigationBarView.swift */; };
 		52501E082EA906BA0054DB54 /* ProgressBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E072EA906BA0054DB54 /* ProgressBarView.swift */; };
 		52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E092EA90CB10054DB54 /* AudioDescriptionView.swift */; };
 		52501E0D2EAA9F3F0054DB54 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52501E0C2EAA9F350054DB54 /* ColorExtension.swift */; };
@@ -83,7 +82,6 @@
 
 /* Begin PBXFileReference section */
 		52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerScreenView.swift; sourceTree = "<group>"; };
-		52501E002EA7EB450054DB54 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
 		52501E072EA906BA0054DB54 /* ProgressBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBarView.swift; sourceTree = "<group>"; };
 		52501E092EA90CB10054DB54 /* AudioDescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDescriptionView.swift; sourceTree = "<group>"; };
 		52501E0C2EAA9F350054DB54 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
@@ -517,7 +515,6 @@
 		63D6569C2EC649E100B7EF10 /* Subviews */ = {
 			isa = PBXGroup;
 			children = (
-				52501E002EA7EB450054DB54 /* NavigationBarView.swift */,
 				52501E072EA906BA0054DB54 /* ProgressBarView.swift */,
 				52501E092EA90CB10054DB54 /* AudioDescriptionView.swift */,
 			);
@@ -718,7 +715,6 @@
 				636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */,
 				636754FE2EC2882D004702F4 /* ProfileTabDestinationFactory.swift in Sources */,
 				52501E1E2EB7876B0054DB54 /* SaveSheetView.swift in Sources */,
-				52501E012EA7EB450054DB54 /* NavigationBarView.swift in Sources */,
 				52501E0A2EA90CB10054DB54 /* AudioDescriptionView.swift in Sources */,
 				639E98F02EC66E140026D76B /* DateService.swift in Sources */,
 				6300DD592EC3E5F600AF7DAC /* LocationService.swift in Sources */,

@@ -7,23 +7,82 @@
 
 import Foundation
 import AVKit
-import os
+import OSLog
 import Combine
 
-final class PlayerDelegate: NSObject, AVAudioPlayerDelegate {
-    var isPlaying = false
-    
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        isPlaying = false
-    }
-}
+private let logger = Logger(subsystem: "SmartRecorder", category: "PlayerViewModel")
 
-@Observable
-final class PlayerViewModel {
-    var isPlaying: Bool {
-        get {
-            delegate.isPlaying
+@MainActor
+final class PlayerViewModel: ObservableObject {
+    
+    private let delegate = PlayerDelegate()
+    // Delegate wiring will be set after player creation
+    
+    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var isPlaying: Bool = false
+    
+    private let note: Note
+    private var player: AVAudioPlayer?
+    
+    internal var duration = 1.0
+    
+    init(note: Note) {
+        self.note = note
+        // Kick off async setup without blocking UI (no backend interaction)
+        isLoading = true
+        Task { [weak self] in
+            guard let self else { return }
+            if let path = note.audioPath, !path.isEmpty {
+                let raw = path.trimmingCharacters(in: .whitespacesAndNewlines)
+                let url: URL
+                if raw.hasPrefix("file://") {
+                    let tmp = URL(string: raw)
+                    url = URL(fileURLWithPath: tmp?.path ?? raw)
+                } else {
+                    url = URL(fileURLWithPath: raw)
+                }
+                self.initializePlayer(with: url)
+                self.isLoading = false
+            } else {
+                logger.critical("Audio path is missing for note: \(note.title, privacy: .private)")
+                self.isLoading = false
+            }
         }
+    }
+    
+    private func initializePlayer(with url: URL) {
+        if !FileManager.default.fileExists(atPath: url.path) {
+            logger.error("Audio file does not exist at path: \(url.path(percentEncoded: false), privacy: .private)")
+            return
+        }
+        
+        if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+           let size = attrs[.size] as? NSNumber {
+            logger.debug("Audio file size: \(size.int64Value, privacy: .public) bytes")
+        }
+        
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.prepareToPlay()
+            currentTime = player.currentTime
+            self.player = player
+            player.delegate = delegate
+            delegate.onFinish = { [weak self] in
+                guard let self else { return }
+                self.isPlaying = false
+            }
+            duration = player.duration
+        } catch {
+            logger.error("Error initializing player with path: \(url.path, privacy: .private). Error: \(String(describing: error), privacy: .private)")
+        }
+    }
+    
+    internal var noteName: String {
+        note.title
+    }
+    
+    internal var noteDate: Date {
+        note.createdAt
     }
     
     var currentTime: TimeInterval {
@@ -35,38 +94,23 @@ final class PlayerViewModel {
         }
     }
     
-    var duration = 1.0
-    
-    private var player: AVAudioPlayer?
-    private var delegate = PlayerDelegate()
-    private var logger = Logger(subsystem: "todo.TODO.smart-recorder", category: "PlayerViewModel")
-    
-    // тестовое аудио не залито в репозиторий
-    private let fileName = "testAudio"
-
-    init() {
-        guard let url = Bundle.main.url(forResource: fileName, withExtension: "flac") else {
-            logger.critical("Test audio not found")
-            return
-        }
-        do {
-            let player = try AVAudioPlayer(contentsOf: url)
-            player.prepareToPlay()
-            currentTime = player.currentTime
-            self.player = player
-            player.delegate = delegate
-            duration = player.duration
-        } catch {
-            logger.critical("Error initializing player: \(error)")
+    func togglePlayback() {
+        if isLoading { return }
+        guard let player else { return }
+        if isPlaying {
+            player.pause()
+            isPlaying = false
+        } else {
+            player.play()
+            isPlaying = true
         }
     }
-    
-    func toggle() {
-        if isPlaying {
-            player?.pause()
-        } else {
-            player?.play()
-        }
-        delegate.isPlaying.toggle()
+}
+
+final class PlayerDelegate: NSObject, AVAudioPlayerDelegate {
+    var onFinish: (() -> Void)?
+
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        onFinish?()
     }
 }

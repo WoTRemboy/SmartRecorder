@@ -121,3 +121,18 @@ extension UserEntity {
         self.username = user.username
     }
 }
+
+extension Note {
+    internal static let mock = Note(
+        id: UUID(),
+        serverId: nil,
+        folderId: "note_folder_work",
+        title: "Sample Note Title",
+        transcription: nil,
+        audioPath: nil,
+        createdAt: .now,
+        updatedAt: .now,
+        duration: 20,
+        location: Location(latitude: 0, longitude: 0, cityName: "Sample City", streetName: "Sample Street")
+    )
+}

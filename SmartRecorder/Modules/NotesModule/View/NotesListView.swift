@@ -12,6 +12,7 @@ struct NotesListView: View {
     
     @EnvironmentObject private var appRouter: AppRouter
     @EnvironmentObject private var viewModel: NotesViewModel
+    @Namespace private var namespace
     
     internal var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -43,9 +44,14 @@ struct NotesListView: View {
         
         .navigationTitle(Texts.NotesPage.title)
         .toolbarRole(.navigationStack)
+        .fullScreenCover(item: $viewModel.selectedNote) { item in
+            PlayerScreenView(note: item, namespace: namespace)
+        }
+        
         .searchable(text: $viewModel.searchItem,
                     placement: .toolbarPrincipal,
                     prompt: Texts.NotesPage.search)
+        
         .onChange(of: viewModel.searchItem) { _, _ in
             Task { await viewModel.refresh() }
         }
@@ -62,9 +68,9 @@ struct NotesListView: View {
     }
     
     private func noteCardView(note: Note) -> some View {
-        NoteCardView(note: note)
+        NoteCardView(note: note, namespace: namespace, viewModel: viewModel)
             .onTapGesture {
-                appRouter.push(.noteDetails(note: note), in: .notes)
+                appRouter.push(.noteDetails(note: note, namespace: namespace, viewModel: viewModel), in: .notes)
             }
             .padding(.horizontal)
             .transition(.blurReplace)

@@ -194,7 +194,7 @@ final class Texts {
     }
     
     enum Button {
-        static let recorder = "начать запись"
+        static let recorder = "начать\nзапись"
     }
 }
 

@@ -8,43 +8,41 @@
 import SwiftUI
 
 struct AudioDescriptionView: View {
-    @State private var date = Date()
     
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack(spacing: 5) {
-                ZStack {
-                    Capsule()
-                        .frame(width: 82, height: 26)
-                        .foregroundColor(.SupportColors.lightBlue.opacity(0.3))
-                    
-                    Text("Apr 1, 2025")
-                        .font(Font.caption())
-                        .foregroundColor(.SupportColors.blue)
-                    
-                }
-                ZStack {
-                    Capsule()
-                        .frame(width: 63, height: 26)
-                        .foregroundColor(.SupportColors.lightBlue.opacity(0.3))
-                    Text("9:41 AM")
-                        .font(Font.caption())
-                        .foregroundColor(.SupportColors.blue)
-                }
-            }
-            
-            Text("Исследования конкурентов и организация взаимодействий")
-                .font(Font.title())
-                .foregroundColor(.SupportColors.blue)
-                .lineLimit(2)
-                .padding(.bottom)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
+    @ObservedObject private var viewModel: PlayerViewModel
+    
+    init(viewModel: PlayerViewModel) {
+        self.viewModel = viewModel
+    }
+        
+    internal var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            noteDetailsView
+            noteNameLabel
         }
         .padding(.horizontal, 20)
+    }
+    
+    private var noteDetailsView: some View {
+        GlassEffectContainer {
+            HStack {
+                ChipsView(text: DateService.formattedDate(viewModel.noteDate))
+                ChipsView(text: DateService.formattedTime(viewModel.noteDate))
+            }
+        }
+    }
+    
+    private var noteNameLabel: some View {
+        Text(viewModel.noteName)
+            .font(Font.title())
+            .foregroundColor(.SupportColors.blue)
+            .lineLimit(2)
+            .padding(.bottom)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
 #Preview {
-    AudioDescriptionView()
+    let viewModel = PlayerViewModel(note: Note.mock)
+    AudioDescriptionView(viewModel: viewModel)
 }

@@ -9,18 +9,22 @@ import SwiftUI
 
 struct SingleAudioDescriptionView: View {
     
-    @StateObject private var viewModel: NoteShareViewModel
+    @ObservedObject private var viewModel: NotesViewModel
+    @StateObject private var shareVM: NoteShareViewModel
 
     @State private var isEditing = false
     @State private var audioDuration: TimeInterval? = nil
     
     private let note: Note
+    private let namespace: Namespace.ID
     
-    init(note: Note) {
+    init(note: Note, namespace: Namespace.ID, viewModel: NotesViewModel) {
         self.note = note
+        self.namespace = namespace
+        self.viewModel = viewModel
         
         let vm = NoteShareViewModel(note: note)
-        _viewModel = StateObject(wrappedValue: vm)
+        _shareVM = StateObject(wrappedValue: vm)
         self._audioDuration = State(initialValue: vm.getAudioDuration(for: note))
     }
     
@@ -29,23 +33,7 @@ struct SingleAudioDescriptionView: View {
             headTitle
             
             HStack {
-                HStack {
-                    Image.NotesPage.play
-                        .resizable()
-                        .frame(width: 32, height: 32)
-                        .background(.white)
-                        .clipShape(Capsule())
-                        .foregroundStyle(Color.SupportColors.blue)
-                    
-                    Text(viewModel.formatDuration(audioDuration))
-                        .font(.subheadline)
-                        .padding(.trailing, 16)
-                        .foregroundStyle(Color.LabelColors.white)
-                }
-                
-                .background(Color(Color.SupportColors.lightBlue))
-                .clipShape(Capsule())
-                
+                playButton
                 Spacer()
                 
                 GlassEffectContainer {
@@ -67,27 +55,27 @@ struct SingleAudioDescriptionView: View {
         .navigationSubtitle(note.location?.streetName ?? Texts.NotesPage.street)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItemGroup {
+            ToolbarItem(placement: .topBarTrailing) {
                 shareMenu
             }
         }
-        .sheet(isPresented: $viewModel.isPresentingShare, onDismiss: { viewModel.shareURL = nil }) {
-            if let url = viewModel.shareURL {
+        .sheet(isPresented: $shareVM.isPresentingShare, onDismiss: { shareVM.shareURL = nil }) {
+            if let url = shareVM.shareURL {
                 ActivityView(activityItems: [url])
                     .ignoresSafeArea()
             }
         }
         .alert(Texts.NotesPage.error,
-               isPresented: .constant(viewModel.errorMessage != nil),
+               isPresented: .constant(shareVM.errorMessage != nil),
                actions: {
             Button(Texts.NotesPage.ok) {
-                viewModel.errorMessage = nil
+                shareVM.errorMessage = nil
             }
         }, message: {
-            Text(viewModel.errorMessage ?? "")
+            Text(shareVM.errorMessage ?? "")
         })
         .overlay(alignment: .center) {
-            if viewModel.isLoading { ProgressView().progressViewStyle(.circular) }
+            if shareVM.isLoading { ProgressView().progressViewStyle(.circular) }
         }
     }
     
@@ -98,6 +86,27 @@ struct SingleAudioDescriptionView: View {
             
             Text(note.title)
                 .font(.title).bold()
+        }
+    }
+    
+    private var playButton: some View {
+        HStack {
+            Image.NotesPage.play
+                .resizable()
+                .frame(width: 32, height: 32)
+                .background(.white)
+                .clipShape(Capsule())
+                .foregroundStyle(Color.SupportColors.blue)
+            
+            Text(shareVM.formatDuration(audioDuration))
+                .font(.subheadline)
+                .padding(.trailing, 16)
+                .foregroundStyle(Color.LabelColors.white)
+        }
+        .matchedTransitionSource(id: note.id, in: namespace)
+        .glassEffect(.regular.interactive().tint(Color.SupportColors.lightBlue))
+        .onTapGesture {
+            viewModel.selectedNote = note
         }
     }
     
@@ -113,7 +122,7 @@ struct SingleAudioDescriptionView: View {
     
     private var sharePDFButton: some View {
         Button {
-            viewModel.sharePDF()
+            shareVM.sharePDF()
         } label: {
             Label {
                 Text(Texts.NotesPage.pdf)
@@ -125,7 +134,7 @@ struct SingleAudioDescriptionView: View {
     
     private var shareAudioButton: some View {
         Button {
-            viewModel.shareAudio()
+            shareVM.shareAudio()
         } label: {
             Label {
                 Text(Texts.NotesPage.audio)
@@ -137,20 +146,8 @@ struct SingleAudioDescriptionView: View {
 }
 
 #Preview {
-    let mock = Note(
-        id: UUID(),
-        serverId: nil,
-        folderId: "note_folder_work",
-        title: "Sample Note Title",
-        transcription: nil,
-        audioPath: nil,
-        createdAt: .now,
-        updatedAt: .now,
-        duration: 20,
-        location: Location(latitude: 0, longitude: 0, cityName: "Sample City", streetName: "Sample Street")
-    )
     NavigationStack {
-        SingleAudioDescriptionView(note: mock)
+        SingleAudioDescriptionView(note: Note.mock, namespace: Namespace().wrappedValue, viewModel: NotesViewModel())
     }
 }
 

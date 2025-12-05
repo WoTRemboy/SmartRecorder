@@ -9,14 +9,20 @@ import SwiftUI
 
 struct NoteCardView: View {
     
-    @StateObject private var viewModel: NoteShareViewModel
+    @ObservedObject internal var viewModel: NotesViewModel
+    @StateObject private var shareVM: NoteShareViewModel
     
     @State private var isEditing = false
-    private let note: Note
+    @State private var isShowingPlayer = false
     
-    init(note: Note) {
+    private let note: Note
+    private let namespace: Namespace.ID
+    
+    init(note: Note, namespace: Namespace.ID, viewModel: NotesViewModel) {
         self.note = note
-        _viewModel = StateObject(wrappedValue: NoteShareViewModel(note: note))
+        self.namespace = namespace
+        self.viewModel = viewModel
+        _shareVM = StateObject(wrappedValue: NoteShareViewModel(note: note))
     }
     
     internal var body: some View {
@@ -29,26 +35,27 @@ struct NoteCardView: View {
         .padding(.horizontal, 24)
         .background(Color.BackgroundColors.main)
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .sheet(isPresented: $viewModel.isPresentingShare, onDismiss: { viewModel.shareURL = nil }) {
-            if let url = viewModel.shareURL {
+        .sheet(isPresented: $shareVM.isPresentingShare, onDismiss: { shareVM.shareURL = nil }) {
+            if let url = shareVM.shareURL {
                 ActivityView(activityItems: [url])
                     .ignoresSafeArea()
             }
         }
         .alert(Texts.NotesPage.error,
-               isPresented: .constant(viewModel.errorMessage != nil),
+               isPresented: .constant(shareVM.errorMessage != nil),
                actions: {
             Button(Texts.NotesPage.ok) {
-                viewModel.errorMessage = nil
+                shareVM.errorMessage = nil
             }
         }, message: {
-            Text(viewModel.errorMessage ?? "")
+            Text(shareVM.errorMessage ?? "")
         })
         .overlay(alignment: .center) {
-            if viewModel.isLoading {
+            if shareVM.isLoading {
                 ProgressView().progressViewStyle(.circular)
             }
         }
+        .matchedTransitionSource(id: note.id, in: namespace)
     }
     
     private var titleStack: some View {
@@ -84,14 +91,15 @@ struct NoteCardView: View {
     }
     
     private var playButton: some View {
-        Image.NotesPage.play
-            .resizable()
-            .frame(width: 64, height: 64)
-            .foregroundStyle(Color.SupportColors.blue)
-            .glassEffect(.regular.interactive())
-            .onTapGesture {
-                // Play Button Action
-            }
+        Button {
+            viewModel.selectedNote = note
+        } label: {
+            Image.NotesPage.play
+                .resizable()
+                .frame(width: 64, height: 64)
+                .foregroundStyle(Color.SupportColors.blue)
+                .glassEffect(.regular.interactive())
+        }
     }
     
     private var shareMenu: some View {
@@ -109,7 +117,7 @@ struct NoteCardView: View {
     
     private var sharePDFButton: some View {
         Button {
-            viewModel.sharePDF()
+            shareVM.sharePDF()
         } label: {
             Label {
                 Text(Texts.NotesPage.pdf)
@@ -121,7 +129,7 @@ struct NoteCardView: View {
     
     private var shareAudioButton: some View {
         Button {
-            viewModel.shareAudio()
+            shareVM.shareAudio()
         } label: {
             Label {
                 Text(Texts.NotesPage.audio)
@@ -133,16 +141,5 @@ struct NoteCardView: View {
 }
 
 #Preview {
-    NoteCardView(note: Note(
-        id: UUID(),
-        serverId: nil,
-        folderId: nil,
-        title: "Sample Note",
-        transcription: nil,
-        audioPath: nil,
-        createdAt: .now,
-        updatedAt: .now,
-        duration: 20,
-        location: nil
-    ))
+    NoteCardView(note: Note.mock, namespace: Namespace().wrappedValue, viewModel: NotesViewModel())
 }

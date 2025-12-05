@@ -20,6 +20,9 @@ final class NotesViewModel: ObservableObject {
     @Published var notes: [Note] = []
     @Published var isSyncing: Bool = false
     
+    @Published internal var isShowingPlayer = false
+    @Published internal var selectedNote: Note? = nil
+    
     private var currentPage: Int = 0
     private var totalPages: Int = 1
     private let pageSize: Int = 20
@@ -47,6 +50,10 @@ final class NotesViewModel: ObservableObject {
         coreDataObserver = NotificationCenter.default.addObserver(forName: .NSManagedObjectContextObjectsDidChange, object: CoreDataStack.shared.viewContext, queue: .main) { [weak self] _ in
             Task { await self?.loadNotes() }
         }
+    }
+    
+    internal func toggleIsShowingPlayer() {
+        isShowingPlayer.toggle()
     }
 
     private func loadNotes() async {

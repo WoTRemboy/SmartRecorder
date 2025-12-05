@@ -48,7 +48,7 @@ final class AppRouter: ObservableObject {
     
     enum Route: Hashable {
         case notesList
-        case noteDetails(note: Note)
+        case noteDetails(note: Note, namespace: Namespace.ID, viewModel: NotesViewModel)
         
         case recorder
         case profile
@@ -71,6 +71,35 @@ final class AppRouter: ObservableObject {
             popToRoot(in: tab)
         } else {
             selectedTab = tab
+        }
+    }
+}
+
+extension AppRouter.Route {
+    static func == (lhs: AppRouter.Route, rhs: AppRouter.Route) -> Bool {
+        switch (lhs, rhs) {
+        case (.notesList, .notesList), (.recorder, .recorder), (.profile, .profile):
+            return true
+        case let (.noteDetails(_, lhsNamespace, lhsVM), .noteDetails(_, rhsNamespace, rhsVM)):
+            // Compare by namespace and view model identity to avoid requiring Hashable on associated types
+            return lhsNamespace == rhsNamespace && ObjectIdentifier(lhsVM) == ObjectIdentifier(rhsVM)
+        default:
+            return false
+        }
+    }
+}
+
+extension AppRouter.Route {
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .notesList:
+            hasher.combine(0)
+        case .recorder:
+            hasher.combine(1)
+        case .profile:
+            hasher.combine(2)
+        case .noteDetails(_, _, _):
+            hasher.combine(3)
         }
     }
 }

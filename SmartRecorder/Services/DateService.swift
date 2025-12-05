@@ -13,7 +13,7 @@ struct DateService {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
-        formatter.locale = .current
+        formatter.locale = Locale(identifier: "ru_RU")
         return formatter.string(from: Date())
     }
     
