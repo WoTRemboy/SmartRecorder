@@ -67,6 +67,8 @@ final class ProfileViewModel: ObservableObject {
         Task { [weak self] in
             guard let self = self else { return }
             await self.refreshAudioCacheStats()
+            _ = await AuthorizationService.shared.refreshProfileOnLaunch()
+            await loadCurrentUser()
         }
     }
     

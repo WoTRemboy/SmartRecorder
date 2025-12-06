@@ -42,7 +42,6 @@ final class RecordsService {
         ]
         
         let fileName = fileURL.lastPathComponent.isEmpty ? "record.m4a" : fileURL.lastPathComponent
-        let fileData = try Data(contentsOf: fileURL)
         
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -51,7 +50,7 @@ final class RecordsService {
         
         let uploadRequest = AF.upload(multipartFormData: { form in
             // file part
-            form.append(fileData, withName: "recordFile", fileName: fileName, mimeType: "audio/m4a")
+            form.append(fileURL, withName: "recordFile", fileName: fileName, mimeType: "audio/m4a")
             
             // text fields
             if let nameData = name.data(using: .utf8) {

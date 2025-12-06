@@ -264,6 +264,7 @@ final class RecorderViewModel: ObservableObject {
                             updatedNote.serverId = serverId
                             _ = try await noteService.upsert(updatedNote)
                         }
+                        
                         await Toast.shared.present(title: Texts.RecorderPage.Toasts.uploadSuccess)
                     } catch {
                         await Toast.shared.present(title: Texts.RecorderPage.Toasts.uploadFailed)

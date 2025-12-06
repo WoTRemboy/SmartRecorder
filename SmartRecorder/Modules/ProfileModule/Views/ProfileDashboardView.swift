@@ -34,7 +34,7 @@ struct ProfileDashboardView: View {
         .safeAreaInset(edge: .bottom) {
             safeAreaInset
         }
-        .onAppear {
+        .task {
             viewModel.dashboardAppeared()
         }
     }

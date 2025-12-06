@@ -16,7 +16,8 @@ final class AudioRecorderService: ObservableObject {
     private var isRecording = false
     private let audioQueue = DispatchQueue(label: "AudioRecorderService.queue")
     
-    private var audioFile: AVAudioFile?
+    private var recorder: AVAudioRecorder?
+    private var meterTimer: Timer?
     private var fileName: String?
     
     func recordedFileName() -> String? {
@@ -51,23 +52,31 @@ final class AudioRecorderService: ObservableObject {
                     try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
                     try session.setActive(true, options: [])
                     
-                    let input = self.engine.inputNode
-                    let inputFormat = input.inputFormat(forBus: 0)
-                    
                     let fileName = UUID().uuidString + ".m4a"
                     let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
                     self.fileName = fileName
-                    self.audioFile = try AVAudioFile(forWriting: url, settings: inputFormat.settings, commonFormat: .pcmFormatFloat32, interleaved: false)
 
-                    input.removeTap(onBus: 0)
-                    input.installTap(onBus: 0, bufferSize: 1024, format: nil) { [weak self] (buffer, _) in
-                        self?.processAudioBuffer(buffer)
-                        if let strongSelf = self {
-                            try? strongSelf.audioFile?.write(from: buffer)
+                    // AAC in M4A settings
+                    let settings: [String: Any] = [
+                        AVFormatIDKey: kAudioFormatMPEG4AAC,
+                        AVSampleRateKey: 44100,
+                        AVNumberOfChannelsKey: 1,
+                        AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+                    ]
+
+                    self.recorder = try AVAudioRecorder(url: url, settings: settings)
+                    self.recorder?.isMeteringEnabled = true
+                    self.recorder?.prepareToRecord()
+                    self.recorder?.record()
+
+                    // Start metering timer to update amplitudes ~20 fps
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.meterTimer?.invalidate()
+                        self.meterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+                            self?.updateAmplitudesFromRecorder()
                         }
                     }
-
-                    try self.engine.start()
 
                     Task { @MainActor in
                         self.isRecording = true
@@ -90,37 +99,33 @@ final class AudioRecorderService: ObservableObject {
         await withCheckedContinuation { cont in
             audioQueue.async { [weak self] in
                 guard let self = self else { cont.resume(returning: ()); return }
-                self.engine.inputNode.removeTap(onBus: 0)
-                self.engine.stop()
+                self.recorder?.stop()
+                self.recorder = nil
+                self.meterTimer?.invalidate()
+                self.meterTimer = nil
                 try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
-                self.audioFile = nil
                 cont.resume(returning: ())
             }
         }
     }
     
-    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
-        let frameLength = Int(buffer.frameLength)
-        guard frameLength > 0, let channelDataPointer = buffer.floatChannelData else { return }
-
-        var averageAmplitude: Float = 0.0
-        for i in 0..<frameLength {
-            averageAmplitude += abs(channelDataPointer[0][i])
-        }
-        averageAmplitude /= Float(frameLength)
+    private func updateAmplitudesFromRecorder() {
+        guard let recorder = recorder else { return }
+        recorder.updateMeters()
+        // Convert average power (dB) to linear 0...1
+        let avgPower = recorder.averagePower(forChannel: 0) // -160...0 dB
+        let level = max(0.0, min(1.0, pow(10.0, avgPower / 20.0)))
 
         var bandValues = [Float](repeating: 0, count: amplitudes.count)
         for band in 0..<amplitudes.count {
             let linearRandomValue = Float.random(in: 0.5..<1.5)
             let normalizedBandIdx = Float(band) / Float(amplitudes.count - 1)
             let sinValue = sin(normalizedBandIdx * .pi)
-            let amplitude = averageAmplitude * (sinValue + 0.1) * linearRandomValue
+            let amplitude = Float(level) * (sinValue + 0.1) * linearRandomValue
             bandValues[band] = amplitude
         }
-        
         DispatchQueue.main.async { [bandValues] in
             self.amplitudes = bandValues
         }
     }
 }
-
