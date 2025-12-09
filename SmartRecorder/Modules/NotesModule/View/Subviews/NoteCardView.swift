@@ -50,11 +50,6 @@ struct NoteCardView: View {
         }, message: {
             Text(shareVM.errorMessage ?? "")
         })
-        .overlay(alignment: .center) {
-            if shareVM.isLoading {
-                ProgressView().progressViewStyle(.circular)
-            }
-        }
         .matchedTransitionSource(id: note.id, in: namespace)
     }
     
@@ -92,13 +87,32 @@ struct NoteCardView: View {
     
     private var playButton: some View {
         Button {
-            viewModel.selectedNote = note
+            playButtonAction()
         } label: {
-            Image.NotesPage.play
-                .resizable()
+            playButtonImage
                 .frame(width: 64, height: 64)
                 .foregroundStyle(Color.SupportColors.blue)
                 .glassEffect(.regular.interactive())
+        }
+        .disabled(shareVM.isLoading)
+        .symbolEffect(.breathe, isActive: shareVM.isLoading)
+    }
+    
+    private var playButtonImage: some View {
+        if isValidAudioPath {
+            return Image.NotesPage.play
+                .resizable()
+        } else {
+            return Image.NotesPage.download
+                .resizable()
+        }
+    }
+    
+    private func playButtonAction() {
+        if isValidAudioPath {
+            viewModel.selectedNote = note
+        } else {
+            shareVM.downloadAudio()
         }
     }
     
@@ -137,6 +151,13 @@ struct NoteCardView: View {
                 Image.NotesPage.audio
             }
         }
+    }
+    
+    private var isValidAudioPath: Bool {
+        if let path = note.audioPath, !path.isEmpty {
+            return true
+        }
+        return false
     }
 }
 

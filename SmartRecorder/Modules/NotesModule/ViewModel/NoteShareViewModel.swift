@@ -20,42 +20,94 @@ final class NoteShareViewModel: ObservableObject {
     @Published var errorMessage: String? = nil
 
     private let note: Note
+    
+    enum ShareType {
+        case pdf, audio
+    }
 
     init(note: Note) {
         self.note = note
     }
 
-    enum ShareType { case pdf, audio }
-
-    func sharePDF() { Task { await downloadAndPresent(type: .pdf) } }
-    func shareAudio() { Task { await downloadAndPresent(type: .audio) } }
+    internal func sharePDF() {
+        Task {
+            await downloadAndPresent(type: .pdf)
+        }
+        
+    }
+    
+    internal func shareAudio() {
+        Task {
+            await downloadAndPresent(type: .audio)
+        }
+    }
+    
+    internal func downloadAudio() {
+        Task {
+            do {
+                _ = try await downloadAudio(manageLoading: false)
+                Toast.shared.present(title: "\(Texts.NotesPage.loadSuccessFirst) \"\(note.title)\" \(Texts.NotesPage.loadSuccessSecond)")
+            } catch(let error) {
+                Toast.shared.present(title: "\(Texts.NotesPage.loadError) \"\(note.title)\"")
+                logger.error("Downloading audio failed: \(error)")
+            }
+        }
+    }
 
     @MainActor
     private func setLoading(_ value: Bool) { self.isLoading = value }
+    
+    // MARK: - Direct Downloads
+    
+    /// Downloads the PDF for the current note and returns a local file URL.
+    private func downloadPDF() async throws -> URL {
+        guard let sid = note.serverId, let recordId = Int64(sid) else {
+            throw NSError(domain: "NoteShareViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "Нет serverId для записи"])
+        }
+        LoadingOverlay.shared.show()
+        return try await RecordsService.shared.downloadRecordPDF(recordId: recordId)
+    }
+
+    /// Downloads the audio for the current note and returns a local file URL.
+    /// - Parameter manageLoading: When true, this method will toggle `isLoading` automatically.
+    private func downloadAudio(manageLoading: Bool = true) async throws -> URL {
+        if manageLoading {
+            await MainActor.run { self.isLoading = true }
+            LoadingOverlay.shared.show()
+        }
+        defer {
+            if manageLoading {
+                Task { @MainActor in self.isLoading = false }
+                LoadingOverlay.shared.hide()
+            }
+        }
+        guard let sid = note.serverId, let recordId = Int64(sid) else {
+            throw NSError(domain: "NoteShareViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "Нет serverId для записи"])
+        }
+        return try await RecordsService.shared.downloadRecordAudio(recordId: recordId)
+    }
 
     private func downloadAndPresent(type: ShareType) async {
-        guard let sid = note.serverId, let recordId = Int64(sid) else {
-            await MainActor.run { self.errorMessage = "Нет serverId для записи" }
-            return
-        }
         setLoading(true)
         do {
             let url: URL
             switch type {
             case .pdf:
-                url = try await RecordsService.shared.downloadRecordPDF(recordId: recordId)
+                url = try await downloadPDF()
             case .audio:
-                url = try await RecordsService.shared.downloadRecordAudio(recordId: recordId)
+                url = try await downloadAudio()
             }
             await MainActor.run {
                 self.shareURL = url
-                self.isPresentingShare = true
                 self.isLoading = false
+                LoadingOverlay.shared.hide()
+                self.isPresentingShare = true
             }
         } catch {
             await MainActor.run {
                 self.errorMessage = error.localizedDescription
                 self.isLoading = false
+                LoadingOverlay.shared.hide()
             }
             logger.error("Share download failed: \(String(describing: error), privacy: .private)")
         }
