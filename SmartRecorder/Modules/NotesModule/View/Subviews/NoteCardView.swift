@@ -33,7 +33,7 @@ struct NoteCardView: View {
         }
         .padding(.vertical)
         .padding(.horizontal, 24)
-        .background(Color.BackgroundColors.main)
+        .background(Color.BackgroundColors.card)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .sheet(isPresented: $shareVM.isPresentingShare, onDismiss: { shareVM.shareURL = nil }) {
             if let url = shareVM.shareURL {
@@ -91,7 +91,6 @@ struct NoteCardView: View {
         } label: {
             playButtonImage
                 .frame(width: 64, height: 64)
-                .foregroundStyle(Color.SupportColors.blue)
                 .glassEffect(.regular.interactive())
         }
         .disabled(shareVM.isLoading)
@@ -102,9 +101,13 @@ struct NoteCardView: View {
         if isValidAudioPath {
             return Image.NotesPage.play
                 .resizable()
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(Color.LabelColors.white, Color.SupportColors.blue)
         } else {
             return Image.NotesPage.download
                 .resizable()
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(Color.LabelColors.white, Color.SupportColors.blue)
         }
     }
     

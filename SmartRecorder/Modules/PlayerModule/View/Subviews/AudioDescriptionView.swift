@@ -35,7 +35,7 @@ struct AudioDescriptionView: View {
     private var noteNameLabel: some View {
         Text(viewModel.noteName)
             .font(Font.title())
-            .foregroundColor(.SupportColors.blue)
+            .foregroundColor(Color.LabelColors.blue)
             .lineLimit(2)
             .padding(.bottom)
             .frame(maxWidth: .infinity, alignment: .leading)

@@ -67,7 +67,7 @@ struct SaveSheetView: View {
         }
         .padding(.horizontal, 30)
         .padding(.vertical, 22)
-        .glassEffect(.regular.tint(isSelected ? Color.BackgroundColors.main : Color.BackgroundColors.primary))
+        .glassEffect(.regular.tint(isSelected ? Color.BackgroundColors.card : Color.BackgroundColors.primary))
         
         .contentShape(.capsule)
         .onTapGesture {

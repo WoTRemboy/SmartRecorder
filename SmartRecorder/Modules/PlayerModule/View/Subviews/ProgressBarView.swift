@@ -83,7 +83,7 @@ struct ProgressBarView: View {
             Text(String("\(timeIntervalToString(viewModel.duration))"))
         }
         .font(Font.caption(.semibold))
-        .foregroundColor(.SupportColors.blue.opacity(0.75))
+        .foregroundColor(Color.LabelColors.blue.opacity(0.75))
     }
     
     private var controlButtons: some View {
@@ -94,7 +94,7 @@ struct ProgressBarView: View {
                 forwardButton
             }
         }
-        .foregroundColor(.SupportColors.blue)
+        .foregroundColor(Color.LabelColors.blue)
         .padding()
     }
     

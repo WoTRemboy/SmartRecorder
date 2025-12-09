@@ -29,7 +29,7 @@ struct EmailCardView: View {
             .overlay {
                 Text(initial)
                     .font(.system(size: 50, weight: .semibold))
-                    .foregroundColor(Color.SupportColors.blue)
+                    .foregroundColor(Color.LabelColors.blue)
             }
             .frame(width: 120, height: 120)
     }
@@ -44,7 +44,7 @@ struct EmailCardView: View {
                 .font(.emailTitle())
                 .minimumScaleFactor(0.4)
                 .lineLimit(1)
-                .foregroundColor(Color.SupportColors.blue)
+                .foregroundColor(Color.LabelColors.blue)
                 .truncationMode(.middle)
         }
     }

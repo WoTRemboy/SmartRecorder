@@ -100,7 +100,7 @@ struct PlayerScreenView: View {
         } label: {
             Image.NotesPage.share
         }
-        .foregroundStyle(Color.SupportColors.blue)
+        .foregroundStyle(Color.LabelColors.blue)
     }
     
     private var sharePDFButton: some View {

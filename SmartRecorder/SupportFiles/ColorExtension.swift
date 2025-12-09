@@ -19,6 +19,7 @@ extension Color {
     enum BackgroundColors {
         static let main = Color("BackMain")
         static let primary = Color("BackPrimary")
+        static let card = Color("BackCard")
   
     }
     enum SupportColors {

@@ -122,7 +122,7 @@ struct OnboardingScreenView: View {
                 if step == page.index {
                     Circle()
                         .frame(width: 15, height: 15)
-                        .foregroundStyle(Color.black)
+                        .foregroundStyle(Color.LabelColors.primary)
                         .transition(.scale)
                 } else {
                     Circle()

@@ -53,7 +53,7 @@ struct ContentView: View {
                 }
             }
         }
-        .accentColor(Color.SupportColors.blue)
+        .accentColor(Color.LabelColors.blue)
         .environmentObject(appRouter)
         
         .task {
