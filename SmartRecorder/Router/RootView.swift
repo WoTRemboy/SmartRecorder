@@ -59,19 +59,19 @@ struct RootView<Content: View>: View {
                     let window = PassthroughWindow(windowScene: windowScene)
                     window.backgroundColor = .clear
                     
-//                    let controller = UIHostingController(rootView: AnyView(
-//                        LoadingOverlayGroup().preferredColorScheme(userTheme.colorScheme)
-//                    ))
-//                    controller.view.frame = windowScene.keyWindow?.frame ?? .zero
-//                    controller.view.backgroundColor = .clear
-//                    window.rootViewController = controller
+                    let controller = UIHostingController(rootView: AnyView(
+                        LoadingOverlayGroup()
+                    ))
+                    controller.view.frame = windowScene.keyWindow?.frame ?? .zero
+                    controller.view.backgroundColor = .clear
+                    window.rootViewController = controller
                     
                     window.isHidden = false
                     window.isUserInteractionEnabled = false
                     window.tag = 1010
                     
                     loadingOverlayWindow = window
-//                    loadingOverlayHostingController = controller
+                    loadingOverlayHostingController = controller
                 }
             }
     }
