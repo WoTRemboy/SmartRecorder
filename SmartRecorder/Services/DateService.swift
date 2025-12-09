@@ -21,6 +21,7 @@ struct DateService {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         formatter.timeStyle = .none
+        formatter.timeZone = .current
         formatter.locale = .current
         return formatter.string(from: date)
     }
@@ -29,6 +30,7 @@ struct DateService {
         let formatter = DateFormatter()
         formatter.dateStyle = .none
         formatter.timeStyle = .short
+        formatter.timeZone = .current
         formatter.locale = .current
         return formatter.string(from: date)
     }

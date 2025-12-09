@@ -1,3 +1,9 @@
+//
+//  ProfileView.swift
+//  SmartRecorder
+//
+//  Created by Roman Tverdokhleb on 13/11/2025.
+//
 import SwiftUI
 
 struct ProfileView: View {

@@ -1,8 +1,15 @@
+//
+//  ProfileDashboardView.swift
+//  SmartRecorder
+//
+//  Created by Roman Tverdokhleb on 13/11/2025.
+//
+
 import SwiftUI
 
 struct ProfileDashboardView: View {
     
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject private var viewModel: ProfileViewModel
     
     @State private var isShowingLogoutAlert: Bool = false
     @State private var isShowingClearCacheDialog: Bool = false

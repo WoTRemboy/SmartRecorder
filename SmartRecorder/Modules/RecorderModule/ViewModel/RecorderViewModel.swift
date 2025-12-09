@@ -9,7 +9,6 @@ import Foundation
 import Combine
 import SwiftUI
 import CoreLocation
-import MapKit
 import AVFoundation
 import CoreData
 import OSLog
@@ -23,8 +22,8 @@ final class RecorderViewModel: ObservableObject {
     @Published private(set) var showTimerView: Bool = false
     @Published private(set) var elapsedTime: TimeInterval = 0
     
-    @Published private(set) var streetName: String? = nil
-    @Published private(set) var cityName: String? = nil
+    @Published internal var streetName: String? = nil
+    @Published internal var cityName: String? = nil
     @Published private(set) var locationPermissionDenied: Bool = false
     
     @Published internal var saveNoteTitle: String = ""
@@ -98,28 +97,14 @@ final class RecorderViewModel: ObservableObject {
                 return
             }
         }
-        updateStreetName(from: location)
-    }
-    
-    private func updateStreetName(from location: CLLocation) {
-        guard let request = MKReverseGeocodingRequest(location: location) else { return }
-        Task {
-            do {
-                let mapItems = try await request.mapItems
-                if let address = mapItems.first?.name {
-                    self.streetName = address
-                } else {
-                    self.streetName = nil
-                }
-                if let cityName = mapItems.first?.addressRepresentations?.cityName {
-                    self.cityName = cityName
-                } else {
-                    self.cityName = nil
-                }
-            } catch {
-                logger.error("Reverse geocoding failed: \(String(describing: error))")
-                self.streetName = nil
-            }
+        do {
+            let names = try await locationService.reverseGeocode(location: location)
+            self.streetName = names.street
+            self.cityName = names.city
+        } catch {
+            logger.error("Reverse geocoding failed: \(String(describing: error))")
+            self.streetName = nil
+            self.cityName = nil
         }
     }
     
@@ -151,7 +136,10 @@ final class RecorderViewModel: ObservableObject {
             recordTimerCancellable?.cancel()
             if let service = audioRecorderService {
                 Task {
+                    LoadingOverlay.shared.show()
                     await service.stopRecording()
+                    
+                    LoadingOverlay.shared.hide()
                     showSaveSheetView.toggle()
                 }
             }

@@ -143,6 +143,12 @@ final class RecordsService {
                         }
                         return String()
                     }()
+                    let durationToUse: Int = {
+                        if let local = existing.first?.duration, local > 0 {
+                            return local
+                        }
+                        return 0
+                    }()
 
                     let loc: Location? = {
                         if let lat = record.latitude, let lon = record.longitude {
@@ -160,7 +166,7 @@ final class RecordsService {
                         audioPath: audioPathToUse,
                         createdAt: record.createdAt ?? record.datetime ?? Date(),
                         updatedAt: record.updatedAt ?? record.datetime ?? Date(),
-                        duration: Int(record.duration ?? 0),
+                        duration: durationToUse,
                         location: loc
                     )
                     _ = try await noteService.upsert(note)
@@ -209,7 +215,7 @@ final class RecordsService {
         ]
 
         let fileName = "record-\(recordId).m4a"
-        let destinationURL: URL = try audioDirectoryURL().appendingPathComponent(fileName, isDirectory: false)
+        let destinationURL: URL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName, isDirectory: false)
 
         let destination: DownloadRequest.Destination = { _, _ in
             return (destinationURL, [.removePreviousFile, .createIntermediateDirectories])
@@ -231,7 +237,7 @@ final class RecordsService {
             let serverId = String(recordId)
             if let existing = try await noteService.fetch(NoteFetchOptions(query: NoteQuery(serverId: serverId), limit: 1)).first {
                 var updated = existing
-                updated.audioPath = fileURL.path
+                updated.audioPath = fileName
                 _ = try await noteService.upsert(updated)
                 logger.info("Updated Core Data note with serverId=\(serverId, privacy: .private) audioPath")
             } else {
@@ -274,7 +280,7 @@ final class RecordsService {
         ]
 
         let fileName = "record-\(recordId).pdf"
-        let destinationURL: URL = try pdfDirectoryURL().appendingPathComponent(fileName, isDirectory: false)
+        let destinationURL: URL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName, isDirectory: false)
 
         let destination: DownloadRequest.Destination = { _, _ in
             return (destinationURL, [.removePreviousFile, .createIntermediateDirectories])

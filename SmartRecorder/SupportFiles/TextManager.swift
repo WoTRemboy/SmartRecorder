@@ -73,6 +73,10 @@ final class Texts {
         
         static let error = "Ошибка"
         static let ok = "Хорошо"
+        
+        static let loadSuccessFirst = "Загрузка"
+        static let loadSuccessSecond = "завершена"
+        static let loadError = "Ошибка загрузки"
     }
     
     enum NoteFolder {

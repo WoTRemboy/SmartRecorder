@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct SingleAudioDescriptionView: View {
     
@@ -51,8 +52,8 @@ struct SingleAudioDescriptionView: View {
             }
         }
         .padding(.horizontal, 20)
-        .navigationTitle(note.location?.cityName ?? Texts.NotesPage.city)
-        .navigationSubtitle(note.location?.streetName ?? Texts.NotesPage.street)
+        .navigationTitle(note.location?.cityName ?? viewModel.placeCity(for: note) ?? "")
+        .navigationSubtitle(note.location?.streetName ?? viewModel.placeStreet(for: note) ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -74,13 +75,10 @@ struct SingleAudioDescriptionView: View {
         }, message: {
             Text(shareVM.errorMessage ?? "")
         })
-        .overlay(alignment: .center) {
-            if shareVM.isLoading {
-                LoadingCoverView()
-                    .transition(.opacity.combined(with: .scale))
-            }
-        }
         .animation(.easeInOut(duration: 0.2), value: shareVM.isLoading)
+        .task {
+            await viewModel.fetchPlaceNamesIfNeeded(for: note)
+        }
     }
     
     private var headTitle: some View {

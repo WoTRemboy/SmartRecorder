@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct PlayerScreenView: View {
     
@@ -34,13 +35,16 @@ struct PlayerScreenView: View {
                 AudioDescriptionView(viewModel: viewModel)
                 ProgressBarView(viewModel: viewModel)
             }
-            .navigationTitle(note.location?.cityName ?? "")
-            .navigationSubtitle(note.location?.streetName ?? "")
+            .navigationTitle(note.location?.cityName ?? viewModel.fetchedCityName ?? "")
+            .navigationSubtitle(note.location?.streetName ?? viewModel.fetchedStreetName ?? "")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     dismissButton
                 }
+            }
+            .task {
+                await viewModel.fetchPlaceNamesIfNeeded()
             }
         }
         .navigationTransition(

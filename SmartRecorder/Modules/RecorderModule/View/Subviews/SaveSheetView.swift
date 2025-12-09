@@ -19,6 +19,7 @@ struct SaveSheetView: View {
                 folderListLabel
                 folderList
                 saveButton
+                    .padding(.top)
             }
             .padding([.top, .horizontal])
         }
@@ -92,10 +93,12 @@ struct SaveSheetView: View {
             Text(Texts.RecorderPage.SaveSheet.save)
                 .font(Font.largeTitle2(.semibold))
                 .frame(maxWidth: .infinity)
-                .padding(8)
+                .padding(.horizontal)
+                .frame(height: 56)
         }
         .buttonStyle(.glassProminent)
         .tint(Color.SupportColors.blue)
+        
         .disabled(viewModel.saveNoteTitle.isEmpty)
         .animation(.easeInOut(duration: 0.2), value: viewModel.saveNoteTitle.isEmpty)
     }

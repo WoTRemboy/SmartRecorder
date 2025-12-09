@@ -218,5 +218,26 @@ final class NoteEntityService: NoteEntityServicing {
         if predicates.isEmpty { return nil }
         return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
+    
+    internal func clearAudioPaths(forFileNames fileNames: [String]) async {
+        guard !fileNames.isEmpty else { return }
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+            self.context.perform {
+                do {
+                    let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
+                    request.predicate = NSPredicate(format: "audioPath IN %@", fileNames)
+                    let objects = try self.context.fetch(request)
+                    for obj in objects {
+                        obj.setValue(nil, forKey: "audioPath")
+                    }
+                    if self.context.hasChanges {
+                        try self.context.save()
+                    }
+                    cont.resume()
+                } catch {
+                    cont.resume()
+                }
+            }
+        }
+    }
 }
-

@@ -9,6 +9,7 @@ import Foundation
 import AVKit
 import OSLog
 import Combine
+import CoreLocation
 
 private let logger = Logger(subsystem: "SmartRecorder", category: "PlayerViewModel")
 
@@ -20,12 +21,14 @@ final class PlayerViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var isPlaying: Bool = false
 
-    @Published var sliderProgress: CGFloat = 0.0
-    @Published var totalWidth: CGFloat = 0.0
-    @Published var sliderChangeInProgress: Bool = false
-    @Published var currentTimeLabel: TimeInterval = 0.0
+    @Published private(set) var sliderProgress: CGFloat = 0.0
+    @Published internal var totalWidth: CGFloat = 0.0
+    @Published private var sliderChangeInProgress: Bool = false
+    @Published private(set) var currentTimeLabel: TimeInterval = 0.0
 
-    @Published var amplitudes: [Float] = []
+    @Published private(set) var amplitudes: [Float] = []
+    @Published private(set) var fetchedCityName: String? = nil
+    @Published private(set) var fetchedStreetName: String? = nil
 
     private let note: Note
     private var player: AVAudioPlayer?
@@ -47,6 +50,30 @@ final class PlayerViewModel: ObservableObject {
                 logger.critical("Audio path is missing or invalid for note: \(note.title, privacy: .private)")
                 self.isLoading = false
             }
+        }
+    }
+    
+    /// Resolves and stores street/city names for the current note when they are missing.
+    func fetchPlaceNamesIfNeeded() async {
+        if let loc = note.location, (loc.cityName != nil && loc.streetName != nil) {
+            return
+        }
+        do {
+            if let loc = note.location {
+                let cl = CLLocation(latitude: loc.latitude, longitude: loc.longitude)
+                let names = try await LocationService.shared.reverseGeocode(location: cl)
+                await MainActor.run {
+                    self.fetchedStreetName = names.street
+                    self.fetchedCityName = names.city
+                }
+            } else if let names = await LocationService.shared.fetchCurrentPlaceNames() {
+                await MainActor.run {
+                    self.fetchedStreetName = names.street
+                    self.fetchedCityName = names.city
+                }
+            }
+        } catch {
+            logger.error("Featching place names failed: \(error)")
         }
     }
     

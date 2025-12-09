@@ -8,6 +8,7 @@
 import Foundation
 import CoreLocation
 import Combine
+import MapKit
 
 @MainActor
 final class LocationService: NSObject, ObservableObject {
@@ -81,6 +82,39 @@ final class LocationService: NSObject, ObservableObject {
         return try await withCheckedThrowingContinuation { continuation in
             self.locationContinuation = continuation
             locationManager.requestLocation()
+        }
+    }
+
+    // MARK: - Reverse Geocoding
+
+    /// Performs reverse geocoding for a given location and returns street and city names if available.
+    /// - Parameter location: The CLLocation to reverse geocode.
+    /// - Returns: A tuple containing optional street and city names.
+    func reverseGeocode(location: CLLocation) async throws -> (street: String?, city: String?) {
+        guard let request = MKReverseGeocodingRequest(location: location) else {
+            return (nil, nil)
+        }
+        let items = try await request.mapItems
+        let first = items.first
+        let street = first?.name
+        let city = first?.addressRepresentations?.cityName
+        return (street, city)
+    }
+
+    /// Attempts to produce current street and city names using the last known location or by requesting a fresh one.
+    /// - Returns: A tuple with optional street and city names, or nil if location cannot be determined.
+    func fetchCurrentPlaceNames() async -> (street: String?, city: String?)? {
+        do {
+            let loc: CLLocation
+            if let last = self.lastKnownLocation {
+                loc = last
+            } else {
+                loc = try await self.requestCurrentLocation()
+            }
+            let names = try await reverseGeocode(location: loc)
+            return names
+        } catch {
+            return nil
         }
     }
 }

@@ -1,21 +1,31 @@
+//
+//  ProfileViewModel.swift
+//  SmartRecorder
+//
+//  Created by Roman Tverdokhleb on 13/11/2025.
+//
+
 import Foundation
 import SwiftUI
 import Combine
 import UIKit
+import OSLog
+
+private let logger = Logger(subsystem: "SmartRecorder", category: "ProfileViewModel")
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
     
-    @Published internal private(set) var isAuthorized: Bool = false
-    @Published internal private(set) var nickname: String = ""
-    @Published internal private(set) var email: String = ""
+    @Published private(set) var isAuthorized: Bool = false
+    @Published private(set) var nickname: String = ""
+    @Published private(set) var email: String = ""
 
     @Published internal var meetingsCount: Int = 0
     @Published internal var minutesInMeetings: Int = 0
 
     // Audio cache stats
-    @Published internal private(set) var audioFilesCount: Int = 0
-    @Published internal private(set) var audioCacheBytes: Int64 = 0
+    @Published private(set) var audioFilesCount: Int = 0
+    @Published private(set) var audioCacheBytes: Int64 = 0
     
     @Published private(set) var mode: AuthMode = .login
     @Published private(set) var isLoading = false
@@ -241,9 +251,12 @@ final class ProfileViewModel: ObservableObject {
         let dir = FileManager.default.temporaryDirectory
         let urls = (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])) ?? []
         let audio = urls.filter { $0.pathExtension.lowercased() == "m4a" }
+        let removedFileNames: [String] = audio.map { $0.lastPathComponent }
         for url in audio {
             try? fm.removeItem(at: url)
         }
+        // Also clear audioPath in Core Data for the removed files
+        await NoteEntityService.shared.clearAudioPaths(forFileNames: removedFileNames)
         await refreshAudioCacheStats()
         await MainActor.run { self.infoMessage = Texts.ProfilePage.Dashboard.Cache.success }
     }
@@ -256,12 +269,15 @@ final class ProfileViewModel: ObservableObject {
             let audioDir = docs.appendingPathComponent("Audio", isDirectory: true)
             if fm.fileExists(atPath: audioDir.path) {
                 let urls = (try? fm.contentsOfDirectory(at: audioDir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])) ?? []
-                for url in urls where url.pathExtension.lowercased() == "m4a" {
+                let audio = urls.filter { $0.pathExtension.lowercased() == "m4a" }
+                let removedFileNames: [String] = audio.map { $0.lastPathComponent }
+                for url in audio {
                     try? fm.removeItem(at: url)
                 }
+                await NoteEntityService.shared.clearAudioPaths(forFileNames: removedFileNames)
             }
         } catch {
-            // Swallow errors silently during logout cleanup
+            logger.error("Clearing Audio directory failed: \(error)")
         }
         await refreshAudioCacheStats()
     }

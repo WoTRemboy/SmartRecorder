@@ -10,6 +10,7 @@ import SwiftUI
 import Combine
 import CoreData
 import OSLog
+import CoreLocation
 
 private let logger = Logger(subsystem: "SmartRecorder", category: "NotesViewModel")
 
@@ -22,6 +23,8 @@ final class NotesViewModel: ObservableObject {
     
     @Published internal var isShowingPlayer = false
     @Published internal var selectedNote: Note? = nil
+    
+    @Published var resolvedPlaceNames: [UUID: (street: String?, city: String?)] = [:]
     
     private var currentPage: Int = 0
     private var totalPages: Int = 1
@@ -40,6 +43,34 @@ final class NotesViewModel: ObservableObject {
             return categoryFiltered
         } else {
             return categoryFiltered.filter { $0.title.lowercased().contains(searchItem.lowercased()) }
+        }
+    }
+    
+    internal func placeCity(for note: Note) -> String? {
+        return resolvedPlaceNames[note.id]?.city
+    }
+
+    internal func placeStreet(for note: Note) -> String? {
+        return resolvedPlaceNames[note.id]?.street
+    }
+    
+    internal func fetchPlaceNamesIfNeeded(for note: Note) async {
+        if let loc = note.location, (loc.cityName != nil && loc.streetName != nil) {
+            return
+        }
+        if resolvedPlaceNames[note.id]?.city != nil || resolvedPlaceNames[note.id]?.street != nil {
+            return
+        }
+        do {
+            if let loc = note.location {
+                let cl = CLLocation(latitude: loc.latitude, longitude: loc.longitude)
+                let names = try await LocationService.shared.reverseGeocode(location: cl)
+                await MainActor.run { self.resolvedPlaceNames[note.id] = names }
+            } else if let names = await LocationService.shared.fetchCurrentPlaceNames() {
+                await MainActor.run { self.resolvedPlaceNames[note.id] = names }
+            }
+        } catch(let error) {
+            logger.error("Location lookup failed: \(error)")
         }
     }
 

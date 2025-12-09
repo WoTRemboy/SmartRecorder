@@ -46,8 +46,12 @@ struct RecorderDetailsView: View {
     }
     
     private var locationText: String {
-        if let street = viewModel.streetName {
-            return street
+        if let street = viewModel.streetName { return street }
+        Task { @MainActor in
+            if let names = await LocationService.shared.fetchCurrentPlaceNames() {
+                if viewModel.streetName == nil { viewModel.streetName = names.street }
+                if viewModel.cityName == nil { viewModel.cityName = names.city }
+            }
         }
         return Texts.RecorderPage.location
     }
