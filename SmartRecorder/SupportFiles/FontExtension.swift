@@ -7,8 +7,11 @@
 import SwiftUI
 
 extension Font {
-    static func largeTitle() -> Font? {
-        Font.system(size: 35, weight: .bold)
+    static func largeTitle(_ weight: Font.Weight = .regular) -> Font? {
+        Font.system(size: 35, weight: weight)
+    }
+    
+    static func largeTitle2(_ weight: Font.Weight = .regular) -> Font? { Font.system(size: 24, weight: weight)
     }
     
     static func subheadline() -> Font? {
@@ -25,7 +28,6 @@ extension Font {
     
     static func title2(_ weight: Font.Weight = .regular) -> Font? {
         Font.system(size: 20, weight: weight)
-        
     }
     
     static func buttonTitle() -> Font? {
@@ -34,6 +36,10 @@ extension Font {
     
     static func buttonTitle2() -> Font? {
         Font.system(size: 30, weight: .bold)
+    }
+    
+    static func emailTitle() -> Font? {
+        Font.system(size: 26, weight: .bold)
     }
     
     static func caption(_ weight: Font.Weight = .regular) -> Font? {

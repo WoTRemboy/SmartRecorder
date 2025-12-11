@@ -51,5 +51,17 @@ extension Image {
     enum NotesPage {
         static let share = Image(systemName: "square.and.arrow.up")
         static let play = Image(systemName: "play.circle.fill")
+        static let download = Image(systemName: "arrow.down.circle.fill")
+        static let empty = Image(systemName: "tray")
+        static let pdf = Image(systemName: "doc.richtext")
+        static let audio = Image(systemName: "waveform")
+    }
+    
+    enum RecorderPage {
+        static let date = Image(systemName: "calendar")
+        static let location = Image(systemName: "location.fill")
+        static let stopRecording = Image(systemName: "stop.fill")
+        static let wave = Image(systemName: "waveform")
+        static let check = Image(systemName: "checkmark")
     }
 }

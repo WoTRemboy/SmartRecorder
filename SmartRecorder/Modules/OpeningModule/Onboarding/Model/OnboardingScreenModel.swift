@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import AVFoundation
 
 struct OnboardingStep {
     let name: String
@@ -28,7 +29,8 @@ extension OnboardingStep {
         
         let third = OnboardingStep(name: Texts.OnboardingPage.ThirdPage.title,
                                    description: Texts.OnboardingPage.ThirdPage.description,
-                                   image: .OnboardingPage.third)
+                                   image: .OnboardingPage.third,
+                                   grantedAccess: AVAudioApplication.shared.recordPermission == .granted)
         
         let fourth = OnboardingStep(name: Texts.OnboardingPage.FourthPage.title,
                                     description: Texts.OnboardingPage.FourthPage.description,
@@ -42,15 +44,23 @@ extension OnboardingStep {
 
 enum OnboardingButtonType: Equatable {
     case nextPage
-    case getMicrophonePermission
+    case getMicrophonePermission(access: AVAudioApplication.recordPermission)
     case getLocationPermission(access: CLAuthorizationStatus)
     
     internal var title: String {
         switch self {
         case .nextPage:
             return Texts.OnboardingPage.next
-        case .getMicrophonePermission:
-            return Texts.OnboardingPage.permission
+            
+        case .getMicrophonePermission(let access):
+            switch access {
+            case .undetermined:
+                return Texts.OnboardingPage.permission
+            case .granted:
+                return Texts.OnboardingPage.next
+            default:
+                return Texts.OnboardingPage.forbidden
+            }
             
         case .getLocationPermission(let access):
             switch access {

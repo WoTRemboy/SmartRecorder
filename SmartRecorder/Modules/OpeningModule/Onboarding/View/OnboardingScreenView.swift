@@ -22,8 +22,10 @@ struct OnboardingScreenView: View {
     
     internal var body: some View {
         if viewModel.skipOnboarding {
-            ContentView()
-                .environmentObject(AppRouter())
+            RootView {
+                ContentView()
+                    .environmentObject(AppRouter())
+            }
         } else {
             VStack(alignment: .trailing) {
                 skipButton
@@ -44,10 +46,15 @@ struct OnboardingScreenView: View {
                 viewModel.triggerDrawOnSymbol(newValue)
             }
             .alert(Texts.OnboardingPage.LocationAlert.title, isPresented: $viewModel.showLocationPermissionAlert) {
-                        locationAlertButtons
-                    } message: {
-                        Text(Texts.OnboardingPage.LocationAlert.content)
-                    }
+                locationAlertButtons
+            } message: {
+                Text(Texts.OnboardingPage.LocationAlert.content)
+            }
+            .alert(Texts.OnboardingPage.MicrophoneAlert.title, isPresented: $viewModel.showMicrophonePermissionAlert) {
+                microphoneAlertButtons
+            } message: {
+                Text(Texts.OnboardingPage.MicrophoneAlert.content)
+            }
         }
     }
     
@@ -65,7 +72,7 @@ struct OnboardingScreenView: View {
                 animatedImage(for: index)
                 
                 Text(viewModel.steps[index].name)
-                    .font(.largeTitle())
+                    .font(.largeTitle(.bold))
                     .padding(.top)
                 
                 Text(viewModel.steps[index].description)
@@ -115,7 +122,7 @@ struct OnboardingScreenView: View {
                 if step == page.index {
                     Circle()
                         .frame(width: 15, height: 15)
-                        .foregroundStyle(Color.black)
+                        .foregroundStyle(Color.LabelColors.primary)
                         .transition(.scale)
                 } else {
                     Circle()
@@ -146,6 +153,16 @@ struct OnboardingScreenView: View {
             }
         }
         Button(Texts.OnboardingPage.LocationAlert.cancel, role: .cancel) {}
+    }
+    
+    @ViewBuilder
+    private var microphoneAlertButtons: some View {
+        Button(Texts.OnboardingPage.MicrophoneAlert.settings) {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        }
+        Button(Texts.OnboardingPage.MicrophoneAlert.cancel, role: .cancel) {}
     }
 }
 

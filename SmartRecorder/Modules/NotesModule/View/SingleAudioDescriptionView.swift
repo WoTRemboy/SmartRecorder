@@ -6,75 +6,149 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct SingleAudioDescriptionView: View {
     
-    @ObservedObject var audio: Note
+    @ObservedObject private var viewModel: NotesViewModel
+    @StateObject private var shareVM: NoteShareViewModel
+
     @State private var isEditing = false
+    @State private var audioDuration: TimeInterval? = nil
     
-    var body: some View {
+    private let note: Note
+    private let namespace: Namespace.ID
+    
+    init(note: Note, namespace: Namespace.ID, viewModel: NotesViewModel) {
+        self.note = note
+        self.namespace = namespace
+        self.viewModel = viewModel
+        
+        let vm = NoteShareViewModel(note: note)
+        _shareVM = StateObject(wrappedValue: vm)
+        self._audioDuration = State(initialValue: vm.getAudioDuration(for: note))
+    }
+    
+    internal var body: some View {
         VStack(alignment: .leading) {
-            Text("#" + audio.category)
-                .foregroundStyle(Color.SupportColors.blue)
-            
-            if isEditing {
-                TextField("Заголовок", text: $audio.headline)
-                    .font(.title).bold()
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.vertical, 8)
-            } else {
-                Text(audio.headline)
-                    .font(.title).bold()
-            }
-                
+            headTitle
             
             HStack {
-                HStack {
-                    Image(systemName: "play.circle.fill")
-                        .resizable()
-                        .frame(width: 32, height: 32)
-                        .background(.white)
-                        .clipShape(Capsule())
-                    Text(audio.duration)
-                        .font(.subheadline)
-                        .padding(.trailing, 16)
-                }
-                .foregroundStyle(Color.SupportColors.blue)
-                .background(Color(Color.SupportColors.lightBlue))
-                .clipShape(Capsule())
-                
+                playButton
                 Spacer()
                 
-                ChipsView(text: audio.date)
-
-                ChipsView(text: audio.time)
-
+                GlassEffectContainer {
+                    HStack {
+                        ChipsView(text: DateService.formattedDate(note.createdAt))
+                        ChipsView(text: DateService.formattedTime(note.createdAt))
+                    }
+                }
+                
             }
             .padding(.bottom, 24)
             
             ScrollView {
-                Text(audio.subheadline)
+                Text(note.transcription ?? Texts.NotesPage.inProgress)
             }
         }
         .padding(.horizontal, 20)
-        .navigationTitle(audio.location)
+        .navigationTitle(note.location?.cityName ?? viewModel.placeCity(for: note) ?? "")
+        .navigationSubtitle(note.location?.streetName ?? viewModel.placeStreet(for: note) ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItemGroup {
-                Button(action: {
-                    isEditing.toggle()
-                }) {
-                    Image(systemName: "pencil.line")
-                        .foregroundStyle(Color.SupportColors.blue)
-                }
-                
-                if let url = URL(string: "https://itmo.ru") {
-                    ShareLink(item: url) {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundStyle(Color.SupportColors.blue)
-                    }
-                }
+            ToolbarItem(placement: .topBarTrailing) {
+                shareMenu
             }
         }
+        .sheet(isPresented: $shareVM.isPresentingShare, onDismiss: { shareVM.shareURL = nil }) {
+            if let url = shareVM.shareURL {
+                ActivityView(activityItems: [url])
+                    .ignoresSafeArea()
+            }
+        }
+        .alert(Texts.NotesPage.error,
+               isPresented: .constant(shareVM.errorMessage != nil),
+               actions: {
+            Button(Texts.NotesPage.ok) {
+                shareVM.errorMessage = nil
+            }
+        }, message: {
+            Text(shareVM.errorMessage ?? "")
+        })
+        .animation(.easeInOut(duration: 0.2), value: shareVM.isLoading)
+        .task {
+            await viewModel.fetchPlaceNamesIfNeeded(for: note)
+        }
+    }
+    
+    private var headTitle: some View {
+        VStack(alignment: .leading) {
+            Text("#" + (NoteFolder(rawValue: note.folderId ?? "")?.title ?? "FolderId"))
+                .foregroundStyle(Color.SupportColors.blue)
+            
+            Text(note.title)
+                .font(.title).bold()
+        }
+    }
+    
+    private var playButton: some View {
+        HStack {
+            Image.NotesPage.play
+                .resizable()
+                .frame(width: 32, height: 32)
+                .background(.white)
+                .clipShape(Capsule())
+                .foregroundStyle(Color.SupportColors.blue)
+            
+            Text(shareVM.formatDuration(audioDuration))
+                .font(.subheadline)
+                .padding(.trailing, 16)
+                .foregroundStyle(Color.LabelColors.white)
+        }
+        .matchedTransitionSource(id: note.id, in: namespace)
+        .glassEffect(.regular.interactive().tint(Color.SupportColors.lightBlue))
+        .onTapGesture {
+            viewModel.selectedNote = note
+        }
+    }
+    
+    private var shareMenu: some View {
+        Menu {
+            sharePDFButton
+            shareAudioButton
+        } label: {
+            Image.NotesPage.share
+                .foregroundStyle(Color.SupportColors.blue)
+        }
+    }
+    
+    private var sharePDFButton: some View {
+        Button {
+            shareVM.sharePDF()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.pdf)
+            } icon: {
+                Image.NotesPage.pdf
+            }
+        }
+    }
+    
+    private var shareAudioButton: some View {
+        Button {
+            shareVM.shareAudio()
+        } label: {
+            Label {
+                Text(Texts.NotesPage.audio)
+            } icon: {
+                Image.NotesPage.audio
+            }
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        SingleAudioDescriptionView(note: Note.mock, namespace: Namespace().wrappedValue, viewModel: NotesViewModel())
     }
 }

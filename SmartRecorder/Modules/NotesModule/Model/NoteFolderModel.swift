@@ -6,10 +6,14 @@
 //
 
 enum NoteFolder: String, CaseIterable {
-    case all = "note_folder_all"
-    case work = "note_folder_work"
-    case study = "note_folder_study"
-    case personal = "note_folder_personal"
+    case all = "All"
+    case work = "Work"
+    case study = "Study"
+    case personal = "Personal"
+    
+    static internal var selectCases: [NoteFolder] {
+        [.work, .study, .personal]
+    }
     
     internal var title: String {
         switch self {
