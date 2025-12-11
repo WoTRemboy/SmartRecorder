@@ -14,9 +14,12 @@ extension Color {
         static let disable = Color("LabelDisable")
         static let blue = Color("LabelBlue")
         static let purple = Color("LabelPurple")
+        static let white = Color("LabelWhite")
     }
     enum BackgroundColors {
+        static let main = Color("BackMain")
         static let primary = Color("BackPrimary")
+        static let card = Color("BackCard")
   
     }
     enum SupportColors {

@@ -13,36 +13,33 @@ struct TabItems {
     /// Creates the notes tab view.
     /// - Parameter isSelected: A boolean indicating whether the tab is currently selected.
     /// - Returns: A `NotesView` wrapped in a tab item.
-    static func notesTab(isSelected: Bool) -> some View {
-        NotesView()
-            .tabItem {
-                Image.Tabbar.Notes.system
-                    .environment(\.symbolVariants, .none)
-                Text(Texts.Tabbar.notes)
+    static func notesTab(appRouter: AppRouter) -> some View {
+        NotesListView()
+            .environmentObject(appRouter)
+            .navigationDestination(for: AppRouter.Route.self) { route in
+                route.destinationView(in: .notes, appRouter: appRouter)
             }
     }
     
     /// Creates the recorder tab view.
     /// - Parameter isSelected: A boolean indicating whether the tab is currently selected.
     /// - Returns: A `PlayerScreenView` wrapped in a tab item.
-    static func recorderTab(isSelected: Bool) -> some View {
-        PlayerScreenView()
-            .tabItem {
-                Image.Tabbar.Recorder.system
-                    .environment(\.symbolVariants, .none)
-                Text(Texts.Tabbar.recorder)
+    static func recorderTab(appRouter: AppRouter) -> some View {
+        RecorderView()
+            .environmentObject(appRouter)
+            .navigationDestination(for: AppRouter.Route.self) { route in
+                route.destinationView(in: .recorder, appRouter: appRouter)
             }
     }
     
     /// Creates the profile tab view.
     /// - Parameter isSelected: A boolean indicating whether the tab is currently selected.
     /// - Returns: A `ProfileView` wrapped in a tab item.
-    static func profileTab(isSelected: Bool) -> some View {
+    static func profileTab(appRouter: AppRouter) -> some View {
         ProfileView()
-            .tabItem {
-                Image.Tabbar.Profile.system
-                    .environment(\.symbolVariants, .none)
-                Text(Texts.Tabbar.profile)
+            .environmentObject(appRouter)
+            .navigationDestination(for: AppRouter.Route.self) { route in
+                route.destinationView(in: .profile, appRouter: appRouter)
             }
     }
 }
