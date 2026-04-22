@@ -33,6 +33,8 @@
 		6300DD592EC3E5F600AF7DAC /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6300DD582EC3E5F600AF7DAC /* LocationService.swift */; };
 		632DFAC72ED777A8003D528B /* TokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632DFAC62ED777A8003D528B /* TokenService.swift */; };
 		632DFAC92ED7786C003D528B /* AuthAppService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632DFAC82ED7786C003D528B /* AuthAppService.swift */; };
+		6339B9DA2F9964860055744D /* ggml-tiny.bin in Resources */ = {isa = PBXBuildFile; fileRef = 6339B9D92F9964860055744D /* ggml-tiny.bin */; };
+		6339B9DC2F9964A60055744D /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6339B9DB2F9964A60055744D /* whisper.xcframework */; };
 		635FDF742EE343F200F3F6C5 /* LoadingCoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635FDF732EE343F200F3F6C5 /* LoadingCoverView.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
@@ -111,6 +113,8 @@
 		6300DD5A2EC3E69200AF7DAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		632DFAC62ED777A8003D528B /* TokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenService.swift; sourceTree = "<group>"; };
 		632DFAC82ED7786C003D528B /* AuthAppService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAppService.swift; sourceTree = "<group>"; };
+		6339B9D92F9964860055744D /* ggml-tiny.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = "ggml-tiny.bin"; sourceTree = "<group>"; };
+		6339B9DB2F9964A60055744D /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = whisper.xcframework; sourceTree = "<group>"; };
 		635FDF732EE343F200F3F6C5 /* LoadingCoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCoverView.swift; sourceTree = "<group>"; };
 		636072452E96CF6D00E5DCC9 /* SmartRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		636072532E96D26E00E5DCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -168,6 +172,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				63009A7A2EBFA6DB00FD5220 /* SwiftUIPager in Frameworks */,
+				6339B9DC2F9964A60055744D /* whisper.xcframework in Frameworks */,
 				6389C72C2EE0F68900EABF54 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -305,10 +310,27 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		6339B9D72F99643F0055744D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6339B9DB2F9964A60055744D /* whisper.xcframework */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
+		6339B9D82F9964570055744D /* MLModels */ = {
+			isa = PBXGroup;
+			children = (
+				6339B9D92F9964860055744D /* ggml-tiny.bin */,
+			);
+			path = MLModels;
+			sourceTree = "<group>";
+		};
 		6360723C2E96CF6D00E5DCC9 = {
 			isa = PBXGroup;
 			children = (
 				636072562E96D26E00E5DCC9 /* SmartRecorder */,
+				6339B9D72F99643F0055744D /* Frameworks */,
 				636072462E96CF6D00E5DCC9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -333,6 +355,7 @@
 				63D7B8732EE301CF00943B00 /* Helpers */,
 				6360725B2E96D2E500E5DCC9 /* SupportFiles */,
 				63009A802EBFDDFF00FD5220 /* Assets */,
+				6339B9D82F9964570055744D /* MLModels */,
 				6300DD5A2EC3E69200AF7DAC /* Info.plist */,
 			);
 			path = SmartRecorder;
@@ -708,6 +731,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */,
+				6339B9DA2F9964860055744D /* ggml-tiny.bin in Resources */,
 				63FD4DE02EC0D43B00104B95 /* AppIconComposer.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
