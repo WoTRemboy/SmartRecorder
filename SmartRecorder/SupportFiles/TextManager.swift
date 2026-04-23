@@ -91,6 +91,9 @@ final class Texts {
         static let location = "Местоположение"
         static let message = "Ознакомиться с протоколом встречи после её окончания можно в архиве записей"
         static let range = "архиве записей"
+        static let liveTranscriptTitle = "Живая расшифровка"
+        static let liveTranscriptPlaceholder = "Речь появится здесь через несколько секунд после начала записи"
+        static let liveTranscriptProcessing = "Распознаем текущий фрагмент..."
         
         enum SaveSheet {
             static let title = "Название записи"

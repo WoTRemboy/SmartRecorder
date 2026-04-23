@@ -34,7 +34,8 @@
 		632DFAC72ED777A8003D528B /* TokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632DFAC62ED777A8003D528B /* TokenService.swift */; };
 		632DFAC92ED7786C003D528B /* AuthAppService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632DFAC82ED7786C003D528B /* AuthAppService.swift */; };
 		6339B9DA2F9964860055744D /* ggml-tiny.bin in Resources */ = {isa = PBXBuildFile; fileRef = 6339B9D92F9964860055744D /* ggml-tiny.bin */; };
-		6339B9DC2F9964A60055744D /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6339B9DB2F9964A60055744D /* whisper.xcframework */; };
+		6339B9DD2F9969D90055744D /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6339B9DB2F9964A60055744D /* whisper.xcframework */; };
+		6339B9DE2F9969D90055744D /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6339B9DB2F9964A60055744D /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		635FDF742EE343F200F3F6C5 /* LoadingCoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635FDF732EE343F200F3F6C5 /* LoadingCoverView.swift */; };
 		636072572E96D26E00E5DCC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 636072532E96D26E00E5DCC9 /* Assets.xcassets */; };
 		636072592E96D26E00E5DCC9 /* SmartRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636072552E96D26E00E5DCC9 /* SmartRecorderApp.swift */; };
@@ -85,6 +86,20 @@
 		63FDC3142ED9C89000D0AAB8 /* AuthorizationPayloadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FDC3132ED9C88B00D0AAB8 /* AuthorizationPayloadModel.swift */; };
 		63FDC3162ED9CB1100D0AAB8 /* UserEntityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FDC3152ED9CB1100D0AAB8 /* UserEntityService.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6339B9DF2F9969D90055744D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				6339B9DE2F9969D90055744D /* whisper.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		52501DFE2EA7E5ED0054DB54 /* PlayerScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerScreenView.swift; sourceTree = "<group>"; };
@@ -172,7 +187,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				63009A7A2EBFA6DB00FD5220 /* SwiftUIPager in Frameworks */,
-				6339B9DC2F9964A60055744D /* whisper.xcframework in Frameworks */,
+				6339B9DD2F9969D90055744D /* whisper.xcframework in Frameworks */,
 				6389C72C2EE0F68900EABF54 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -673,6 +688,7 @@
 				636072412E96CF6D00E5DCC9 /* Sources */,
 				636072422E96CF6D00E5DCC9 /* Frameworks */,
 				636072432E96CF6D00E5DCC9 /* Resources */,
+				6339B9DF2F9969D90055744D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
