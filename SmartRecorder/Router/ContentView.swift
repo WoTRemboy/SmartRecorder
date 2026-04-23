@@ -14,8 +14,10 @@ struct ContentView: View {
     
     /// Tab router to manage selected tab state across the app.
     @StateObject private var appRouter = AppRouter()
+    @EnvironmentObject private var recorderViewModel: RecorderViewModel
     @State private var search: String = ""
     @Environment(\.scenePhase) private var scenePhase
+    @Namespace private var recorderNamespace
     
     private func bindingForTab(_ tab: AppRouter.Tab) -> Binding<[AppRouter.Route]> {
         Binding(
@@ -28,33 +30,38 @@ struct ContentView: View {
     
     /// The main body rendering a tab view with custom view models and tab routing.
     internal var body: some View {
-        TabView(selection: $appRouter.selectedTab) {
-            Tab(AppRouter.Tab.recorder.title,
-                systemImage: AppRouter.Tab.recorder.imageName,
-                value: .recorder) {
-                NavigationStack(path: bindingForTab(.recorder)) {
-                    TabItems.recorderTab(appRouter: appRouter)
+        ZStack {
+            TabView(selection: $appRouter.selectedTab) {
+                Tab(AppRouter.Tab.recorder.title,
+                    systemImage: AppRouter.Tab.recorder.imageName,
+                    value: .recorder) {
+                    NavigationStack(path: bindingForTab(.recorder)) {
+                        TabItems.recorderTab(appRouter: appRouter, namespace: recorderNamespace)
+                    }
+                }
+
+                Tab(AppRouter.Tab.profile.title,
+                    systemImage: AppRouter.Tab.profile.imageName,
+                    value: .profile) {
+                    NavigationStack(path: bindingForTab(.profile)) {
+                        TabItems.profileTab(appRouter: appRouter)
+                    }
+                }
+
+                Tab(AppRouter.Tab.notes.title,
+                    systemImage: AppRouter.Tab.notes.imageName,
+                    value: .notes, role: .search) {
+                    NavigationStack(path: bindingForTab(.notes)) {
+                        TabItems.notesTab(appRouter: appRouter)
+                    }
                 }
             }
-            
-            Tab(AppRouter.Tab.profile.title,
-                systemImage: AppRouter.Tab.profile.imageName,
-                value: .profile) {
-                NavigationStack(path: bindingForTab(.profile)) {
-                    TabItems.profileTab(appRouter: appRouter)
-                }
-            }
-            
-            Tab(AppRouter.Tab.notes.title,
-                systemImage: AppRouter.Tab.notes.imageName,
-                value: .notes, role: .search) {
-                NavigationStack(path: bindingForTab(.notes)) {
-                    TabItems.notesTab(appRouter: appRouter)
-                }
-            }
+            .accentColor(Color.LabelColors.blue)
+            .environmentObject(appRouter)
+
+            LiveTranscriptionExpansionLayer(namespace: recorderNamespace)
+                .environmentObject(recorderViewModel)
         }
-        .accentColor(Color.LabelColors.blue)
-        .environmentObject(appRouter)
         
         .task {
             if await AuthorizationService.shared.isAuthorized() {

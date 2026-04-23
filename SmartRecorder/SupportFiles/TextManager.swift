@@ -204,12 +204,14 @@ final class Texts {
         enum Recorder {
             static let timer = "RecorderTimerGlassEffect"
             static let stop = "RecorderStopGlassEffect"
+            static let liveTranscript = "RecorderLiveTranscriptGlassEffect"
         }
     }
     
     enum GeometryEffectId {
         enum Recorder {
             static let control = "RecorderGeometryEffect"
+            static let liveTranscript = "RecorderLiveTranscriptGeometryEffect"
         }
     }
     

@@ -37,6 +37,7 @@ final class RecorderViewModel: ObservableObject {
     @Published var amplitudes: [Float] = Array(repeating: 0, count: 16)
     @Published private(set) var liveTranscription: String = ""
     @Published private(set) var isTranscribing: Bool = false
+    @Published var isLiveTranscriptionExpanded: Bool = false
 
     private let locationService = LocationService.shared
     
@@ -134,6 +135,7 @@ final class RecorderViewModel: ObservableObject {
         if isRecording {
             isRecording = false
             logger.info("Recording stop requested. elapsedTime=\(self.elapsedTime)")
+            isLiveTranscriptionExpanded = false
             showTimerView = false
             timerTask?.cancel()
             timerTask = nil
@@ -154,6 +156,7 @@ final class RecorderViewModel: ObservableObject {
         } else {
             isRecording = true
             logger.info("Recording start requested")
+            isLiveTranscriptionExpanded = false
             showTimerView = false
             elapsedTime = 0
             liveTranscription = ""
@@ -207,6 +210,10 @@ final class RecorderViewModel: ObservableObject {
                     self?.isTranscribing = isTranscribing
                 }
         }
+    }
+
+    internal func setLiveTranscriptionExpanded(_ isExpanded: Bool) {
+        isLiveTranscriptionExpanded = isExpanded
     }
     
     @MainActor
