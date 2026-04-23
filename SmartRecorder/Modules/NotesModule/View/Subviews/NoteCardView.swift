@@ -128,7 +128,7 @@ struct NoteCardView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 32, height: 32)
-                .foregroundStyle(Color.SupportColors.blue)
+                .foregroundStyle(Color.LabelColors.blue)
         }
     }
     

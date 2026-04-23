@@ -41,6 +41,7 @@ final class AudioRecorderService: ObservableObject {
     private let overlapDuration: Double = 0.5
     private let minimumFinalChunkDuration: Double = 0.8
     private let minimumSpeechRMS: Float = 0.006
+    private let recordingMeterGain: Float = 2.0
 
     func recordedFileName() -> String? {
         fileName
@@ -193,22 +194,16 @@ final class AudioRecorderService: ObservableObject {
         let bandsCount = amplitudes.count
         guard bandsCount > 0 else { return }
 
-        let chunkSize = max(1, samples.count / bandsCount)
-        var bandValues = [Float]()
-        bandValues.reserveCapacity(bandsCount)
+        let rms = sqrt(samples.reduce(0) { $0 + ($1 * $1) } / Float(samples.count))
+        let base = max(0.0, min(1.0, rms * recordingMeterGain))
 
+        var bandValues = [Float](repeating: 0, count: bandsCount)
         for band in 0..<bandsCount {
-            let startIndex = band * chunkSize
-            let endIndex = min(samples.count, startIndex + chunkSize)
-            guard startIndex < endIndex else {
-                bandValues.append(0)
-                continue
-            }
-
-            let slice = samples[startIndex..<endIndex]
-            let rms = sqrt(slice.reduce(0) { $0 + ($1 * $1) } / Float(slice.count))
-            let shapedValue = min(max(rms * 4.5, 0.04), 1.0)
-            bandValues.append(shapedValue)
+            let normalizedIdx = Float(band) / Float(max(1, bandsCount - 1))
+            let sinValue = sin(normalizedIdx * .pi)
+            let jitter = Float.random(in: 0.5..<1.5)
+            let value = Float(base) * (sinValue + 0.1) * jitter
+            bandValues[band] = value
         }
 
         DispatchQueue.main.async { [bandValues] in
