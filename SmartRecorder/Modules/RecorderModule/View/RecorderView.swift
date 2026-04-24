@@ -10,18 +10,22 @@ import SwiftUI
 struct RecorderView: View {
     
     @EnvironmentObject private var viewModel: RecorderViewModel
-    @Namespace private var namespace
+    private let namespace: Namespace.ID
+
+    init(namespace: Namespace.ID) {
+        self.namespace = namespace
+    }
     
     internal var body: some View {
         VStack {
             RecorderDetailsView()
                 .padding(.top, 40)
-            
+
             if !viewModel.isRecording {
                 RecorderStartView(namespace: namespace)
                     .frame(maxHeight: .infinity, alignment: .center)
             }
-            
+
             if viewModel.isRecording {
                 RecorderStopView(namespace: namespace)
                     .frame(maxHeight: .infinity, alignment: .center)
@@ -73,6 +77,6 @@ struct RecorderView: View {
 }
 
 #Preview {
-    RecorderView()
+    RecorderView(namespace: Namespace().wrappedValue)
         .environmentObject(RecorderViewModel())
 }
