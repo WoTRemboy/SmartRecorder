@@ -77,6 +77,30 @@ final class Texts {
         static let loadSuccessFirst = "Загрузка"
         static let loadSuccessSecond = "завершена"
         static let loadError = "Ошибка загрузки"
+
+        enum Enhancement {
+            static let action = "Улучшить перевод"
+            static let subtitle = "Прогонит запись через более точную модель и обновит текст"
+            static let processing = "Улучшение..."
+            static let successShort = "Успешно"
+            static let processingDescription = "Тяжелая модель собирает более чистую и точную расшифровку"
+            static let success = "Перевод улучшен"
+            static let successDescription = "Новая версия текста уже сохранена в записи"
+
+            enum ErrorAlert {
+                static let title = "Не удалось улучшить перевод"
+                static let ok = "Хорошо"
+            }
+
+            enum Errors {
+                static let audioMissing = "Аудиофайл записи не найден."
+                static let modelMissing = "Тяжелая модель не найдена в приложении."
+                static let audioReadFailed = "Не удалось прочитать аудиофайл для повторной расшифровки."
+                static let modelLoadFailed = "Не удалось загрузить тяжелую модель для повторной расшифровки."
+                static let transcriptionFailed = "Ошибка повторной расшифровки."
+                static let emptyTranscription = "Модель не вернула текст для этой записи."
+            }
+        }
     }
     
     enum NoteFolder {
