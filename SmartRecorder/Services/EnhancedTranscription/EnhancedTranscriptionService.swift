@@ -2,7 +2,7 @@
 //  EnhancedTranscriptionService.swift
 //  SmartRecorder
 //
-//  Created by OpenAI Codex on 18.11.2025.
+//  Created by Roman Tverdokhleb on 04/24/2025.
 //
 
 import Foundation
@@ -10,66 +10,21 @@ import Foundation
 import OSLog
 import whisper
 
-enum EnhancedTranscriptionError: LocalizedError {
-    case missingAudioFile
-    case missingModel(String)
-    case failedToReadAudio
-    case failedToInitializeModel
-    case transcriptionFailed(Int32)
-    case emptyTranscription
-
-    var errorDescription: String? {
-        switch self {
-        case .missingAudioFile:
-            return Texts.NotesPage.Enhancement.Errors.audioMissing
-        case .missingModel:
-            return Texts.NotesPage.Enhancement.Errors.modelMissing
-        case .failedToReadAudio:
-            return Texts.NotesPage.Enhancement.Errors.audioReadFailed
-        case .failedToInitializeModel:
-            return Texts.NotesPage.Enhancement.Errors.modelLoadFailed
-        case let .transcriptionFailed(code):
-            return "\(Texts.NotesPage.Enhancement.Errors.transcriptionFailed) (\(code))"
-        case .emptyTranscription:
-            return Texts.NotesPage.Enhancement.Errors.emptyTranscription
-        }
-    }
-}
-
 actor EnhancedTranscriptionService {
     static let shared = EnhancedTranscriptionService()
-    private static let modelResourceName = "ggml-large-v3-turbo-q5_0"
-    private static let chunkDuration: Double = 20
-    private static let overlapDuration: Double = 2
 
     private let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "SmartRecorder",
         category: "EnhancedTranscriptionService"
     )
-    private let languageCode = "ru"
-    private let targetFormat = AVAudioFormat(
-        commonFormat: .pcmFormatFloat32,
-        sampleRate: Double(WHISPER_SAMPLE_RATE),
-        channels: 1,
-        interleaved: false
-    )
+    private let configuration = EnhancedTranscriptionConfiguration()
     private let context: OpaquePointer?
 
     private init() {
-        let modelResourceName = Self.modelResourceName
+        let modelResourceName = configuration.modelResourceName
         whisper_log_set({ _, text, _ in
             guard let text else { return }
             let message = String(cString: text)
-
-            let suppressedFragments = [
-                "The model is not found at URL:",
-                "failed to load Core ML model",
-                "-encoder.mlmodelc"
-            ]
-
-            if suppressedFragments.contains(where: { message.contains($0) }) {
-                return
-            }
 
             fputs(message, stderr)
         }, nil)
@@ -116,7 +71,7 @@ actor EnhancedTranscriptionService {
             logger.info("Enhanced transcription audio file size bytes=\(size.int64Value, privacy: .public)")
         }
 
-        let modelResourceName = Self.modelResourceName
+        let modelResourceName = configuration.modelResourceName
         guard Bundle.main.url(forResource: modelResourceName, withExtension: "bin") != nil else {
             logger.error("Enhanced transcription failed: model resource missing in bundle model=\(modelResourceName, privacy: .public)")
             throw EnhancedTranscriptionError.missingModel(modelResourceName)
@@ -152,7 +107,7 @@ actor EnhancedTranscriptionService {
         parameters.suppress_blank = true
         parameters.suppress_nst = true
 
-        let languagePointer = strdup(languageCode)
+        let languagePointer = strdup(configuration.languageCode)
         parameters.language = languagePointer.map { UnsafePointer<CChar>($0) }
 
         defer {
@@ -160,8 +115,8 @@ actor EnhancedTranscriptionService {
         }
 
         let sampleRate = Int(WHISPER_SAMPLE_RATE)
-        let chunkSampleCount = Int(Self.chunkDuration * Double(sampleRate))
-        let overlapSampleCount = Int(Self.overlapDuration * Double(sampleRate))
+        let chunkSampleCount = Int(configuration.chunkDuration * Double(sampleRate))
+        let overlapSampleCount = Int(configuration.overlapDuration * Double(sampleRate))
 
         var mergedText = ""
         var startIndex = 0
@@ -173,7 +128,7 @@ actor EnhancedTranscriptionService {
             try Task.checkCancellation()
             let endIndex = min(samples.count, startIndex + chunkSampleCount)
             let chunk = Array(samples[startIndex..<endIndex])
-            let prompt = transcriptionPrompt(from: mergedText)
+            let prompt = EnhancedTranscriptionTextMerger.transcriptionPrompt(from: mergedText)
 
             logger.info("Enhanced transcription chunk start index=\(chunkIndex, privacy: .public) range=\(startIndex, privacy: .public)..<\(endIndex, privacy: .public) chunkCount=\(chunk.count, privacy: .public) promptLength=\(prompt?.count ?? 0, privacy: .public)")
 
@@ -184,7 +139,7 @@ actor EnhancedTranscriptionService {
                     mergedText = chunkText.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                     logger.info("Enhanced transcription seeded merged text from first non-empty chunk length=\(mergedText.count, privacy: .public)")
                 } else {
-                    mergedText = mergeTranscription(existing: mergedText, incoming: chunkText)
+                    mergedText = EnhancedTranscriptionTextMerger.merge(existing: mergedText, incoming: chunkText)
                     logger.info("Enhanced transcription merged text updated length=\(mergedText.count, privacy: .public)")
                 }
             } else {
@@ -259,7 +214,7 @@ actor EnhancedTranscriptionService {
     }
 
     private func resampledSamples(from url: URL) throws -> [Float] {
-        guard let targetFormat else {
+        guard let targetFormat = configuration.targetFormat else {
             throw EnhancedTranscriptionError.failedToReadAudio
         }
 
@@ -364,76 +319,5 @@ actor EnhancedTranscriptionService {
         logger.info("Enhanced transcription audio read finished iterations=\(iteration, privacy: .public) totalSamples=\(samples.count, privacy: .public) remainingFrames=\(remainingFrames, privacy: .public)")
 
         return samples
-    }
-
-    private func transcriptionPrompt(from text: String) -> String? {
-        let words = text
-            .split(whereSeparator: \.isWhitespace)
-            .map(String.init)
-
-        guard words.count >= 3 else { return nil }
-        return words.suffix(24).joined(separator: " ")
-    }
-
-    private func mergeTranscription(existing: String, incoming: String) -> String {
-        let normalizedExisting = normalize(existing)
-        let normalizedIncoming = normalize(incoming)
-
-        guard !normalizedIncoming.isEmpty else { return existing }
-        guard !normalizedExisting.isEmpty else { return incoming.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) }
-
-        if normalizedExisting == normalizedIncoming || normalizedExisting.hasSuffix(normalizedIncoming) {
-            return existing
-        }
-
-        if normalizedIncoming.hasPrefix(normalizedExisting) {
-            return incoming.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        }
-
-        let existingWords = normalizedExisting.split(separator: " ").map(String.init)
-        let incomingWords = normalizedIncoming.split(separator: " ").map(String.init)
-        let existingOriginalWords = tokenizedWords(from: existing)
-        let incomingOriginalWords = tokenizedWords(from: incoming)
-        let overlapLimit = min(existingWords.count, incomingWords.count, 30)
-
-        var overlap = 0
-        if overlapLimit > 0 {
-            for candidate in stride(from: overlapLimit, through: 1, by: -1) {
-                if existingWords.suffix(candidate) == incomingWords.prefix(candidate) {
-                    overlap = candidate
-                    break
-                }
-            }
-        }
-
-        if overlap > 0, existingOriginalWords.count >= overlap {
-            let mergedOriginalWords = existingOriginalWords + incomingOriginalWords.dropFirst(overlap)
-            return mergedOriginalWords.joined(separator: " ").trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        }
-
-        return [existing.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), incoming.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)]
-            .filter { !$0.isEmpty }
-            .joined(separator: " ")
-    }
-
-    private func normalize(_ text: String) -> String {
-        text
-            .replacingOccurrences(of: "\n", with: " ")
-            .replacingOccurrences(
-                of: #"[^\\p{L}\\p{N}\\s]"#,
-                with: " ",
-                options: .regularExpression
-            )
-            .lowercased()
-            .split(whereSeparator: \.isWhitespace)
-            .joined(separator: " ")
-            .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-    }
-
-    private func tokenizedWords(from text: String) -> [String] {
-        text
-            .replacingOccurrences(of: "\n", with: " ")
-            .split(whereSeparator: \.isWhitespace)
-            .map(String.init)
     }
 }

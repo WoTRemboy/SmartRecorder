@@ -16,7 +16,6 @@ struct SingleAudioDescriptionView: View {
     @State private var isEditing = false
     @State private var audioDuration: TimeInterval? = nil
     @State private var displayedTranscription: String
-    @State private var enhancementGradientRotation: Double = 0
     
     private let note: Note
     private let namespace: Namespace.ID
@@ -141,133 +140,16 @@ struct SingleAudioDescriptionView: View {
     }
 
     private var enhancementSection: some View {
-        GlassEffectContainer {
-            HStack {
-                enhanceButton
-                if isEnhancing {
-                    stopEnhancementButton
-                }
-            }
-        }
-        .frame(height: 70)
-        .frame(maxWidth: .infinity)
-        .task {
-            enhancementGradientRotation = 0
-            withAnimation(.linear(duration: 15.0).repeatForever(autoreverses: false)) {
-                enhancementGradientRotation = 360
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var enhanceButton: some View {
-        if isEnhancing {
-            enhancementProgressPill
-        } else {
-            HStack(spacing: 14) {
-                enhancementIcon
-                
-                Text(enhancementButtonTitle)
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.white)
-                
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 18)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .onTapGesture {
+        EnhancementControlView(
+            isEnhancing: isEnhancing,
+            wasRecentlyEnhanced: wasRecentlyEnhanced,
+            onStart: {
                 viewModel.startEnhancement(for: note)
-            }
-            .glassEffect(.regular.interactive())
-            .overlay {
-                enhancementGradientOverlay
-            }
-        }
-    }
-
-    private var enhancementProgressPill: some View {
-        HStack(spacing: 14) {
-            enhancementIcon
-
-            Text(Texts.NotesPage.Enhancement.processing)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
-
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 18)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .glassEffect(.regular.interactive())
-        .overlay {
-            enhancementGradientOverlay
-        }
-    }
-
-    private var stopEnhancementButton: some View {
-            Image(systemName: "stop.fill")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(width: 70, height: 70)
-            .onTapGesture {
+            },
+            onStop: {
                 viewModel.cancelEnhancement(for: note.id)
             }
-            .glassEffect(.regular.tint(.red).interactive())
-    }
-
-    private var enhancementGradientOverlay: some View {
-        GeometryReader { proxy in
-            let side = max(proxy.size.width, 0)
-
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(
-                    AngularGradient(
-                        colors: [
-                            Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.00),
-                            Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.44),
-                            Color(red: 0.52, green: 0.42, blue: 1.00).opacity(0.5),
-                            Color(red: 1.00, green: 0.38, blue: 0.82).opacity(0.52),
-                            Color(red: 1.00, green: 0.78, blue: 0.36).opacity(0.4),
-                            Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.00)
-                        ],
-                        center: .center
-                    )
-                )
-                .frame(width: side, height: side)
-                .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
-                .blur(radius: 10)
-                .scaleEffect(1.18)
-                .rotationEffect(.degrees(enhancementGradientRotation))
-                .blendMode(.screen)
-                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-                .mask {
-                    RoundedRectangle(cornerRadius: 40, style: .continuous)
-                }
-                .allowsHitTesting(false)
-        }
-    }
-
-    private var enhancementIcon: some View {
-        ZStack {
-            Circle()
-                .fill(.white.opacity(isEnhancing ? 0.18 : 0.12))
-                .frame(width: 40, height: 40)
-
-            Image(systemName: wasRecentlyEnhanced ? "checkmark.circle.fill" : "wand.and.stars")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
-                .phaseAnimator(iconPhases) { content, phase in
-                    content
-                        .scaleEffect(phase.iconScale)
-                        .opacity(phase.iconOpacity)
-                } animation: { phase in
-                    phase.iconAnimation
-                }
-        }
-        .contentTransition(.opacity)
-    }
-
-    private var enhancementButtonTitle: String {
-        wasRecentlyEnhanced ? Texts.NotesPage.Enhancement.successShort : Texts.NotesPage.Enhancement.action
+        )
     }
 
     private var shareMenu: some View {
@@ -317,14 +199,6 @@ struct SingleAudioDescriptionView: View {
         viewModel.wasRecentlyEnhanced(noteID: note.id)
     }
 
-    private var iconPhases: [EnhancementPhase] {
-        if wasRecentlyEnhanced {
-            return [.rest]
-        }
-
-        return isEnhancing ? EnhancementPhase.allCases : [.rest]
-    }
-
     private var enhancementErrorBinding: Binding<Bool> {
         Binding(
             get: { viewModel.enhancementErrorMessage != nil },
@@ -334,78 +208,6 @@ struct SingleAudioDescriptionView: View {
                 }
             }
         )
-    }
-}
-
-private enum EnhancementPhase: CaseIterable {
-    case rest
-    case lifted
-    case settled
-
-    var scale: CGFloat {
-        switch self {
-        case .rest:
-            return 1.0
-        case .lifted:
-            return 1.02
-        case .settled:
-            return 0.995
-        }
-    }
-
-    var highlightOpacity: Double {
-        switch self {
-        case .rest:
-            return 0.08
-        case .lifted:
-            return 0.22
-        case .settled:
-            return 0.12
-        }
-    }
-
-    var iconScale: CGFloat {
-        switch self {
-        case .rest:
-            return 1.0
-        case .lifted:
-            return 1.18
-        case .settled:
-            return 0.98
-        }
-    }
-
-    var iconOpacity: Double {
-        switch self {
-        case .rest:
-            return 0.95
-        case .lifted:
-            return 1.0
-        case .settled:
-            return 0.88
-        }
-    }
-
-    var animation: Animation? {
-        switch self {
-        case .rest:
-            return .smooth(duration: 0.2)
-        case .lifted:
-            return .easeInOut(duration: 0.55)
-        case .settled:
-            return .spring(duration: 0.45, bounce: 0.35)
-        }
-    }
-
-    var iconAnimation: Animation? {
-        switch self {
-        case .rest:
-            return .smooth(duration: 0.2)
-        case .lifted:
-            return .easeInOut(duration: 0.6)
-        case .settled:
-            return .spring(duration: 0.45, bounce: 0.4)
-        }
     }
 }
 
