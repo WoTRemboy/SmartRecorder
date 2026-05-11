@@ -12,6 +12,8 @@ import Combine
 final class AudioRecorderService: ObservableObject {
     
     @Published var amplitudes: [Float] = Array(repeating: 0, count: 16)
+    private var preferredInput: AVAudioSessionPortDescription?
+    private var session: AVAudioSession?
     private let engine = AVAudioEngine()
     private var isRecording = false
     private let audioQueue = DispatchQueue(label: "AudioRecorderService.queue")
@@ -27,6 +29,29 @@ final class AudioRecorderService: ObservableObject {
     static func url(forFileName fileName: String?) -> URL? {
         guard let name = fileName, !name.isEmpty else { return nil }
         return FileManager.default.temporaryDirectory.appendingPathComponent(name)
+    }
+    
+    func prepareAudioSession() throws {
+        session = AVAudioSession.sharedInstance()
+        try session?.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
+    }
+    
+    // TODO: throw it in a separate Task
+    func observeRouteChanges() async {
+        // Observe route change notifications.
+        for await notification in NotificationCenter.default.notifications(
+            named: AVAudioSession.routeChangeNotification
+        ) {
+            print(notification)
+        }
+    }
+    
+    func getMicrophones() -> [AVAudioSessionPortDescription] {
+        return session?.availableInputs ?? []
+    }
+    
+    func chooseMicrophone(microphone: AVAudioSessionPortDescription)  throws {
+        preferredInput = microphone
     }
     
     func startRecording() async throws {
@@ -51,6 +76,7 @@ final class AudioRecorderService: ObservableObject {
                     let session = AVAudioSession.sharedInstance()
                     try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
                     try session.setActive(true, options: [])
+                    try session.setPreferredInput(preferredInput)
                     
                     let fileName = UUID().uuidString + ".m4a"
                     let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
