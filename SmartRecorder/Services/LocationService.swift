@@ -46,6 +46,7 @@ final class LocationService: NSObject, ObservableObject {
 
     private let locationManager = CLLocationManager()
     private var locationContinuation: CheckedContinuation<CLLocation, Error>?
+    private var locationTimeoutTask: Task<Void, Never>?
     
     internal var grantedAccess: Bool {
         switch authorizationStatus {
@@ -80,8 +81,30 @@ final class LocationService: NSObject, ObservableObject {
             throw LocationError.notDetermined
         }
         return try await withCheckedThrowingContinuation { continuation in
+            finishLocationRequest(with: .failure(LocationError.unableToFetch))
             self.locationContinuation = continuation
+            self.locationTimeoutTask?.cancel()
+            self.locationTimeoutTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(10))
+                guard let self, self.locationContinuation != nil else { return }
+                self.finishLocationRequest(with: .failure(LocationError.unableToFetch))
+            }
             locationManager.requestLocation()
+        }
+    }
+
+    private func finishLocationRequest(with result: Result<CLLocation, Error>) {
+        locationTimeoutTask?.cancel()
+        locationTimeoutTask = nil
+
+        guard let continuation = locationContinuation else { return }
+        locationContinuation = nil
+
+        switch result {
+        case let .success(location):
+            continuation.resume(returning: location)
+        case let .failure(error):
+            continuation.resume(throwing: error)
         }
     }
 
@@ -126,8 +149,10 @@ extension LocationService: CLLocationManagerDelegate {
         self.authorizationStatus = manager.authorizationStatus
         if authorizationStatus == .denied {
             locationError = .denied
+            finishLocationRequest(with: .failure(LocationError.denied))
         } else if authorizationStatus == .restricted {
             locationError = .restricted
+            finishLocationRequest(with: .failure(LocationError.restricted))
         } else {
             locationError = nil
         }
@@ -136,18 +161,15 @@ extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else {
             self.locationError = .unableToFetch
-            locationContinuation?.resume(throwing: LocationError.unableToFetch)
-            locationContinuation = nil
+            finishLocationRequest(with: .failure(LocationError.unableToFetch))
             return
         }
         self.lastKnownLocation = location
-        locationContinuation?.resume(returning: location)
-        locationContinuation = nil
+        finishLocationRequest(with: .success(location))
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         self.locationError = .unknown
-        locationContinuation?.resume(throwing: error)
-        locationContinuation = nil
+        finishLocationRequest(with: .failure(error))
     }
 }
