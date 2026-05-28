@@ -21,6 +21,8 @@ final class RecorderViewModel: ObservableObject {
     @Published private(set) var isRecording: Bool = false
     @Published private(set) var showTimerView: Bool = false
     @Published private(set) var elapsedTime: TimeInterval = 0
+    @Published private(set) var microphone: AVAudioSessionPortDescription? = nil
+    @Published private(set) var availableMicrophones: [AVAudioSessionPortDescription?] = []
     
     @Published internal var streetName: String? = nil
     @Published internal var cityName: String? = nil
@@ -55,6 +57,7 @@ final class RecorderViewModel: ObservableObject {
     }
     
     init() {
+        prepareAudioSessionData()
         authorizationCancellable = locationService.$authorizationStatus
             .receive(on: RunLoop.main)
             .sink { [weak self] status in
@@ -115,6 +118,20 @@ final class RecorderViewModel: ObservableObject {
     
     // MARK: - Audio helpers
     
+    private func prepareAudioSessionData() {
+        let service = AudioRecorderService()
+        audioRecorderService = service
+        
+        do {
+            try service.prepareAudioSession()
+            availableMicrophones = service.getMicrophones()
+        }
+        catch {
+            logger.info("Failed to start audio session: \(error)")
+        }
+        
+    }
+    
     private func audioDuration(for fileURL: URL) async -> TimeInterval? {
         let asset = AVURLAsset(url: fileURL)
         do {
@@ -129,6 +146,16 @@ final class RecorderViewModel: ObservableObject {
     private func integerSeconds(from seconds: TimeInterval?) -> Int? {
         guard let s = seconds, s.isFinite else { return nil }
         return Int(s.rounded())
+    }
+    
+    internal func changeMicrophone(_ device: AVAudioSessionPortDescription) {
+        do {
+            try audioRecorderService?.chooseMicrophone(microphone: device)
+                microphone = device
+        }
+        catch {
+            logger.info("Failed to choose microphone: \(error)")
+        }
     }
     
     internal func toggleRecording() {
@@ -180,8 +207,6 @@ final class RecorderViewModel: ObservableObject {
                     self.elapsedTime += 1
                 }
             
-            let service = AudioRecorderService()
-            audioRecorderService = service
             Task {
                 do {
                     try await service.startRecording()
@@ -194,7 +219,7 @@ final class RecorderViewModel: ObservableObject {
                     }
                 }
             }
-            amplitudeCancellable = service.$amplitudes
+            amplitudeCancellable = audioRecorderService?.$amplitudes
                 .receive(on: RunLoop.main)
                 .sink { [weak self] amps in
                     self?.amplitudes = amps
@@ -259,7 +284,7 @@ final class RecorderViewModel: ObservableObject {
             duration: durationToSave,
             location: noteLocation
         )
-        audioRecorderService = nil
+        
         let noteService = NoteEntityService.shared
         do {
             _ = try await noteService.create(note)
