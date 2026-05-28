@@ -405,14 +405,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		6339B9D72F99643F0055744D /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				6339B9DB2F9964A60055744D /* whisper.xcframework */,
-			);
-			path = Frameworks;
-			sourceTree = "<group>";
-		};
 		6339B9D82F9964570055744D /* MLModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -438,7 +430,6 @@
 				636072562E96D26E00E5DCC9 /* SmartRecorder */,
 				8957E91F2FC5AC1D00DA1D7F /* RecordingLiveActivityExtension */,
 				8957E91A2FC5AC1D00DA1D7F /* Frameworks */,
-				6339B9D72F99643F0055744D /* Frameworks */,
 				636072462E96CF6D00E5DCC9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -780,6 +771,7 @@
 		8957E91A2FC5AC1D00DA1D7F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6339B9DB2F9964A60055744D /* whisper.xcframework */,
 				8957E91B2FC5AC1D00DA1D7F /* WidgetKit.framework */,
 				8957E91D2FC5AC1D00DA1D7F /* SwiftUI.framework */,
 			);
