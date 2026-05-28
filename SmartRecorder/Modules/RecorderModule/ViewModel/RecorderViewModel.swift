@@ -21,8 +21,6 @@ final class RecorderViewModel: ObservableObject {
     @Published private(set) var isRecording: Bool = false
     @Published private(set) var showTimerView: Bool = false
     @Published private(set) var elapsedTime: TimeInterval = 0
-    @Published private(set) var isStartingRecording: Bool = false
-
     @Published internal var participantCount: Int = 1
 
     @Published private(set) var microphone: AVAudioSessionPortDescription? = nil
@@ -203,88 +201,7 @@ final class RecorderViewModel: ObservableObject {
     }
     
     internal func toggleRecording() {
-        guard !isStartingRecording else { return }
-
         if isRecording {
-            stopRecordingSession()
-        } else {
-            Task {
-                await startRecordingSession()
-            }
-        }
-    }
-
-    private func startRecordingSession() async {
-        logger.info("Recording start requested")
-        isStartingRecording = true
-        resetRecordingUI()
-
-        let service = AudioRecorderService()
-        audioRecorderService = service
-        amplitudeCancellable?.cancel()
-        amplitudeCancellable = service.$amplitudes
-            .receive(on: RunLoop.main)
-            .sink { [weak self] amps in
-                self?.amplitudes = amps
-            }
-
-        do {
-            try await service.startRecording()
-            isRecording = true
-            isStartingRecording = false
-            startRecordingTimers()
-            LiveActivityService.shared.startActivity(
-                locationName: streetName,
-                cityName: cityName,
-                participantCount: participantCount
-            )
-        } catch {
-            logger.error("Failed to start recording: \(String(describing: error))")
-            isRecording = false
-            isStartingRecording = false
-            audioRecorderService = nil
-            amplitudeCancellable?.cancel()
-            amplitudeCancellable = nil
-            amplitudes = Array(repeating: 0, count: 16)
-            showTimerView = false
-            await LiveActivityService.shared.endImmediately()
-        }
-    }
-
-    private func stopRecordingSession() {
-        isRecording = false
-        logger.info("Recording stop requested. elapsedTime=\(self.elapsedTime)")
-        stopRecordingTimers()
-        amplitudeCancellable?.cancel()
-
-        guard let service = audioRecorderService else { return }
-        Task {
-            LoadingOverlay.shared.show()
-            await service.stopRecording()
-            await LiveActivityService.shared.stopActivity()
-            LoadingOverlay.shared.hide()
-            showSaveSheetView.toggle()
-        }
-    }
-
-    private func resetRecordingUI() {
-        isRecording = false
-        showTimerView = false
-        elapsedTime = 0
-        stopRecordingTimers()
-    }
-
-    private func startRecordingTimers() {
-        timerTask?.cancel()
-        timerTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            await MainActor.run {
-                if self?.isRecording == true {
-                    withAnimation {
-                        self?.showTimerView = true
-                    }
-                }
-            }
             isRecording = false
             logger.info("Recording stop requested. elapsedTime=\(self.elapsedTime)")
             isLiveTranscriptionExpanded = false
@@ -292,16 +209,27 @@ final class RecorderViewModel: ObservableObject {
             timerTask?.cancel()
             timerTask = nil
             recordTimerCancellable?.cancel()
+
             if let service = audioRecorderService {
                 Task {
                     LoadingOverlay.shared.show()
+                    await LiveActivityService.shared.updateActivity(
+                        status: .processing,
+                        participantCount: participantCount
+                    )
                     await service.stopRecording()
+                    await LiveActivityService.shared.stopActivity()
                     self.liveTranscription = service.transcriptionText
                     self.isTranscribing = false
                     LoadingOverlay.shared.hide()
                     showSaveSheetView.toggle()
                 }
+            } else {
+                Task {
+                    await LiveActivityService.shared.endImmediately()
+                }
             }
+
             amplitudeCancellable?.cancel()
             transcriptionCancellable?.cancel()
             transcriptionStateCancellable?.cancel()
@@ -338,50 +266,49 @@ final class RecorderViewModel: ObservableObject {
                     guard let self = self, self.isRecording else { return }
                     self.elapsedTime += 1
                 }
-            
+
             Task {
                 do {
                     try await service.startRecording()
+                    LiveActivityService.shared.startActivity(
+                        locationName: streetName,
+                        cityName: cityName,
+                        participantCount: participantCount
+                    )
                 } catch {
                     await MainActor.run {
                         self.isRecording = false
                         self.showTimerView = false
                         self.recordTimerCancellable?.cancel()
                         self.timerTask?.cancel()
+                        self.amplitudes = Array(repeating: 0, count: 16)
+                        self.amplitudeCancellable?.cancel()
+                        self.transcriptionCancellable?.cancel()
+                        self.transcriptionStateCancellable?.cancel()
                     }
+                    await LiveActivityService.shared.endImmediately()
                 }
             }
+
+            amplitudeCancellable?.cancel()
             amplitudeCancellable = service.$amplitudes
                 .receive(on: RunLoop.main)
                 .sink { [weak self] amps in
                     self?.amplitudes = amps
                 }
+            transcriptionCancellable?.cancel()
             transcriptionCancellable = service.$transcriptionText
                 .receive(on: RunLoop.main)
                 .sink { [weak self] text in
                     self?.liveTranscription = text
                 }
+            transcriptionStateCancellable?.cancel()
             transcriptionStateCancellable = service.$isTranscribing
                 .receive(on: RunLoop.main)
                 .sink { [weak self] isTranscribing in
                     self?.isTranscribing = isTranscribing
                 }
         }
-        recordTimerCancellable?.cancel()
-        recordTimerCancellable = Timer.publish(every: 1.0, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                guard let self = self, self.isRecording else { return }
-                self.elapsedTime += 1
-            }
-    }
-
-    private func stopRecordingTimers() {
-        showTimerView = false
-        timerTask?.cancel()
-        timerTask = nil
-        recordTimerCancellable?.cancel()
-        recordTimerCancellable = nil
     }
 
     internal func setLiveTranscriptionExpanded(_ isExpanded: Bool) {

@@ -156,6 +156,7 @@ final class AudioRecorderService: ObservableObject {
                     self.engine = AVAudioEngine()
                     self.converter = nil
                     self.converterInputFormat = nil
+                    self.isRecording = true
 
                     let settings: [String: Any] = [
                         AVFormatIDKey: kAudioFormatMPEG4AAC,
@@ -178,18 +179,6 @@ final class AudioRecorderService: ObservableObject {
                         throw RecordingError.startFailed
                     }
 
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        self.meterTimer?.invalidate()
-                        self.meterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
-                            self?.updateAmplitudesFromRecorder()
-                        }
-                    }
-                    self.recorder?.prepareToRecord()
-                    self.recorder?.record()
-                    self.isRecording = true
-
-                    self.isRecording = true
                     cont.resume(returning: ())
                 } catch {
                     self.isRecording = false
@@ -230,11 +219,6 @@ final class AudioRecorderService: ObservableObject {
     func stopRecording() async {
         guard isRecording else { return }
         isRecording = false
-        await MainActor.run {
-            self.meterTimer?.invalidate()
-            self.meterTimer = nil
-        }
-        await MainActor.run { self.isRecording = false }
 
         await withCheckedContinuation { cont in
             audioQueue.async { [weak self] in
@@ -343,6 +327,8 @@ final class AudioRecorderService: ObservableObject {
         fileName = nil
         try? FileManager.default.removeItem(at: url)
         try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+    }
+
     private func scheduleTranscriptionIfNeeded(force: Bool) {
         guard transcriptionTask == nil else { return }
 
