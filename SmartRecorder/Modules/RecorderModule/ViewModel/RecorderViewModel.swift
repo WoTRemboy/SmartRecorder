@@ -314,6 +314,15 @@ final class RecorderViewModel: ObservableObject {
     internal func setLiveTranscriptionExpanded(_ isExpanded: Bool) {
         isLiveTranscriptionExpanded = isExpanded
     }
+
+    internal func cancelCurrentNoteSave() {
+        audioRecorderService?.discardRecordingFile()
+        showSaveSheetView = false
+        saveNoteTitle = ""
+        liveTranscription = ""
+        isTranscribing = false
+        amplitudes = Array(repeating: 0, count: 16)
+    }
     
     @MainActor
     func saveCurrentNote() async {

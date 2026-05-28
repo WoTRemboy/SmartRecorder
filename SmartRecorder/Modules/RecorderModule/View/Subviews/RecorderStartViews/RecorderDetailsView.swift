@@ -17,7 +17,6 @@ struct RecorderDetailsView: View {
         VStack(spacing: 5) {
             dateView
             locationView
-            participantsView
         }
     }
     

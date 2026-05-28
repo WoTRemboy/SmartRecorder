@@ -11,6 +11,7 @@ struct SaveSheetView: View {
     
     @FocusState private var isTitleFocused: Bool
     @EnvironmentObject private var viewModel: RecorderViewModel
+    @State private var showCancelAlert = false
     
     internal var body: some View {
         ScrollView {
@@ -18,7 +19,7 @@ struct SaveSheetView: View {
                 titleTextField
                 folderListLabel
                 folderList
-                saveButton
+                actionButtons
                     .padding(.top)
             }
             .padding([.top, .horizontal])
@@ -26,6 +27,14 @@ struct SaveSheetView: View {
         .scrollDisabled(true)
         .onAppear {
             isTitleFocused = true
+        }
+        .alert(Texts.RecorderPage.SaveSheet.CancelAlert.title, isPresented: $showCancelAlert) {
+            Button(Texts.RecorderPage.SaveSheet.CancelAlert.keep, role: .cancel) {}
+            Button(Texts.RecorderPage.SaveSheet.CancelAlert.discard, role: .destructive) {
+                viewModel.cancelCurrentNoteSave()
+            }
+        } message: {
+            Text(Texts.RecorderPage.SaveSheet.CancelAlert.message)
         }
     }
     
@@ -83,6 +92,26 @@ struct SaveSheetView: View {
             .foregroundStyle(Color.SupportColors.purple)
             .transition(.scale)
     }
+
+    private var actionButtons: some View {
+        HStack(spacing: 10) {
+            cancelButton
+            saveButton
+        }
+    }
+
+    private var cancelButton: some View {
+        Button(role: .destructive) {
+            showCancelAlert = true
+        } label: {
+            Text(Texts.RecorderPage.SaveSheet.cancel)
+                .font(Font.largeTitle3(.semibold))
+                .padding(.horizontal)
+                .frame(height: 46)
+        }
+        .buttonStyle(.glass)
+        .tint(Color.SupportColors.red)
+    }
     
     private var saveButton: some View {
         Button {
@@ -91,10 +120,10 @@ struct SaveSheetView: View {
             }
         } label: {
             Text(Texts.RecorderPage.SaveSheet.save)
-                .font(Font.largeTitle2(.semibold))
+                .font(Font.largeTitle3(.semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal)
-                .frame(height: 56)
+                .frame(height: 46)
         }
         .buttonStyle(.glassProminent)
         .tint(Color.SupportColors.blue)

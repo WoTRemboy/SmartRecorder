@@ -68,6 +68,17 @@ final class AudioRecorderService: ObservableObject {
         fileName
     }
 
+    func discardRecordingFile() {
+        guard let fileURL = Self.url(forFileName: fileName) else { return }
+
+        do {
+            try FileManager.default.removeItem(at: fileURL)
+            fileName = nil
+        } catch {
+            logger.error("Failed to delete discarded recording: \(String(describing: error))")
+        }
+    }
+
     static func url(forFileName fileName: String?) -> URL? {
         guard let name = fileName, !name.isEmpty else { return nil }
         return FileManager.default.temporaryDirectory.appendingPathComponent(name)

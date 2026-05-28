@@ -11,7 +11,12 @@ extension Font {
         Font.system(size: 35, weight: weight)
     }
     
-    static func largeTitle2(_ weight: Font.Weight = .regular) -> Font? { Font.system(size: 24, weight: weight)
+    static func largeTitle2(_ weight: Font.Weight = .regular) -> Font? {
+        Font.system(size: 24, weight: weight)
+    }
+    
+    static func largeTitle3(_ weight: Font.Weight = .regular) -> Font? {
+        Font.system(size: 18, weight: weight)
     }
     
     static func subheadline() -> Font? {
