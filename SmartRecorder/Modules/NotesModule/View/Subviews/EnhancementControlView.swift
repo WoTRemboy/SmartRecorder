@@ -14,6 +14,7 @@ struct EnhancementControlView: View {
     let onStart: () -> Void
     let onStop: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
     @State private var gradientRotation: Double = 0
 
     var body: some View {
@@ -93,14 +94,7 @@ struct EnhancementControlView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(
                     AngularGradient(
-                        colors: [
-                            Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.00),
-                            Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.44),
-                            Color(red: 0.52, green: 0.42, blue: 1.00).opacity(0.5),
-                            Color(red: 1.00, green: 0.38, blue: 0.82).opacity(0.52),
-                            Color(red: 1.00, green: 0.78, blue: 0.36).opacity(0.4),
-                            Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.00)
-                        ],
+                        colors: enhancementGradientColors,
                         center: .center
                     )
                 )
@@ -109,13 +103,36 @@ struct EnhancementControlView: View {
                 .blur(radius: 10)
                 .scaleEffect(1.18)
                 .rotationEffect(.degrees(gradientRotation))
-                .blendMode(.screen)
+                .blendMode(colorScheme == .dark ? .screen : .normal)
                 .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                 .mask {
                     RoundedRectangle(cornerRadius: 40, style: .continuous)
                 }
                 .allowsHitTesting(false)
         }
+    }
+
+    private var enhancementGradientColors: [Color] {
+        if colorScheme == .dark {
+            return [
+                Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.00), // Cyan fade
+                Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.44), // Cyan
+                Color(red: 0.52, green: 0.42, blue: 1.00).opacity(0.5), // Violet
+                Color(red: 1.00, green: 0.38, blue: 0.82).opacity(0.52), // Pink
+                Color(red: 1.00, green: 0.78, blue: 0.36).opacity(0.4), // Amber
+                Color(red: 0.23, green: 0.86, blue: 1.00).opacity(0.00) // Cyan fade
+            ]
+        }
+
+        return [
+            Color(red: 0.00, green: 0.58, blue: 1.00).opacity(0.86), // Sky blue
+            Color(red: 0.00, green: 0.48, blue: 1.00).opacity(0.88), // Saturated blue
+            Color(red: 0.36, green: 0.18, blue: 1.00).opacity(0.82), // Violet
+            Color(red: 0.96, green: 0.05, blue: 0.64).opacity(0.88), // Magenta
+            Color(red: 1.00, green: 0.48, blue: 0.00).opacity(0.82), // Orange
+            Color(red: 0.08, green: 0.10, blue: 0.42).opacity(0.78), // Deep indigo
+            Color(red: 0.00, green: 0.58, blue: 1.00).opacity(0.86) // Sky blue
+        ]
     }
 
     private var enhancementIcon: some View {
