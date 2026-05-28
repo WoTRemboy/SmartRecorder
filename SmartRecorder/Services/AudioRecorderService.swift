@@ -26,6 +26,24 @@ final class AudioRecorderService: ObservableObject {
 
     private var recorder: AVAudioRecorder?
     private var fileName: String?
+
+    enum RecordingError: LocalizedError {
+        case microphonePermissionDenied
+        case preparationFailed
+        case startFailed
+
+        var errorDescription: String? {
+            switch self {
+            case .microphonePermissionDenied:
+                return "Microphone permission not granted"
+            case .preparationFailed:
+                return "Unable to prepare audio recorder"
+            case .startFailed:
+                return "Unable to start audio recording"
+            }
+        }
+    }
+    
     private var converter: AVAudioConverter?
     private var converterInputFormat: AVAudioFormat?
     private let targetFormat = AVAudioFormat(
@@ -115,9 +133,9 @@ final class AudioRecorderService: ObservableObject {
             }
         }
         guard granted else {
-            await MainActor.run { self.isRecording = false }
+            isRecording = false
             Toast.shared.present(title: Texts.RecorderPage.Toasts.accessDenied)
-            throw NSError(domain: "AudioRecorderService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Microphone permission not granted"])
+            throw RecordingError.microphonePermissionDenied
         }
 
         try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
@@ -150,14 +168,28 @@ final class AudioRecorderService: ObservableObject {
                     try self.engine.start()
 
                     self.recorder = try AVAudioRecorder(url: url, settings: settings)
+                    self.recorder?.isMeteringEnabled = true
+                    guard self.recorder?.prepareToRecord() == true else {
+                        self.resetRecorderAfterFailedStart(url: url)
+                        throw RecordingError.preparationFailed
+                    }
+                    guard self.recorder?.record() == true else {
+                        self.resetRecorderAfterFailedStart(url: url)
+                        throw RecordingError.startFailed
+                    }
+
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.meterTimer?.invalidate()
+                        self.meterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+                            self?.updateAmplitudesFromRecorder()
+                        }
+                    }
                     self.recorder?.prepareToRecord()
                     self.recorder?.record()
                     self.isRecording = true
 
-                    Task { @MainActor in
-                        self.isRecording = true
-                    }
-
+                    self.isRecording = true
                     cont.resume(returning: ())
                 } catch {
                     self.isRecording = false
@@ -197,6 +229,11 @@ final class AudioRecorderService: ObservableObject {
 
     func stopRecording() async {
         guard isRecording else { return }
+        isRecording = false
+        await MainActor.run {
+            self.meterTimer?.invalidate()
+            self.meterTimer = nil
+        }
         await MainActor.run { self.isRecording = false }
 
         await withCheckedContinuation { cont in
@@ -300,6 +337,12 @@ final class AudioRecorderService: ObservableObject {
         }
     }
 
+    private func resetRecorderAfterFailedStart(url: URL) {
+        recorder?.stop()
+        recorder = nil
+        fileName = nil
+        try? FileManager.default.removeItem(at: url)
+        try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
     private func scheduleTranscriptionIfNeeded(force: Bool) {
         guard transcriptionTask == nil else { return }
 
