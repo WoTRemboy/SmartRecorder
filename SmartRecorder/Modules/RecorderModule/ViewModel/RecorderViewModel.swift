@@ -124,7 +124,7 @@ final class RecorderViewModel: ObservableObject {
         
         do {
             try service.prepareAudioSession()
-            availableMicrophones = service.getMicrophones()
+            refreshAvailableMicrophones()
         }
         catch {
             logger.info("Failed to start audio session: \(error)")
@@ -150,11 +150,31 @@ final class RecorderViewModel: ObservableObject {
     
     internal func changeMicrophone(_ device: AVAudioSessionPortDescription) {
         do {
-            try audioRecorderService?.chooseMicrophone(microphone: device)
-                microphone = device
+            if let selectedDevice = try audioRecorderService?.chooseMicrophone(microphone: device) {
+                microphone = selectedDevice
+                refreshAvailableMicrophones()
+            }
         }
         catch {
             logger.info("Failed to choose microphone: \(error)")
+        }
+    }
+
+    private func refreshAvailableMicrophones() {
+        guard let audioRecorderService else {
+            availableMicrophones = []
+            microphone = nil
+            return
+        }
+
+        let microphones = audioRecorderService.getMicrophones()
+        availableMicrophones = microphones
+
+        if let selected = microphone,
+           let refreshedSelection = microphones.first(where: { $0.uid == selected.uid }) {
+            microphone = refreshedSelection
+        } else {
+            microphone = audioRecorderService.selectedMicrophone()
         }
     }
     
@@ -181,6 +201,13 @@ final class RecorderViewModel: ObservableObject {
             transcriptionCancellable?.cancel()
             transcriptionStateCancellable?.cancel()
         } else {
+            guard let service = audioRecorderService else {
+                logger.error("Recording start failed: audio recorder service is missing")
+                isRecording = false
+                return
+            }
+
+            refreshAvailableMicrophones()
             isRecording = true
             logger.info("Recording start requested")
             isLiveTranscriptionExpanded = false
@@ -219,7 +246,7 @@ final class RecorderViewModel: ObservableObject {
                     }
                 }
             }
-            amplitudeCancellable = audioRecorderService?.$amplitudes
+            amplitudeCancellable = service.$amplitudes
                 .receive(on: RunLoop.main)
                 .sink { [weak self] amps in
                     self?.amplitudes = amps

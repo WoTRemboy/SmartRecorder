@@ -14,12 +14,13 @@ import whisper
 final class AudioRecorderService: ObservableObject {
 
     @Published var amplitudes: [Float] = Array(repeating: 0, count: 16)
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "SmartRecorder", category: "AudioRecorderService")
     private var preferredInput: AVAudioSessionPortDescription?
     private var session: AVAudioSession?
     @Published private(set) var transcriptionText: String = ""
     @Published private(set) var isTranscribing: Bool = false
 
-    private let engine = AVAudioEngine()
+    private var engine = AVAudioEngine()
     private var isRecording = false
     private let audioQueue = DispatchQueue(label: "AudioRecorderService.queue")
 
@@ -56,7 +57,11 @@ final class AudioRecorderService: ObservableObject {
     
     func prepareAudioSession() throws {
         session = AVAudioSession.sharedInstance()
-        try session?.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
+        guard let session else { return }
+
+        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
+        try session.setActive(true, options: [])
+        try applyPreferredInput(in: session)
     }
     
     // TODO: throw it in a separate Task
@@ -70,11 +75,35 @@ final class AudioRecorderService: ObservableObject {
     }
     
     func getMicrophones() -> [AVAudioSessionPortDescription] {
-        return session?.availableInputs ?? []
+        let audioSession = session ?? AVAudioSession.sharedInstance()
+        return audioSession.availableInputs ?? []
+    }
+
+    func selectedMicrophone() -> AVAudioSessionPortDescription? {
+        let audioSession = session ?? AVAudioSession.sharedInstance()
+        let inputs = audioSession.availableInputs ?? []
+
+        if let preferredInput,
+           let input = inputs.first(where: { $0.uid == preferredInput.uid }) {
+            return input
+        }
+
+        if let routeInput = audioSession.currentRoute.inputs.first,
+           let input = inputs.first(where: { $0.uid == routeInput.uid }) {
+            preferredInput = input
+            return input
+        }
+
+        preferredInput = inputs.first
+        return preferredInput
     }
     
-    func chooseMicrophone(microphone: AVAudioSessionPortDescription)  throws {
-        preferredInput = microphone
+    @discardableResult
+    func chooseMicrophone(microphone: AVAudioSessionPortDescription) throws -> AVAudioSessionPortDescription {
+        let inputs = session?.availableInputs ?? []
+        let resolvedInput = inputs.first { $0.uid == microphone.uid } ?? microphone
+        preferredInput = resolvedInput
+        return resolvedInput
     }
     
     func startRecording() async throws {
@@ -98,12 +127,17 @@ final class AudioRecorderService: ObservableObject {
                     let session = AVAudioSession.sharedInstance()
                     try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
                     try session.setActive(true, options: [])
-                    try session.setPreferredInput(preferredInput)
-                    
+                    try self.applyPreferredInput(in: session)
+
                     let fileName = UUID().uuidString + ".m4a"
                     let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
                     self.fileName = fileName
                     self.resetStreamingState()
+                    self.engine.stop()
+                    self.engine.inputNode.removeTap(onBus: 0)
+                    self.engine = AVAudioEngine()
+                    self.converter = nil
+                    self.converterInputFormat = nil
 
                     let settings: [String: Any] = [
                         AVFormatIDKey: kAudioFormatMPEG4AAC,
@@ -118,6 +152,7 @@ final class AudioRecorderService: ObservableObject {
                     self.recorder = try AVAudioRecorder(url: url, settings: settings)
                     self.recorder?.prepareToRecord()
                     self.recorder?.record()
+                    self.isRecording = true
 
                     Task { @MainActor in
                         self.isRecording = true
@@ -125,6 +160,11 @@ final class AudioRecorderService: ObservableObject {
 
                     cont.resume(returning: ())
                 } catch {
+                    self.isRecording = false
+                    self.engine.inputNode.removeTap(onBus: 0)
+                    self.engine.stop()
+                    self.converter = nil
+                    self.converterInputFormat = nil
                     Task { @MainActor in
                         self.isRecording = false
                     }
@@ -132,6 +172,27 @@ final class AudioRecorderService: ObservableObject {
                 }
             }
         }
+    }
+
+    private func applyPreferredInput(in session: AVAudioSession) throws {
+        let inputs = session.availableInputs ?? []
+        let inputToApply: AVAudioSessionPortDescription?
+
+        if let preferredInput {
+            inputToApply = inputs.first { $0.uid == preferredInput.uid }
+        } else if let routeInput = session.currentRoute.inputs.first {
+            inputToApply = inputs.first { $0.uid == routeInput.uid } ?? inputs.first
+        } else {
+            inputToApply = inputs.first
+        }
+
+        guard let inputToApply else {
+            try session.setPreferredInput(nil)
+            return
+        }
+
+        try session.setPreferredInput(inputToApply)
+        self.preferredInput = inputToApply
     }
 
     func stopRecording() async {
@@ -157,11 +218,12 @@ final class AudioRecorderService: ObservableObject {
 
     private func configureEngineTap() throws {
         let inputNode = engine.inputNode
-        let inputFormat = inputNode.outputFormat(forBus: 0)
 
         inputNode.removeTap(onBus: 0)
-        inputNode.installTap(onBus: 0, bufferSize: 2_048, format: inputFormat) { [weak self] buffer, _ in
-            self?.processInputBuffer(buffer, inputFormat: inputFormat)
+        converter = nil
+        converterInputFormat = nil
+        inputNode.installTap(onBus: 0, bufferSize: 2_048, format: nil) { [weak self] buffer, _ in
+            self?.processInputBuffer(buffer, inputFormat: buffer.format)
         }
     }
 
@@ -184,6 +246,7 @@ final class AudioRecorderService: ObservableObject {
 
     private func downsampledBuffer(from buffer: AVAudioPCMBuffer, inputFormat: AVAudioFormat) -> AVAudioPCMBuffer? {
         guard let targetFormat else { return nil }
+        guard inputFormat.sampleRate > 0, inputFormat.channelCount > 0 else { return nil }
 
         if converter == nil || converterInputFormat != inputFormat {
             converter = AVAudioConverter(from: inputFormat, to: targetFormat)
