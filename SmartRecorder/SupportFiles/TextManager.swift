@@ -124,6 +124,7 @@ final class Texts {
             static let folder = "Добавить в папку"
             
             static let ok = "Хорошо"
+            static let cancel = "Отмена"
             static let save = "Сохранить"
             
             static let success = "Успешно"
@@ -131,6 +132,13 @@ final class Texts {
 
             static let failure = "Ошибка"
             static let failureMessage = "Что-то пошло не так"
+
+            enum CancelAlert {
+                static let title = "Удалить запись?"
+                static let message = "Аудиозапись будет удалена с устройства без сохранения."
+                static let keep = "Оставить"
+                static let discard = "Удалить"
+            }
         }
         
         enum Toasts {

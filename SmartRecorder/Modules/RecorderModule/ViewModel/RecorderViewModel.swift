@@ -21,21 +21,23 @@ final class RecorderViewModel: ObservableObject {
     @Published private(set) var isRecording: Bool = false
     @Published private(set) var showTimerView: Bool = false
     @Published private(set) var elapsedTime: TimeInterval = 0
+    @Published internal var participantCount: Int = 1
+
     @Published private(set) var microphone: AVAudioSessionPortDescription? = nil
     @Published private(set) var availableMicrophones: [AVAudioSessionPortDescription?] = []
     
     @Published internal var streetName: String? = nil
     @Published internal var cityName: String? = nil
     @Published private(set) var locationPermissionDenied: Bool = false
-    
+
     @Published internal var saveNoteTitle: String = ""
     @Published private(set) var saveNoteFolder: NoteFolder = .work
-    
+
     @Published internal var showLocationPermissionAlert: Bool = false
     @Published internal var showSaveSheetView: Bool = false
     @Published internal var showSaveSuccessAlert: Bool = false
     @Published internal var showSaveErrorAlert: Bool = false
-    
+
     @Published var amplitudes: [Float] = Array(repeating: 0, count: 16)
     @Published private(set) var liveTranscription: String = ""
     @Published private(set) var isTranscribing: Bool = false
@@ -73,9 +75,29 @@ final class RecorderViewModel: ObservableObject {
     internal func isSelectedFolder(_ folder: NoteFolder) -> Bool {
         saveNoteFolder == folder
     }
-    
+
     internal func setSaveFolder(_ folder: NoteFolder) {
         saveNoteFolder = folder
+    }
+
+    internal func incrementParticipants() {
+        participantCount = min(participantCount + 1, 99)
+        if isRecording {
+            Task { await LiveActivityService.shared.updateActivity(
+                status: .recording,
+                participantCount: participantCount
+            )}
+        }
+    }
+
+    internal func decrementParticipants() {
+        participantCount = max(participantCount - 1, 1)
+        if isRecording {
+            Task { await LiveActivityService.shared.updateActivity(
+                status: .recording,
+                participantCount: participantCount
+            )}
+        }
     }
     
     internal func toggleShowSaveSheetView() {
@@ -187,16 +209,27 @@ final class RecorderViewModel: ObservableObject {
             timerTask?.cancel()
             timerTask = nil
             recordTimerCancellable?.cancel()
+
             if let service = audioRecorderService {
                 Task {
                     LoadingOverlay.shared.show()
+                    await LiveActivityService.shared.updateActivity(
+                        status: .processing,
+                        participantCount: participantCount
+                    )
                     await service.stopRecording()
+                    await LiveActivityService.shared.stopActivity()
                     self.liveTranscription = service.transcriptionText
                     self.isTranscribing = false
                     LoadingOverlay.shared.hide()
                     showSaveSheetView.toggle()
                 }
+            } else {
+                Task {
+                    await LiveActivityService.shared.endImmediately()
+                }
             }
+
             amplitudeCancellable?.cancel()
             transcriptionCancellable?.cancel()
             transcriptionStateCancellable?.cancel()
@@ -233,29 +266,43 @@ final class RecorderViewModel: ObservableObject {
                     guard let self = self, self.isRecording else { return }
                     self.elapsedTime += 1
                 }
-            
+
             Task {
                 do {
                     try await service.startRecording()
+                    LiveActivityService.shared.startActivity(
+                        locationName: streetName,
+                        cityName: cityName,
+                        participantCount: participantCount
+                    )
                 } catch {
                     await MainActor.run {
                         self.isRecording = false
                         self.showTimerView = false
                         self.recordTimerCancellable?.cancel()
                         self.timerTask?.cancel()
+                        self.amplitudes = Array(repeating: 0, count: 16)
+                        self.amplitudeCancellable?.cancel()
+                        self.transcriptionCancellable?.cancel()
+                        self.transcriptionStateCancellable?.cancel()
                     }
+                    await LiveActivityService.shared.endImmediately()
                 }
             }
+
+            amplitudeCancellable?.cancel()
             amplitudeCancellable = service.$amplitudes
                 .receive(on: RunLoop.main)
                 .sink { [weak self] amps in
                     self?.amplitudes = amps
                 }
+            transcriptionCancellable?.cancel()
             transcriptionCancellable = service.$transcriptionText
                 .receive(on: RunLoop.main)
                 .sink { [weak self] text in
                     self?.liveTranscription = text
                 }
+            transcriptionStateCancellable?.cancel()
             transcriptionStateCancellable = service.$isTranscribing
                 .receive(on: RunLoop.main)
                 .sink { [weak self] isTranscribing in
@@ -266,6 +313,15 @@ final class RecorderViewModel: ObservableObject {
 
     internal func setLiveTranscriptionExpanded(_ isExpanded: Bool) {
         isLiveTranscriptionExpanded = isExpanded
+    }
+
+    internal func cancelCurrentNoteSave() {
+        audioRecorderService?.discardRecordingFile()
+        showSaveSheetView = false
+        saveNoteTitle = ""
+        liveTranscription = ""
+        isTranscribing = false
+        amplitudes = Array(repeating: 0, count: 16)
     }
     
     @MainActor

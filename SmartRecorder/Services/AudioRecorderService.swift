@@ -26,6 +26,24 @@ final class AudioRecorderService: ObservableObject {
 
     private var recorder: AVAudioRecorder?
     private var fileName: String?
+
+    enum RecordingError: LocalizedError {
+        case microphonePermissionDenied
+        case preparationFailed
+        case startFailed
+
+        var errorDescription: String? {
+            switch self {
+            case .microphonePermissionDenied:
+                return "Microphone permission not granted"
+            case .preparationFailed:
+                return "Unable to prepare audio recorder"
+            case .startFailed:
+                return "Unable to start audio recording"
+            }
+        }
+    }
+    
     private var converter: AVAudioConverter?
     private var converterInputFormat: AVAudioFormat?
     private let targetFormat = AVAudioFormat(
@@ -48,6 +66,17 @@ final class AudioRecorderService: ObservableObject {
 
     func recordedFileName() -> String? {
         fileName
+    }
+
+    func discardRecordingFile() {
+        guard let fileURL = Self.url(forFileName: fileName) else { return }
+
+        do {
+            try FileManager.default.removeItem(at: fileURL)
+            fileName = nil
+        } catch {
+            logger.error("Failed to delete discarded recording: \(String(describing: error))")
+        }
     }
 
     static func url(forFileName fileName: String?) -> URL? {
@@ -115,9 +144,9 @@ final class AudioRecorderService: ObservableObject {
             }
         }
         guard granted else {
-            await MainActor.run { self.isRecording = false }
+            isRecording = false
             Toast.shared.present(title: Texts.RecorderPage.Toasts.accessDenied)
-            throw NSError(domain: "AudioRecorderService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Microphone permission not granted"])
+            throw RecordingError.microphonePermissionDenied
         }
 
         try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
@@ -138,6 +167,7 @@ final class AudioRecorderService: ObservableObject {
                     self.engine = AVAudioEngine()
                     self.converter = nil
                     self.converterInputFormat = nil
+                    self.isRecording = true
 
                     let settings: [String: Any] = [
                         AVFormatIDKey: kAudioFormatMPEG4AAC,
@@ -150,12 +180,14 @@ final class AudioRecorderService: ObservableObject {
                     try self.engine.start()
 
                     self.recorder = try AVAudioRecorder(url: url, settings: settings)
-                    self.recorder?.prepareToRecord()
-                    self.recorder?.record()
-                    self.isRecording = true
-
-                    Task { @MainActor in
-                        self.isRecording = true
+                    self.recorder?.isMeteringEnabled = true
+                    guard self.recorder?.prepareToRecord() == true else {
+                        self.resetRecorderAfterFailedStart(url: url)
+                        throw RecordingError.preparationFailed
+                    }
+                    guard self.recorder?.record() == true else {
+                        self.resetRecorderAfterFailedStart(url: url)
+                        throw RecordingError.startFailed
                     }
 
                     cont.resume(returning: ())
@@ -197,7 +229,7 @@ final class AudioRecorderService: ObservableObject {
 
     func stopRecording() async {
         guard isRecording else { return }
-        await MainActor.run { self.isRecording = false }
+        isRecording = false
 
         await withCheckedContinuation { cont in
             audioQueue.async { [weak self] in
@@ -298,6 +330,14 @@ final class AudioRecorderService: ObservableObject {
         DispatchQueue.main.async { [bandValues] in
             self.amplitudes = bandValues
         }
+    }
+
+    private func resetRecorderAfterFailedStart(url: URL) {
+        recorder?.stop()
+        recorder = nil
+        fileName = nil
+        try? FileManager.default.removeItem(at: url)
+        try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
     }
 
     private func scheduleTranscriptionIfNeeded(force: Bool) {
