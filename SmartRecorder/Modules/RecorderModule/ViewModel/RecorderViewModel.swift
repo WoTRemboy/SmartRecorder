@@ -21,19 +21,22 @@ final class RecorderViewModel: ObservableObject {
     @Published private(set) var isRecording: Bool = false
     @Published private(set) var showTimerView: Bool = false
     @Published private(set) var elapsedTime: TimeInterval = 0
-    
+    @Published private(set) var isStartingRecording: Bool = false
+
+    @Published internal var participantCount: Int = 1
+
     @Published internal var streetName: String? = nil
     @Published internal var cityName: String? = nil
     @Published private(set) var locationPermissionDenied: Bool = false
-    
+
     @Published internal var saveNoteTitle: String = ""
     @Published private(set) var saveNoteFolder: NoteFolder = .work
-    
+
     @Published internal var showLocationPermissionAlert: Bool = false
     @Published internal var showSaveSheetView: Bool = false
     @Published internal var showSaveSuccessAlert: Bool = false
     @Published internal var showSaveErrorAlert: Bool = false
-    
+
     @Published var amplitudes: [Float] = Array(repeating: 0, count: 16)
 
     private let locationService = LocationService.shared
@@ -65,9 +68,29 @@ final class RecorderViewModel: ObservableObject {
     internal func isSelectedFolder(_ folder: NoteFolder) -> Bool {
         saveNoteFolder == folder
     }
-    
+
     internal func setSaveFolder(_ folder: NoteFolder) {
         saveNoteFolder = folder
+    }
+
+    internal func incrementParticipants() {
+        participantCount = min(participantCount + 1, 99)
+        if isRecording {
+            Task { await LiveActivityService.shared.updateActivity(
+                status: .recording,
+                participantCount: participantCount
+            )}
+        }
+    }
+
+    internal func decrementParticipants() {
+        participantCount = max(participantCount - 1, 1)
+        if isRecording {
+            Task { await LiveActivityService.shared.updateActivity(
+                status: .recording,
+                participantCount: participantCount
+            )}
+        }
     }
     
     internal func toggleShowSaveSheetView() {
@@ -127,58 +150,104 @@ final class RecorderViewModel: ObservableObject {
     }
     
     internal func toggleRecording() {
+        guard !isStartingRecording else { return }
+
         if isRecording {
-            isRecording = false
-            logger.info("Recording stop requested. elapsedTime=\(self.elapsedTime)")
-            showTimerView = false
-            timerTask?.cancel()
-            timerTask = nil
-            recordTimerCancellable?.cancel()
-            if let service = audioRecorderService {
-                Task {
-                    LoadingOverlay.shared.show()
-                    await service.stopRecording()
-                    
-                    LoadingOverlay.shared.hide()
-                    showSaveSheetView.toggle()
-                }
-            }
-            amplitudeCancellable?.cancel()
+            stopRecordingSession()
         } else {
+            Task {
+                await startRecordingSession()
+            }
+        }
+    }
+
+    private func startRecordingSession() async {
+        logger.info("Recording start requested")
+        isStartingRecording = true
+        resetRecordingUI()
+
+        let service = AudioRecorderService()
+        audioRecorderService = service
+        amplitudeCancellable?.cancel()
+        amplitudeCancellable = service.$amplitudes
+            .receive(on: RunLoop.main)
+            .sink { [weak self] amps in
+                self?.amplitudes = amps
+            }
+
+        do {
+            try await service.startRecording()
             isRecording = true
-            logger.info("Recording start requested")
+            isStartingRecording = false
+            startRecordingTimers()
+            LiveActivityService.shared.startActivity(
+                locationName: streetName,
+                cityName: cityName,
+                participantCount: participantCount
+            )
+        } catch {
+            logger.error("Failed to start recording: \(String(describing: error))")
+            isRecording = false
+            isStartingRecording = false
+            audioRecorderService = nil
+            amplitudeCancellable?.cancel()
+            amplitudeCancellable = nil
+            amplitudes = Array(repeating: 0, count: 16)
             showTimerView = false
-            elapsedTime = 0
-            timerTask?.cancel()
-            timerTask = Task { [weak self] in
-                try? await Task.sleep(nanoseconds: 500_000_000)
-                await MainActor.run {
-                    if self?.isRecording == true {
-                        withAnimation {
-                            self?.showTimerView = true
-                        }
+            await LiveActivityService.shared.endImmediately()
+        }
+    }
+
+    private func stopRecordingSession() {
+        isRecording = false
+        logger.info("Recording stop requested. elapsedTime=\(self.elapsedTime)")
+        stopRecordingTimers()
+        amplitudeCancellable?.cancel()
+
+        guard let service = audioRecorderService else { return }
+        Task {
+            LoadingOverlay.shared.show()
+            await service.stopRecording()
+            await LiveActivityService.shared.stopActivity()
+            LoadingOverlay.shared.hide()
+            showSaveSheetView.toggle()
+        }
+    }
+
+    private func resetRecordingUI() {
+        isRecording = false
+        showTimerView = false
+        elapsedTime = 0
+        stopRecordingTimers()
+    }
+
+    private func startRecordingTimers() {
+        timerTask?.cancel()
+        timerTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            await MainActor.run {
+                if self?.isRecording == true {
+                    withAnimation {
+                        self?.showTimerView = true
                     }
                 }
             }
-            recordTimerCancellable?.cancel()
-            recordTimerCancellable = Timer.publish(every: 1.0, on: .main, in: .common)
-                .autoconnect()
-                .sink { [weak self] _ in
-                    guard let self = self, self.isRecording else { return }
-                    self.elapsedTime += 1
-                }
-            
-            let service = AudioRecorderService()
-            audioRecorderService = service
-            Task {
-                try? await service.startRecording()
-            }
-            amplitudeCancellable = service.$amplitudes
-                .receive(on: RunLoop.main)
-                .sink { [weak self] amps in
-                    self?.amplitudes = amps
-                }
         }
+        recordTimerCancellable?.cancel()
+        recordTimerCancellable = Timer.publish(every: 1.0, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self, self.isRecording else { return }
+                self.elapsedTime += 1
+            }
+    }
+
+    private func stopRecordingTimers() {
+        showTimerView = false
+        timerTask?.cancel()
+        timerTask = nil
+        recordTimerCancellable?.cancel()
+        recordTimerCancellable = nil
     }
     
     @MainActor

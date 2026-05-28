@@ -12,11 +12,12 @@ import MapKit
 
 struct RecorderDetailsView: View {
     @EnvironmentObject private var viewModel: RecorderViewModel
-    
+
     internal var body: some View {
         VStack(spacing: 5) {
             dateView
             locationView
+            participantsView
         }
     }
     
@@ -45,6 +46,33 @@ struct RecorderDetailsView: View {
         }
     }
     
+    private var participantsView: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "person.2.fill")
+            Button {
+                viewModel.decrementParticipants()
+            } label: {
+                Image(systemName: "minus.circle")
+            }
+            .disabled(viewModel.participantCount <= 1)
+
+            Text("\(viewModel.participantCount)")
+                .monospacedDigit()
+                .frame(minWidth: 24)
+                .contentTransition(.numericText(value: Double(viewModel.participantCount)))
+                .animation(.default, value: viewModel.participantCount)
+
+            Button {
+                viewModel.incrementParticipants()
+            } label: {
+                Image(systemName: "plus.circle")
+            }
+        }
+        .font(Font.title2())
+        .foregroundStyle(Color.LabelColors.purple)
+        .padding(.horizontal)
+    }
+
     private var locationText: String {
         if let street = viewModel.streetName { return street }
         Task { @MainActor in
