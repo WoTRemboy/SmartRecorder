@@ -25,10 +25,15 @@ final class NotesViewModel: ObservableObject {
     @Published internal var selectedNote: Note? = nil
     
     @Published var resolvedPlaceNames: [UUID: (street: String?, city: String?)] = [:]
+    @Published private(set) var enhancingNoteIDs: Set<UUID> = []
+    @Published private(set) var recentlyEnhancedNoteIDs: Set<UUID> = []
+    @Published var enhancementErrorMessage: String? = nil
     
     private var currentPage: Int = 0
     private var totalPages: Int = 1
     private let pageSize: Int = 20
+    private let enhancedTranscriptionService = EnhancedTranscriptionService.shared
+    private var enhancementTasks: [UUID: Task<Void, Never>] = [:]
     
     private var cancellables = Set<AnyCancellable>()
 
@@ -94,6 +99,18 @@ final class NotesViewModel: ObservableObject {
         isShowingPlayer.toggle()
     }
 
+    internal func note(withID id: UUID) -> Note? {
+        notes.first(where: { $0.id == id })
+    }
+
+    internal func isEnhancing(noteID: UUID) -> Bool {
+        enhancingNoteIDs.contains(noteID)
+    }
+
+    internal func wasRecentlyEnhanced(noteID: UUID) -> Bool {
+        recentlyEnhancedNoteIDs.contains(noteID)
+    }
+
     internal func loadNotes() async {
         let service = NoteEntityService.shared
         do {
@@ -145,5 +162,115 @@ final class NotesViewModel: ObservableObject {
             logger.error("Failed to load next page: \(String(describing: error))")
             await MainActor.run { self.isSyncing = false }
         }
+    }
+
+    @MainActor
+    func startEnhancement(for note: Note) {
+        let currentNote = self.note(withID: note.id) ?? note
+        logger.info("Enhanced translation requested for note id=\(currentNote.id.uuidString, privacy: .public) title=\(currentNote.title, privacy: .private)")
+
+        guard !enhancingNoteIDs.contains(currentNote.id) else { return }
+        guard let audioURL = Self.resolveAudioURL(for: currentNote.audioPath) else {
+            logger.error("Enhanced translation aborted: audio URL is missing for note id=\(currentNote.id.uuidString, privacy: .public) audioPath=\(String(describing: currentNote.audioPath), privacy: .private)")
+            enhancementErrorMessage = Texts.NotesPage.Enhancement.Errors.audioMissing
+            return
+        }
+
+        logger.info("Enhanced translation audio URL resolved for note id=\(currentNote.id.uuidString, privacy: .public) path=\(audioURL.path, privacy: .private)")
+
+        enhancementErrorMessage = nil
+        recentlyEnhancedNoteIDs.remove(currentNote.id)
+        enhancingNoteIDs.insert(currentNote.id)
+        enhancementTasks[currentNote.id]?.cancel()
+
+        enhancementTasks[currentNote.id] = Task { [weak self] in
+            guard let self else { return }
+
+            do {
+                let transcription = try await self.enhancedTranscriptionService.transcribeAudioFile(at: audioURL)
+                try Task.checkCancellation()
+                logger.info("Enhanced translation completed whisper pass for note id=\(currentNote.id.uuidString, privacy: .public) textLength=\(transcription.count, privacy: .public)")
+
+                var updatedNote = currentNote
+                updatedNote.transcription = transcription.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).nilIfEmpty
+                updatedNote.updatedAt = .now
+
+                let savedNote = try await NoteEntityService.shared.upsert(updatedNote)
+                try Task.checkCancellation()
+                logger.info("Enhanced translation saved updated note id=\(currentNote.id.uuidString, privacy: .public)")
+
+                await MainActor.run {
+                    self.replaceStoredNote(with: savedNote)
+                    self.recentlyEnhancedNoteIDs.insert(currentNote.id)
+                    self.finishEnhancementTask(for: currentNote.id)
+                }
+
+                Task { @MainActor [weak self] in
+                    try? await Task.sleep(for: .seconds(2.2))
+                    self?.recentlyEnhancedNoteIDs.remove(currentNote.id)
+                }
+            } catch is CancellationError {
+                logger.info("Enhanced translation cancelled for note id=\(currentNote.id.uuidString, privacy: .public)")
+                await MainActor.run {
+                    self.finishEnhancementTask(for: currentNote.id)
+                }
+            } catch {
+                logger.error("Enhanced translation failed for note id=\(currentNote.id.uuidString, privacy: .public) error=\(String(describing: error), privacy: .public)")
+                await MainActor.run {
+                    self.enhancementErrorMessage = (error as? LocalizedError)?.errorDescription ?? Texts.NotesPage.Enhancement.Errors.transcriptionFailed
+                    self.finishEnhancementTask(for: currentNote.id)
+                }
+            }
+        }
+    }
+
+    @MainActor
+    func cancelEnhancement(for noteID: UUID) {
+        logger.info("Enhanced translation cancel requested for note id=\(noteID.uuidString, privacy: .public)")
+        enhancementTasks[noteID]?.cancel()
+        finishEnhancementTask(for: noteID)
+    }
+
+    @MainActor
+    func dismissEnhancementError() {
+        enhancementErrorMessage = nil
+    }
+
+    @MainActor
+    private func replaceStoredNote(with note: Note) {
+        if let index = notes.firstIndex(where: { $0.id == note.id }) {
+            notes[index] = note
+        }
+
+        if selectedNote?.id == note.id {
+            selectedNote = note
+        }
+    }
+
+    @MainActor
+    private func finishEnhancementTask(for noteID: UUID) {
+        enhancingNoteIDs.remove(noteID)
+        enhancementTasks[noteID] = nil
+    }
+
+    private static func resolveAudioURL(for audioPath: String?) -> URL? {
+        guard let audioPath, !audioPath.isEmpty else { return nil }
+
+        let trimmed = audioPath.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("/") || trimmed.hasPrefix("file://") {
+            if trimmed.hasPrefix("file://") {
+                return URL(string: trimmed)
+            }
+
+            return URL(fileURLWithPath: trimmed)
+        }
+
+        return AudioRecorderService.url(forFileName: trimmed)
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        isEmpty ? nil : self
     }
 }

@@ -77,6 +77,30 @@ final class Texts {
         static let loadSuccessFirst = "Загрузка"
         static let loadSuccessSecond = "завершена"
         static let loadError = "Ошибка загрузки"
+
+        enum Enhancement {
+            static let action = "Улучшить перевод"
+            static let subtitle = "Прогонит запись через более точную модель и обновит текст"
+            static let processing = "Улучшение..."
+            static let successShort = "Успешно"
+            static let processingDescription = "Тяжелая модель собирает более чистую и точную расшифровку"
+            static let success = "Перевод улучшен"
+            static let successDescription = "Новая версия текста уже сохранена в записи"
+
+            enum ErrorAlert {
+                static let title = "Не удалось улучшить перевод"
+                static let ok = "Хорошо"
+            }
+
+            enum Errors {
+                static let audioMissing = "Аудиофайл записи не найден."
+                static let modelMissing = "Тяжелая модель не найдена в приложении."
+                static let audioReadFailed = "Не удалось прочитать аудиофайл для повторной расшифровки."
+                static let modelLoadFailed = "Не удалось загрузить тяжелую модель для повторной расшифровки."
+                static let transcriptionFailed = "Ошибка повторной расшифровки."
+                static let emptyTranscription = "Модель не вернула текст для этой записи."
+            }
+        }
     }
     
     enum NoteFolder {
@@ -91,6 +115,9 @@ final class Texts {
         static let location = "Местоположение"
         static let message = "Ознакомиться с протоколом встречи после её окончания можно в архиве записей"
         static let range = "архиве записей"
+        static let liveTranscriptTitle = "Живая расшифровка"
+        static let liveTranscriptPlaceholder = "Речь появится здесь через несколько секунд после начала записи"
+        static let liveTranscriptProcessing = "Распознаем текущий фрагмент..."
         
         enum SaveSheet {
             static let title = "Название записи"
@@ -201,12 +228,14 @@ final class Texts {
         enum Recorder {
             static let timer = "RecorderTimerGlassEffect"
             static let stop = "RecorderStopGlassEffect"
+            static let liveTranscript = "RecorderLiveTranscriptGlassEffect"
         }
     }
     
     enum GeometryEffectId {
         enum Recorder {
             static let control = "RecorderGeometryEffect"
+            static let liveTranscript = "RecorderLiveTranscriptGeometryEffect"
         }
     }
     

@@ -15,6 +15,7 @@ struct SingleAudioDescriptionView: View {
 
     @State private var isEditing = false
     @State private var audioDuration: TimeInterval? = nil
+    @State private var displayedTranscription: String
     
     private let note: Note
     private let namespace: Namespace.ID
@@ -27,6 +28,7 @@ struct SingleAudioDescriptionView: View {
         let vm = NoteShareViewModel(note: note)
         _shareVM = StateObject(wrappedValue: vm)
         self._audioDuration = State(initialValue: vm.getAudioDuration(for: note))
+        self._displayedTranscription = State(initialValue: note.transcription ?? Texts.NotesPage.inProgress)
     }
     
     internal var body: some View {
@@ -46,9 +48,16 @@ struct SingleAudioDescriptionView: View {
                 
             }
             .padding(.bottom, 24)
+
+            enhancementSection
+                .padding(.bottom, 20)
             
             ScrollView {
-                Text(note.transcription ?? Texts.NotesPage.inProgress)
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(resolvedTranscription)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.horizontal, 20)
@@ -76,6 +85,24 @@ struct SingleAudioDescriptionView: View {
             Text(shareVM.errorMessage ?? "")
         })
         .animation(.easeInOut(duration: 0.2), value: shareVM.isLoading)
+        .alert(
+            Texts.NotesPage.Enhancement.ErrorAlert.title,
+            isPresented: enhancementErrorBinding,
+            actions: {
+                Button(Texts.NotesPage.Enhancement.ErrorAlert.ok) {
+                    viewModel.dismissEnhancementError()
+                }
+            },
+            message: {
+                Text(viewModel.enhancementErrorMessage ?? "")
+            }
+        )
+        .animation(.smooth(duration: 0.35), value: isEnhancing)
+        .animation(.smooth(duration: 0.35), value: wasRecentlyEnhanced)
+        .onReceive(viewModel.$notes) { notes in
+            guard let updatedNote = notes.first(where: { $0.id == note.id }) else { return }
+            displayedTranscription = updatedNote.transcription ?? Texts.NotesPage.inProgress
+        }
         .task {
             await viewModel.fetchPlaceNamesIfNeeded(for: note)
         }
@@ -111,7 +138,20 @@ struct SingleAudioDescriptionView: View {
             viewModel.selectedNote = note
         }
     }
-    
+
+    private var enhancementSection: some View {
+        EnhancementControlView(
+            isEnhancing: isEnhancing,
+            wasRecentlyEnhanced: wasRecentlyEnhanced,
+            onStart: {
+                viewModel.startEnhancement(for: note)
+            },
+            onStop: {
+                viewModel.cancelEnhancement(for: note.id)
+            }
+        )
+    }
+
     private var shareMenu: some View {
         Menu {
             sharePDFButton
@@ -144,6 +184,30 @@ struct SingleAudioDescriptionView: View {
                 Image.NotesPage.audio
             }
         }
+    }
+
+    private var resolvedTranscription: String {
+        let trimmed = displayedTranscription.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? Texts.NotesPage.inProgress : trimmed
+    }
+
+    private var isEnhancing: Bool {
+        viewModel.isEnhancing(noteID: note.id)
+    }
+
+    private var wasRecentlyEnhanced: Bool {
+        viewModel.wasRecentlyEnhanced(noteID: note.id)
+    }
+
+    private var enhancementErrorBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.enhancementErrorMessage != nil },
+            set: { newValue in
+                if !newValue {
+                    viewModel.dismissEnhancementError()
+                }
+            }
+        )
     }
 }
 
