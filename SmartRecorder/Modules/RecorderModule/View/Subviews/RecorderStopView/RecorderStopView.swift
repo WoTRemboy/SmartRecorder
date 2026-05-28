@@ -19,8 +19,9 @@ struct RecorderStopView: View {
     }
     
     internal var body: some View {
-        VStack(spacing: 84) {
+        VStack(spacing: 36) {
             aqualizerView
+            liveTranscriptionView
             controlView
         }
         .transition(.blurReplace)
@@ -37,6 +38,26 @@ struct RecorderStopView: View {
         }
         .frame(height: 200)
         .padding(.horizontal, 36)
+    }
+
+    private var liveTranscriptionView: some View {
+        GlassEffectContainer(spacing: 24) {
+            LiveTranscriptionView(
+                text: viewModel.liveTranscription,
+                isTranscribing: viewModel.isTranscribing,
+                isExpanded: false,
+                namespace: namespace
+            )
+            .onTapGesture {
+                withAnimation(.spring(response: 0.24, dampingFraction: 0.9)) {
+                    viewModel.setLiveTranscriptionExpanded(true)
+                }
+            }
+            .opacity(viewModel.isLiveTranscriptionExpanded ? 0.001 : 1)
+            .scaleEffect(viewModel.isLiveTranscriptionExpanded ? 0.98 : 1, anchor: .top)
+            .allowsHitTesting(!viewModel.isLiveTranscriptionExpanded)
+        }
+        .padding(.horizontal, 20)
     }
     
     private var controlView: some View {

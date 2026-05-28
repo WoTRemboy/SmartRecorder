@@ -7,6 +7,7 @@
 
 import SwiftUI
 import OSLog
+import AVFAudio
 
 /// A logger instance for debug and error messages.
 private let logger = Logger(subsystem: "com.transono.recorder", category: "StartRecView")
@@ -24,11 +25,46 @@ struct RecorderStartView: View {
     
     internal var body: some View {
         VStack(spacing: 84) {
-            recorderButton
+            VStack {
+                recorderButton
+                HStack {
+                    Spacer()
+                    microphoneChoiceMenu
+                        .padding(.trailing, 50)
+                    }
+            }
             descriptionLabel
         }
         .transition(.blurReplace)
     }
+
+    private var microphoneChoiceMenu: some View {
+        Menu {
+            ForEach(viewModel.availableMicrophones, id: \.self) { device in
+                        Button {
+                            if let device = device { viewModel.changeMicrophone(device)
+                            }
+                        } label: {
+                            HStack {
+                                Text(device?.portName ?? "")
+                                Spacer()
+                                if viewModel.microphone == device {
+                                    Image.RecorderPage.check
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(Color.SupportColors.lightBlue)
+                            .frame(width: 55, height: 55)
+                        
+                        Image.RecorderPage.chooseMicrophone .font(Font.title2)
+                            .foregroundColor(Color.LabelColors.white)
+                    }
+                }.compositingGroup()
+            }
     
     private var recorderButton: some View {
         Button {

@@ -58,7 +58,7 @@ struct SaveSheetView: View {
         return HStack {
             Text(folder.title)
                 .font(Font.body())
-                .foregroundStyle(Color.SupportColors.purple)
+                .foregroundStyle(Color.LabelColors.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             if isSelected {
