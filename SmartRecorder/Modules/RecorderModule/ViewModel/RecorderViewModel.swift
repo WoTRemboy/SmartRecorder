@@ -22,7 +22,7 @@ final class RecorderViewModel: ObservableObject {
     @Published private(set) var showTimerView: Bool = false
     @Published private(set) var elapsedTime: TimeInterval = 0
     @Published private(set) var microphone: AVAudioSessionPortDescription? = nil
-    @Published private(set) var availableMicrophones: [AVAudioSessionPortDescription?] = []
+    @Published private(set) var availableMicrophones: [AVAudioSessionPortDescription] = []
     
     @Published internal var streetName: String? = nil
     @Published internal var cityName: String? = nil
@@ -44,7 +44,7 @@ final class RecorderViewModel: ObservableObject {
     private var recordTimerCancellable: AnyCancellable?
     private var authorizationCancellable: AnyCancellable?
     
-    private var audioRecorderService: AudioRecorderService?
+    private var audioRecorderService: AudioRecorderService
     private var amplitudeCancellable: AnyCancellable?
 
     internal var timerString: String {
@@ -52,7 +52,8 @@ final class RecorderViewModel: ObservableObject {
     }
     
     init() {
-        prepareAudioSessionData()
+        audioRecorderService = AudioRecorderService()
+        prepareAudioSession()
         authorizationCancellable = locationService.$authorizationStatus
             .receive(on: RunLoop.main)
             .sink { [weak self] status in
@@ -113,18 +114,19 @@ final class RecorderViewModel: ObservableObject {
     
     // MARK: - Audio helpers
     
-    private func prepareAudioSessionData() {
-        let service = AudioRecorderService()
-        audioRecorderService = service
-        
+    private func prepareAudioSession() {
         do {
-            try service.prepareAudioSession()
-            availableMicrophones = service.getMicrophones()
+            try audioRecorderService.resetSessionCategory()
+            try audioRecorderService.setDefaultMicrophone()
+            microphone = audioRecorderService.getPreferredInput()
+            availableMicrophones = audioRecorderService.getMicrophones()
         }
         catch {
             logger.info("Failed to start audio session: \(error)")
         }
-        
+        audioRecorderService.startObservingAudioSession {
+            self.updateAvailableMicrophones()
+        }
     }
     
     private func audioDuration(for fileURL: URL) async -> TimeInterval? {
@@ -143,10 +145,21 @@ final class RecorderViewModel: ObservableObject {
         return Int(s.rounded())
     }
     
+    internal func updateAvailableMicrophones() {
+        availableMicrophones = audioRecorderService.getMicrophones()
+        if let input = audioRecorderService.getPreferredInput() {
+            if !availableMicrophones.contains(input) {
+                do { try audioRecorderService.setDefaultMicrophone() }
+                catch { print("Failed to set microphone: \(error)") }
+                microphone = audioRecorderService.getPreferredInput()
+            }
+        }
+    }
+    
     internal func changeMicrophone(_ device: AVAudioSessionPortDescription) {
         do {
-            try audioRecorderService?.chooseMicrophone(microphone: device)
-                microphone = device
+            try audioRecorderService.chooseMicrophone(microphone: device)
+            microphone = device
         }
         catch {
             logger.info("Failed to choose microphone: \(error)")
@@ -161,14 +174,11 @@ final class RecorderViewModel: ObservableObject {
             timerTask?.cancel()
             timerTask = nil
             recordTimerCancellable?.cancel()
-            if let service = audioRecorderService {
-                Task {
-                    LoadingOverlay.shared.show()
-                    await service.stopRecording()
-                    
-                    LoadingOverlay.shared.hide()
-                    showSaveSheetView.toggle()
-                }
+            Task {
+                LoadingOverlay.shared.show()
+                await audioRecorderService.stopRecording()
+                LoadingOverlay.shared.hide()
+                showSaveSheetView.toggle()
             }
             amplitudeCancellable?.cancel()
         } else {
@@ -196,9 +206,9 @@ final class RecorderViewModel: ObservableObject {
                 }
             
             Task {
-                try? await audioRecorderService?.startRecording()
+                try? await audioRecorderService.startRecording()
             }
-            amplitudeCancellable = audioRecorderService?.$amplitudes
+            amplitudeCancellable = audioRecorderService.$amplitudes
                 .receive(on: RunLoop.main)
                 .sink { [weak self] amps in
                     self?.amplitudes = amps
@@ -211,8 +221,7 @@ final class RecorderViewModel: ObservableObject {
         let title = saveNoteTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !title.isEmpty else { return }
         let folderId = saveNoteFolder.rawValue
-
-        let fileName = audioRecorderService?.recordedFileName()
+        let fileName = audioRecorderService.recordedFileName()
         let now = Date()
         let locationObj = locationService.lastKnownLocation
 
@@ -300,10 +309,10 @@ final class RecorderViewModel: ObservableObject {
         recordTimerCancellable?.cancel()
         authorizationCancellable?.cancel()
         amplitudeCancellable?.cancel()
-        if let audioRecorderService = audioRecorderService {
-            Task { @MainActor in
-                await audioRecorderService.stopRecording()
-            }
+        
+        // TODO: Fix "Capture of 'self' in a closure that outlives deinit; this is an error in the Swift 6 language mode"
+        Task { @MainActor in
+            await audioRecorderService.stopRecording()
         }
     }
     

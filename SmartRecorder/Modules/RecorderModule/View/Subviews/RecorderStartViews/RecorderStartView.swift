@@ -42,13 +42,12 @@ struct RecorderStartView: View {
         Menu {
             ForEach(viewModel.availableMicrophones, id: \.self) { device in
                         Button {
-                            if let device = device { viewModel.changeMicrophone(device)
-                            }
+                            viewModel.changeMicrophone(device)
                         } label: {
                             HStack {
-                                Text(device?.portName ?? "")
+                                Text(device.portName)
                                 Spacer()
-                                if viewModel.microphone == device {
+                                if viewModel.microphone != nil && viewModel.microphone!.uid == device.uid {
                                     Image.RecorderPage.check
                                 }
                             }

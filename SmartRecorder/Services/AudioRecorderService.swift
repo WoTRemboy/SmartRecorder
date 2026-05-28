@@ -13,14 +13,19 @@ final class AudioRecorderService: ObservableObject {
     
     @Published var amplitudes: [Float] = Array(repeating: 0, count: 16)
     private var preferredInput: AVAudioSessionPortDescription?
-    private var session: AVAudioSession?
+    private var session: AVAudioSession
     private let engine = AVAudioEngine()
     private var isRecording = false
     private let audioQueue = DispatchQueue(label: "AudioRecorderService.queue")
     
+    
     private var recorder: AVAudioRecorder?
     private var meterTimer: Timer?
     private var fileName: String?
+    
+    init() {
+        session = AVAudioSession.sharedInstance()
+    }
     
     func recordedFileName() -> String? {
         return fileName
@@ -31,27 +36,36 @@ final class AudioRecorderService: ObservableObject {
         return FileManager.default.temporaryDirectory.appendingPathComponent(name)
     }
     
-    func prepareAudioSession() throws {
-        session = AVAudioSession.sharedInstance()
-        try session?.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
+    // Allow bluetoth headphones
+    func resetSessionCategory() throws {
+        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
     }
     
-    // TODO: throw it in a separate Task
-    func observeRouteChanges() async {
-        // Observe route change notifications.
-        for await notification in NotificationCenter.default.notifications(
-            named: AVAudioSession.routeChangeNotification
-        ) {
-            print(notification)
-        }
+    // Set builtIn microphone as default
+    func setDefaultMicrophone() throws {
+        preferredInput = getMicrophones().first
+        print("Prepared \(preferredInput?.portName ?? "none")")
+    }
+    
+    func getPreferredInput() -> AVAudioSessionPortDescription? {
+        self.preferredInput
     }
     
     func getMicrophones() -> [AVAudioSessionPortDescription] {
-        return session?.availableInputs ?? []
+        return session.availableInputs ?? []
     }
     
-    func chooseMicrophone(microphone: AVAudioSessionPortDescription)  throws {
+    
+    func chooseMicrophone(microphone: AVAudioSessionPortDescription) throws {
         preferredInput = microphone
+    }
+    
+    func startObservingAudioSession(action: @escaping () -> Void) {
+        let center = NotificationCenter.default
+        center.addObserver(forName: AVAudioSession.availableInputsChangeNotification, object: nil, queue: OperationQueue.main) { notification in
+            action()
+        }
+
     }
     
     func startRecording() async throws {
@@ -74,7 +88,13 @@ final class AudioRecorderService: ObservableObject {
                 guard let self = self else { return cont.resume(returning: ()) }
                 do {
                     let session = AVAudioSession.sharedInstance()
-                    try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
+                    // Remove allowBluetoothHFP option to stop headphones from setting active automatically
+                    if preferredInput?.portType == .builtInMic {
+                        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+                    }
+                    else {
+                        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
+                    }
                     try session.setActive(true, options: [])
                     try session.setPreferredInput(preferredInput)
                     
@@ -129,7 +149,9 @@ final class AudioRecorderService: ObservableObject {
                 self.recorder = nil
                 self.meterTimer?.invalidate()
                 self.meterTimer = nil
-                try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+                try? self.session.setActive(false, options: [.notifyOthersOnDeactivation])
+                // Re-Allow bluetooth headphones in case they were removed from options
+                try? resetSessionCategory()
                 cont.resume(returning: ())
             }
         }
