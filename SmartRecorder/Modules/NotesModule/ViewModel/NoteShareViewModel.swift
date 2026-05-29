@@ -137,3 +137,140 @@ final class NoteShareViewModel: ObservableObject {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 }
+
+@MainActor
+final class RecordDetailsViewModel: ObservableObject {
+    @Published var record: RecordResponse?
+    @Published var statuses: [ProcessingStatusResponse] = []
+    @Published var summary: RecordSummaryResponse?
+    @Published var sharedUsers: [SharedRecordUserResponse] = []
+    @Published var shareEmail: String = ""
+    @Published var selectedRole: RecordAccessRole = .viewer
+    @Published var isLoadingDetails: Bool = false
+    @Published var isSharing: Bool = false
+    @Published var errorMessage: String?
+
+    private let recordId: Int64?
+    private var pollingTask: Task<Void, Never>?
+
+    init(recordId: Int64?) {
+        self.recordId = recordId
+    }
+
+    deinit {
+        pollingTask?.cancel()
+    }
+
+    var canLoadRemoteDetails: Bool {
+        recordId != nil
+    }
+
+    var transcriptionStatus: ProcessingStatusResponse? {
+        statuses.first { $0.stage == .transcription }
+    }
+
+    var summarizationStatus: ProcessingStatusResponse? {
+        statuses.first { $0.stage == .summarization }
+    }
+
+    var shouldPollSummary: Bool {
+        guard let status = summarizationStatus?.status else {
+            return recordId != nil && summary == nil
+        }
+        return status == .pending || status == .inProgress
+    }
+
+    func load() {
+        guard recordId != nil else { return }
+        pollingTask?.cancel()
+        pollingTask = Task { [weak self] in
+            await self?.loadOnce()
+            await self?.startPollingIfNeeded()
+        }
+    }
+
+    func stopPolling() {
+        pollingTask?.cancel()
+        pollingTask = nil
+    }
+
+    func addShare() {
+        let trimmedEmail = shareEmail.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedEmail.isEmpty, let recordId else { return }
+
+        isSharing = true
+        errorMessage = nil
+
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await RecordsService.shared.shareRecord(recordId: recordId, email: trimmedEmail, userId: nil, role: selectedRole)
+                let users = try await RecordsService.shared.fetchSharedUsers(recordId: recordId)
+                self.sharedUsers = users
+                self.shareEmail = ""
+                self.isSharing = false
+                Toast.shared.present(title: Texts.NotesPage.Sharing.shareSuccess)
+            } catch {
+                self.errorMessage = error.localizedDescription
+                self.isSharing = false
+            }
+        }
+    }
+
+    func revokeAccess(for user: SharedRecordUserResponse) {
+        guard let recordId else { return }
+
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await RecordsService.shared.revokeSharedUser(recordId: recordId, userId: user.userId)
+                self.sharedUsers.removeAll { $0.userId == user.userId }
+                Toast.shared.present(title: Texts.NotesPage.Sharing.revokeSuccess)
+            } catch {
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    private func loadOnce() async {
+        guard let recordId else { return }
+
+        isLoadingDetails = true
+        errorMessage = nil
+
+        do {
+            async let recordRequest = RecordsService.shared.fetchRecord(recordId: recordId)
+            async let sharedUsersRequest = RecordsService.shared.fetchSharedUsers(recordId: recordId)
+            let loadedRecord = try await recordRequest
+            record = loadedRecord
+            statuses = loadedRecord.statuses
+            summary = loadedRecord.summary
+            sharedUsers = (try? await sharedUsersRequest) ?? []
+            isLoadingDetails = false
+        } catch {
+            errorMessage = error.localizedDescription
+            isLoadingDetails = false
+        }
+    }
+
+    private func refreshProcessingState() async {
+        guard let recordId else { return }
+
+        do {
+            let loadedRecord = try await RecordsService.shared.fetchRecord(recordId: recordId)
+            record = loadedRecord
+            statuses = loadedRecord.statuses
+            summary = loadedRecord.summary
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func startPollingIfNeeded() async {
+        while shouldPollSummary && !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(4))
+            guard !Task.isCancelled else { return }
+            await refreshProcessingState()
+        }
+    }
+}

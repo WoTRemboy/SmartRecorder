@@ -60,6 +60,15 @@ struct NoteCardView: View {
                 .foregroundStyle(Color.LabelColors.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .lineLimit(1)
+            if viewModel.accessRole(for: note) != .owner {
+                Text(viewModel.accessRole(for: note).title)
+                    .font(.caption(.semibold))
+                    .foregroundStyle(Color.SupportColors.blue)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color.SupportColors.lightBlue.opacity(0.18))
+                    .clipShape(Capsule())
+            }
             shareMenu
         }
     }

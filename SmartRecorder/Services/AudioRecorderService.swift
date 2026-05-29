@@ -176,8 +176,11 @@ final class AudioRecorderService: ObservableObject {
                         AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
                     ]
 
-                    try self.configureEngineTap()
-                    try self.engine.start()
+                    let didConfigureEngineTap = self.configureEngineTap()
+                    if didConfigureEngineTap {
+                        self.engine.prepare()
+                        try self.engine.start()
+                    }
 
                     self.recorder = try AVAudioRecorder(url: url, settings: settings)
                     self.recorder?.isMeteringEnabled = true
@@ -248,15 +251,26 @@ final class AudioRecorderService: ObservableObject {
         await finalizeTranscription()
     }
 
-    private func configureEngineTap() throws {
+    private func configureEngineTap() -> Bool {
         let inputNode = engine.inputNode
+        let inputFormat = inputNode.outputFormat(forBus: 0)
 
         inputNode.removeTap(onBus: 0)
         converter = nil
         converterInputFormat = nil
-        inputNode.installTap(onBus: 0, bufferSize: 2_048, format: nil) { [weak self] buffer, _ in
+
+        guard inputFormat.sampleRate > 0, inputFormat.channelCount > 0 else {
+            logger.error(
+                "Skipping live transcription tap because input format is invalid. sampleRate=\(inputFormat.sampleRate, privacy: .public), channels=\(inputFormat.channelCount, privacy: .public)"
+            )
+            return false
+        }
+
+        inputNode.installTap(onBus: 0, bufferSize: 2_048, format: inputFormat) { [weak self] buffer, _ in
             self?.processInputBuffer(buffer, inputFormat: buffer.format)
         }
+
+        return true
     }
 
     private func processInputBuffer(_ buffer: AVAudioPCMBuffer, inputFormat: AVAudioFormat) {

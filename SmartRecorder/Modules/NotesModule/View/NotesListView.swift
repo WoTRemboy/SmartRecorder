@@ -44,6 +44,11 @@ struct NotesListView: View {
         
         .navigationTitle(Texts.NotesPage.title)
         .toolbarRole(.navigationStack)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                scopeMenu
+            }
+        }
         .fullScreenCover(item: $viewModel.selectedNote) { item in
             PlayerScreenView(note: item, namespace: namespace)
         }
@@ -58,6 +63,37 @@ struct NotesListView: View {
         .refreshable { await viewModel.refresh() }
     }
     
+    private var scopeMenu: some View {
+        Menu {
+            ForEach(NotesViewModel.NotesScope.allCases) { scope in
+                Button {
+                    selectScope(scope)
+                } label: {
+                    Label {
+                        Text(scope.title)
+                    } icon: {
+                        if viewModel.selectedScope == scope {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            Label(viewModel.selectedScope.title, systemImage: "tray.full")
+                .foregroundStyle(Color.SupportColors.blue)
+        }
+    }
+
+    private func selectScope(_ scope: NotesViewModel.NotesScope) {
+        guard viewModel.selectedScope != scope else {
+            Task { await viewModel.refresh() }
+            return
+        }
+
+        viewModel.selectedScope = scope
+        Task { await viewModel.refresh() }
+    }
+
     private var pickerView: some View {
         PickerView(selectedCategory: $viewModel.selectedCategory)
             .padding(.top, 8)

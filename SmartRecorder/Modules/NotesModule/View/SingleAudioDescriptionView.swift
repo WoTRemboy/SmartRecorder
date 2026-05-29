@@ -12,10 +12,13 @@ struct SingleAudioDescriptionView: View {
     
     @ObservedObject private var viewModel: NotesViewModel
     @StateObject private var shareVM: NoteShareViewModel
+    @StateObject private var detailsVM: RecordDetailsViewModel
 
     @State private var isEditing = false
     @State private var audioDuration: TimeInterval? = nil
     @State private var displayedTranscription: String
+    @State private var displayedUpdatedAt: Date
+    @State private var isShowingServerShare = false
     
     private let note: Note
     private let namespace: Namespace.ID
@@ -27,8 +30,10 @@ struct SingleAudioDescriptionView: View {
         
         let vm = NoteShareViewModel(note: note)
         _shareVM = StateObject(wrappedValue: vm)
+        _detailsVM = StateObject(wrappedValue: RecordDetailsViewModel(recordId: Int64(note.serverId ?? "")))
         self._audioDuration = State(initialValue: vm.getAudioDuration(for: note))
         self._displayedTranscription = State(initialValue: note.transcription ?? Texts.NotesPage.inProgress)
+        self._displayedUpdatedAt = State(initialValue: note.updatedAt)
     }
     
     internal var body: some View {
@@ -54,8 +59,11 @@ struct SingleAudioDescriptionView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(resolvedTranscription)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if detailsVM.canLoadRemoteDetails {
+                        processingSection
+                        summarySection
+                    }
+                    transcriptionSection
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -74,6 +82,11 @@ struct SingleAudioDescriptionView: View {
                 ActivityView(activityItems: [url])
                     .ignoresSafeArea()
             }
+        }
+        .sheet(isPresented: $isShowingServerShare) {
+            ServerShareSheetView(detailsVM: detailsVM, isPresented: $isShowingServerShare)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
         .alert(Texts.NotesPage.error,
                isPresented: .constant(shareVM.errorMessage != nil),
@@ -102,9 +115,14 @@ struct SingleAudioDescriptionView: View {
         .onReceive(viewModel.$notes) { notes in
             guard let updatedNote = notes.first(where: { $0.id == note.id }) else { return }
             displayedTranscription = updatedNote.transcription ?? Texts.NotesPage.inProgress
+            displayedUpdatedAt = updatedNote.updatedAt
         }
         .task {
             await viewModel.fetchPlaceNamesIfNeeded(for: note)
+            detailsVM.load()
+        }
+        .onDisappear {
+            detailsVM.stopPolling()
         }
     }
     
@@ -152,16 +170,87 @@ struct SingleAudioDescriptionView: View {
         )
     }
 
+    private var processingSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: "sparkles")
+                    .foregroundStyle(Color.SupportColors.blue)
+                Text(Texts.NotesPage.Summary.processingTitle)
+                    .font(.headline)
+                Spacer()
+                if detailsVM.isLoadingDetails {
+                    ProgressView()
+                }
+            }
+
+            statusRow(title: Texts.NotesPage.Summary.transcription, status: detailsVM.transcriptionStatus)
+            statusRow(title: Texts.NotesPage.Summary.summarization, status: detailsVM.summarizationStatus)
+        }
+        .padding(16)
+        .background(Color.BackgroundColors.card)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var summarySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(Texts.NotesPage.Summary.title)
+                    .font(.headline)
+                Spacer()
+                if detailsVM.shouldPollSummary {
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            }
+
+            if let failed = detailsVM.summarizationStatus, failed.status == .failed {
+                Text(failed.errorMessage ?? Texts.NotesPage.Summary.failed)
+                    .font(.body())
+                    .foregroundStyle(Color.SupportColors.red)
+            } else if let summary = detailsVM.summary?.summaryText, !summary.isEmpty {
+                Text(cleanMarkdown(summary))
+                    .font(.body())
+                    .foregroundStyle(Color.LabelColors.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Text(Texts.NotesPage.Summary.waiting)
+                    .font(.body())
+                    .foregroundStyle(Color.LabelColors.secondary)
+            }
+        }
+        .padding(16)
+        .background(Color.SupportColors.lightBlue.opacity(0.14))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var transcriptionSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(Texts.NotesPage.Summary.fullTranscription)
+                .font(.headline)
+
+            Text(resolvedTranscription)
+                .font(.body())
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
     private var shareMenu: some View {
         Menu {
             sharePDFButton
             shareAudioButton
+            if viewModel.accessRole(for: note) == .owner, detailsVM.canLoadRemoteDetails {
+                Button {
+                    isShowingServerShare = true
+                } label: {
+                    Label(Texts.NotesPage.Sharing.openAccess, systemImage: "person.crop.circle.badge.plus")
+                }
+            }
         } label: {
             Image.NotesPage.share
                 .foregroundStyle(Color.SupportColors.blue)
         }
     }
-    
+
     private var sharePDFButton: some View {
         Button {
             shareVM.sharePDF()
@@ -187,8 +276,82 @@ struct SingleAudioDescriptionView: View {
     }
 
     private var resolvedTranscription: String {
-        let trimmed = displayedTranscription.trimmingCharacters(in: .whitespacesAndNewlines)
+        let localTranscription = displayedTranscription.trimmingCharacters(in: .whitespacesAndNewlines)
+        let remoteTranscription = detailsVM.record?.description?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let trimmed: String
+
+        if shouldPreferLocalTranscription, !localTranscription.isEmpty, localTranscription != Texts.NotesPage.inProgress {
+            trimmed = localTranscription
+        } else if !remoteTranscription.isEmpty {
+            trimmed = remoteTranscription
+        } else {
+            trimmed = localTranscription
+        }
+
         return trimmed.isEmpty ? Texts.NotesPage.inProgress : trimmed
+    }
+
+    private var shouldPreferLocalTranscription: Bool {
+        guard let record = detailsVM.record else {
+            return true
+        }
+
+        guard let remoteUpdatedAt = record.updatedAt ?? record.datetime ?? record.createdAt else {
+            return false
+        }
+
+        return displayedUpdatedAt > remoteUpdatedAt
+    }
+
+    private func statusRow(title: String, status: ProcessingStatusResponse?) -> some View {
+        HStack(spacing: 10) {
+            statusIcon(for: status?.status)
+            Text(title)
+                .font(.body())
+            Spacer()
+            Text(statusTitle(for: status?.status))
+                .font(.caption(.semibold))
+                .foregroundStyle(Color.LabelColors.secondary)
+        }
+    }
+
+    private func statusIcon(for status: ProcessingStatus?) -> some View {
+        Group {
+            switch status {
+            case .completed:
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(Color.SupportColors.blue)
+            case .failed:
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(Color.SupportColors.red)
+            case .pending, .inProgress:
+                ProgressView()
+                    .controlSize(.small)
+            case .none:
+                Image(systemName: "clock")
+                    .foregroundStyle(Color.LabelColors.secondary)
+            }
+        }
+        .frame(width: 22, height: 22)
+    }
+
+    private func statusTitle(for status: ProcessingStatus?) -> String {
+        switch status {
+        case .pending:
+            return Texts.NotesPage.Summary.pending
+        case .inProgress:
+            return Texts.NotesPage.Summary.inProgress
+        case .completed:
+            return Texts.NotesPage.Summary.completed
+        case .failed:
+            return Texts.NotesPage.Summary.failed
+        case .none:
+            return Texts.NotesPage.Summary.unknown
+        }
+    }
+
+    private func cleanMarkdown(_ text: String) -> String {
+        text.replacingOccurrences(of: "**", with: "")
     }
 
     private var isEnhancing: Bool {

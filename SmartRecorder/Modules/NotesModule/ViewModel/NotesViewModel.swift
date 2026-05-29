@@ -15,10 +15,27 @@ import CoreLocation
 private let logger = Logger(subsystem: "SmartRecorder", category: "NotesViewModel")
 
 final class NotesViewModel: ObservableObject {
+    enum NotesScope: String, CaseIterable, Identifiable {
+        case owned
+        case shared
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .owned:
+                return Texts.NotesPage.Scope.owned
+            case .shared:
+                return Texts.NotesPage.Scope.shared
+            }
+        }
+    }
     
     @Published var selectedCategory: NoteFolder = .all
+    @Published var selectedScope: NotesScope = .owned
     @Published var searchItem: String = String()
     @Published var notes: [Note] = []
+    @Published var sharedRecords: [SharedRecordResponse] = []
     @Published var isSyncing: Bool = false
     
     @Published internal var isShowingPlayer = false
@@ -38,11 +55,12 @@ final class NotesViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     var filteredAndSearchedAudios: [Note] {
+        let sourceNotes = selectedScope == .owned ? notes : sharedRecords.map { Self.note(from: $0.record) }
         let categoryFiltered: [Note]
         if selectedCategory == .all {
-            categoryFiltered = notes
+            categoryFiltered = sourceNotes
         } else {
-            categoryFiltered = notes.filter { ($0.folderId ?? "") == selectedCategory.rawValue }
+            categoryFiltered = sourceNotes.filter { ($0.folderId ?? "") == selectedCategory.rawValue }
         }
         if searchItem.isEmpty {
             return categoryFiltered
@@ -111,6 +129,13 @@ final class NotesViewModel: ObservableObject {
         recentlyEnhancedNoteIDs.contains(noteID)
     }
 
+    internal func accessRole(for note: Note) -> RecordAccessRole {
+        guard selectedScope == .shared, let serverId = note.serverId else {
+            return .owner
+        }
+        return sharedRecords.first { String($0.record.id) == serverId }?.role ?? .viewer
+    }
+
     internal func loadNotes() async {
         let service = NoteEntityService.shared
         do {
@@ -131,11 +156,21 @@ final class NotesViewModel: ObservableObject {
         await MainActor.run { isSyncing = true }
         await MainActor.run { resetPagination() }
         do {
-            let page = try await RecordsService.shared.fetchRecords(search: self.searchItem.isEmpty ? nil : self.searchItem, folderId: nil, page: currentPage, size: pageSize)
-            await MainActor.run {
-                self.totalPages = page.totalPages
-                self.isSyncing = false
-                logger.info("Sync finished. totalPages=\(self.totalPages)")
+            if await MainActor.run(resultType: NotesScope.self, body: { self.selectedScope }) == .owned {
+                let page = try await RecordsService.shared.fetchRecords(search: self.searchItem.isEmpty ? nil : self.searchItem, folderId: nil, page: currentPage, size: pageSize)
+                await MainActor.run {
+                    self.totalPages = page.totalPages
+                    self.isSyncing = false
+                    logger.info("Sync finished. totalPages=\(self.totalPages)")
+                }
+            } else {
+                let shared = try await RecordsService.shared.fetchSharedRecords()
+                await MainActor.run {
+                    self.sharedRecords = shared
+                    self.totalPages = 1
+                    self.isSyncing = false
+                    logger.info("Shared records sync finished. count=\(shared.count)")
+                }
             }
         } catch {
             logger.error("Failed to sync records: \(String(describing: error))")
@@ -144,6 +179,7 @@ final class NotesViewModel: ObservableObject {
     }
 
     func loadMoreIfNeeded(currentNote: Note) async {
+        if await MainActor.run(resultType: NotesScope.self, body: { self.selectedScope }) == .shared { return }
         if isSyncing || currentPage + 1 >= totalPages { return }
         // Load next page only when current note is the last rendered
         guard let last = await MainActor.run(resultType: Note?.self, body: { self.filteredAndSearchedAudios.last }) else { return }
@@ -266,6 +302,30 @@ final class NotesViewModel: ObservableObject {
         }
 
         return AudioRecorderService.url(forFileName: trimmed)
+    }
+
+    private static func note(from record: RecordResponse) -> Note {
+        let location: Location? = {
+            if let latitude = record.latitude, let longitude = record.longitude {
+                return Location(latitude: latitude, longitude: longitude, cityName: nil, streetName: nil)
+            }
+            return nil
+        }()
+
+        let stableID = UUID(uuidString: "00000000-0000-0000-0000-\(String(format: "%012lld", record.id))") ?? UUID()
+
+        return Note(
+            id: stableID,
+            serverId: String(record.id),
+            folderId: record.category,
+            title: record.title ?? "",
+            transcription: record.description,
+            audioPath: nil,
+            createdAt: record.createdAt ?? record.datetime ?? Date(),
+            updatedAt: record.updatedAt ?? record.datetime ?? Date(),
+            duration: record.duration.map(Int.init),
+            location: location
+        )
     }
 }
 
