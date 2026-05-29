@@ -30,6 +30,60 @@ final class RecordsService {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
         return formatter
     }()
+
+    private func authorizedHeaders(accept: String = "application/json") async throws -> HTTPHeaders {
+        let token = try await AuthorizationService.shared.validAccessToken()
+        return [
+            .authorization(bearerToken: token),
+            .accept(accept)
+        ]
+    }
+
+    private func jsonDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .formatted(Self.serverDateFormatter)
+        return decoder
+    }
+
+    private func decode<T: Decodable>(_ type: T.Type, from response: AFDataResponse<Data>) throws -> T {
+        guard let http = response.response else {
+            throw ServiceError.invalidResponse
+        }
+
+        switch response.result {
+        case .success(let data):
+            if (200..<300).contains(http.statusCode) {
+                return try jsonDecoder().decode(type, from: data)
+            }
+
+            if let api = try? JSONDecoder().decode(APIErrorResponse.self, from: data) {
+                throw ServiceError.apiError(statusCode: http.statusCode, message: api.message)
+            }
+
+            let bodyString = String(data: data, encoding: .utf8) ?? "(non-utf8 body)"
+            throw ServiceError.httpError(statusCode: http.statusCode, body: bodyString)
+        case .failure(let afError):
+            throw afError
+        }
+    }
+
+    private func validateSuccess(_ response: AFDataResponse<Data>) throws {
+        guard let http = response.response else {
+            throw ServiceError.invalidResponse
+        }
+
+        switch response.result {
+        case .success(let data):
+            guard (200..<300).contains(http.statusCode) else {
+                if let api = try? JSONDecoder().decode(APIErrorResponse.self, from: data) {
+                    throw ServiceError.apiError(statusCode: http.statusCode, message: api.message)
+                }
+                throw ServiceError.httpError(statusCode: http.statusCode, body: String(data: data, encoding: .utf8) ?? "")
+            }
+        case .failure(let afError):
+            throw afError
+        }
+    }
     
     internal func uploadRecord(fileURL: URL, name: String, datetime: Date, category: String, folderId: Int, place: String? = nil) async throws -> RecordResponse {
         
@@ -147,7 +201,21 @@ final class RecordsService {
                         if let local = existing.first?.duration, local > 0 {
                             return local
                         }
+                        if let remote = record.duration, remote > 0 {
+                            return Int(remote)
+                        }
                         return 0
+                    }()
+                    let remoteUpdatedAt = record.updatedAt ?? record.datetime ?? Date.distantPast
+                    let transcriptionToUse: String? = {
+                        if let local = existing.first,
+                           let localTranscription = local.transcription,
+                           !localTranscription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                           local.updatedAt > remoteUpdatedAt {
+                            return localTranscription
+                        }
+
+                        return record.description
                     }()
 
                     let loc: Location? = {
@@ -162,10 +230,10 @@ final class RecordsService {
                         serverId: serverId,
                         folderId: record.category,
                         title: record.title ?? "",
-                        transcription: record.description,
+                        transcription: transcriptionToUse,
                         audioPath: audioPathToUse,
                         createdAt: record.createdAt ?? record.datetime ?? Date(),
-                        updatedAt: record.updatedAt ?? record.datetime ?? Date(),
+                        updatedAt: max(existing.first?.updatedAt ?? Date.distantPast, record.updatedAt ?? record.datetime ?? Date()),
                         duration: durationToUse,
                         location: loc
                     )
@@ -189,6 +257,62 @@ final class RecordsService {
             logger.error("Network failure: \(String(describing: afError), privacy: .private)")
             throw afError
         }
+    }
+
+    internal func fetchRecord(recordId: Int64) async throws -> RecordResponse {
+        let url = baseURL.appendingPathComponent("records/\(recordId)")
+        let headers = try await authorizedHeaders()
+        let request = AF.request(url, method: .get, headers: headers)
+        return try decode(RecordResponse.self, from: await request.serializingData().response)
+    }
+
+    internal func fetchRecordSummary(recordId: Int64) async throws -> RecordSummaryResponse {
+        let url = baseURL.appendingPathComponent("records/\(recordId)/summary")
+        let headers = try await authorizedHeaders()
+        let request = AF.request(url, method: .get, headers: headers)
+        return try decode(RecordSummaryResponse.self, from: await request.serializingData().response)
+    }
+
+    internal func fetchRecordStatuses(recordId: Int64) async throws -> [ProcessingStatusResponse] {
+        let url = baseURL.appendingPathComponent("records/\(recordId)/statuses")
+        let headers = try await authorizedHeaders()
+        let request = AF.request(url, method: .get, headers: headers)
+        return try decode([ProcessingStatusResponse].self, from: await request.serializingData().response)
+    }
+
+    internal func shareRecord(recordId: Int64, email: String?, userId: String?, role: RecordAccessRole) async throws {
+        let url = baseURL.appendingPathComponent("records/\(recordId)/share")
+        let headers = try await authorizedHeaders()
+        var payload: [String: String] = ["role": role.rawValue]
+        if let userId {
+            payload["userId"] = userId
+        }
+        if let email {
+            payload["email"] = email
+        }
+        let request = AF.request(url, method: .post, parameters: payload, encoder: JSONParameterEncoder.default, headers: headers)
+        try validateSuccess(await request.serializingData().response)
+    }
+
+    internal func fetchSharedUsers(recordId: Int64) async throws -> [SharedRecordUserResponse] {
+        let url = baseURL.appendingPathComponent("records/\(recordId)/shared-users")
+        let headers = try await authorizedHeaders()
+        let request = AF.request(url, method: .get, headers: headers)
+        return try decode([SharedRecordUserResponse].self, from: await request.serializingData().response)
+    }
+
+    internal func revokeSharedUser(recordId: Int64, userId: String) async throws {
+        let url = baseURL.appendingPathComponent("records/\(recordId)/shared-users/\(userId)")
+        let headers = try await authorizedHeaders()
+        let request = AF.request(url, method: .delete, headers: headers)
+        try validateSuccess(await request.serializingData().response)
+    }
+
+    internal func fetchSharedRecords() async throws -> [SharedRecordResponse] {
+        let url = baseURL.appendingPathComponent("records/shared")
+        let headers = try await authorizedHeaders()
+        let request = AF.request(url, method: .get, headers: headers)
+        return try decode([SharedRecordResponse].self, from: await request.serializingData().response)
     }
 
     // MARK: - Audio Downloading
@@ -314,4 +438,3 @@ final class RecordsService {
         }
     }
 }
-
