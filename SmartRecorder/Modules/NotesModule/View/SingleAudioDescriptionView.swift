@@ -16,6 +16,7 @@ struct SingleAudioDescriptionView: View {
 
     @State private var isEditing = false
     @State private var audioDuration: TimeInterval? = nil
+    @State private var audioPath: String?
     @State private var displayedTranscription: String
     @State private var displayedUpdatedAt: Date
     @State private var isShowingServerShare = false
@@ -32,6 +33,7 @@ struct SingleAudioDescriptionView: View {
         _shareVM = StateObject(wrappedValue: vm)
         _detailsVM = StateObject(wrappedValue: RecordDetailsViewModel(recordId: Int64(note.serverId ?? "")))
         self._audioDuration = State(initialValue: vm.getAudioDuration(for: note))
+        self._audioPath = State(initialValue: note.audioPath)
         self._displayedTranscription = State(initialValue: note.transcription ?? Texts.NotesPage.inProgress)
         self._displayedUpdatedAt = State(initialValue: note.updatedAt)
     }
@@ -117,6 +119,15 @@ struct SingleAudioDescriptionView: View {
             guard let updatedNote = notes.first(where: { $0.id == note.id }) else { return }
             displayedTranscription = updatedNote.transcription ?? Texts.NotesPage.inProgress
             displayedUpdatedAt = updatedNote.updatedAt
+            if let updatedAudioPath = updatedNote.audioPath, !updatedAudioPath.isEmpty {
+                audioPath = updatedAudioPath
+            }
+
+            var durationNote = updatedNote
+            if durationNote.audioPath?.isEmpty ?? true {
+                durationNote.audioPath = audioPath
+            }
+            audioDuration = shareVM.getAudioDuration(for: durationNote)
         }
         .task {
             await viewModel.fetchPlaceNamesIfNeeded(for: note)
@@ -139,12 +150,7 @@ struct SingleAudioDescriptionView: View {
     
     private var playButton: some View {
         HStack {
-            Image.NotesPage.play
-                .resizable()
-                .frame(width: 32, height: 32)
-                .background(.white)
-                .clipShape(Capsule())
-                .foregroundStyle(Color.SupportColors.blue)
+            playButtonIcon
             
             Text(shareVM.formatDuration(audioDuration))
                 .font(.subheadline)
@@ -154,8 +160,84 @@ struct SingleAudioDescriptionView: View {
         .matchedTransitionSource(id: note.id, in: namespace)
         .glassEffect(.regular.interactive().tint(Color.SupportColors.lightBlue))
         .onTapGesture {
-            viewModel.selectedNote = note
+            playButtonAction()
         }
+        .disabled(shareVM.isLoading)
+        .symbolEffect(.breathe, isActive: shareVM.isLoading)
+    }
+
+    @ViewBuilder
+    private var playButtonIcon: some View {
+        if shareVM.isLoading {
+            ProgressView()
+                .controlSize(.small)
+                .frame(width: 32, height: 32)
+                .background(.white)
+                .clipShape(Capsule())
+        } else if isValidAudioPath {
+            Image.NotesPage.play
+                .resizable()
+                .frame(width: 32, height: 32)
+                .background(.white)
+                .clipShape(Capsule())
+                .foregroundStyle(Color.SupportColors.blue)
+        } else {
+            Image.NotesPage.download
+                .resizable()
+                .frame(width: 32, height: 32)
+                .background(.white)
+                .clipShape(Capsule())
+                .foregroundStyle(Color.SupportColors.blue)
+        }
+    }
+
+    private func playButtonAction() {
+        guard !shareVM.isLoading else { return }
+
+        if isValidAudioPath {
+            viewModel.selectedNote = playableNote
+        } else {
+            downloadAudioForPlayback()
+        }
+    }
+
+    private func downloadAudioForPlayback() {
+        Task {
+            do {
+                let fileURL = try await shareVM.downloadAudioForPlayback()
+                await MainActor.run {
+                    audioPath = fileURL.path
+                    var updatedNote = note
+                    updatedNote.audioPath = fileURL.path
+                    audioDuration = shareVM.getAudioDuration(for: updatedNote)
+                    Toast.shared.present(title: "\(Texts.NotesPage.loadSuccessFirst) \"\(note.title)\" \(Texts.NotesPage.loadSuccessSecond)")
+                }
+            } catch {
+                await MainActor.run {
+                    shareVM.errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+
+    private var isValidAudioPath: Bool {
+        if let audioPath, !audioPath.isEmpty {
+            return true
+        }
+        return false
+    }
+
+    private var playableNote: Note {
+        guard let audioPath, !audioPath.isEmpty else {
+            return note
+        }
+
+        var updatedNote = note
+        updatedNote.audioPath = audioPath
+        if let audioDuration {
+            updatedNote.duration = Int(audioDuration)
+        }
+        return updatedNote
     }
 
     private var enhancementSection: some View {
@@ -206,20 +288,28 @@ struct SingleAudioDescriptionView: View {
                 Text(failed.errorMessage ?? Texts.NotesPage.Summary.failed)
                     .font(.body())
                     .foregroundStyle(Color.SupportColors.red)
+                    .id("summary-error-\(failed.errorMessage ?? Texts.NotesPage.Summary.failed)")
+                    .transition(.blurReplace)
             } else if let summary = detailsVM.summary?.summaryText, !summary.isEmpty {
                 Text(cleanMarkdown(summary))
                     .font(.body())
                     .foregroundStyle(Color.LabelColors.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .id("summary-\(summary)")
+                    .transition(.blurReplace)
             } else {
                 Text(Texts.NotesPage.Summary.waiting)
                     .font(.body())
                     .foregroundStyle(Color.LabelColors.secondary)
+                    .id("summary-waiting")
+                    .transition(.blurReplace)
             }
         }
         .padding(16)
         .background(Color.SupportColors.lightBlue.opacity(0.14))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .animation(.smooth(duration: 0.35), value: detailsVM.summary?.summaryText)
+        .animation(.smooth(duration: 0.35), value: detailsVM.summarizationStatus)
     }
 
     private var transcriptionSection: some View {
@@ -230,7 +320,10 @@ struct SingleAudioDescriptionView: View {
             Text(resolvedTranscription)
                 .font(.body())
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .id(resolvedTranscription)
+                .transition(.blurReplace)
         }
+        .animation(.smooth(duration: 0.35), value: resolvedTranscription)
     }
 
     private var shareMenu: some View {

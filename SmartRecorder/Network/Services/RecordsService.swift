@@ -201,6 +201,9 @@ final class RecordsService {
                         if let local = existing.first?.duration, local > 0 {
                             return local
                         }
+                        if let remote = record.duration, remote > 0 {
+                            return Int(remote)
+                        }
                         return 0
                     }()
                     let remoteUpdatedAt = record.updatedAt ?? record.datetime ?? Date.distantPast

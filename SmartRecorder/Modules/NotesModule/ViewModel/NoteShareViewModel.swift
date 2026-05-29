@@ -45,13 +45,17 @@ final class NoteShareViewModel: ObservableObject {
     internal func downloadAudio() {
         Task {
             do {
-                _ = try await downloadAudio(manageLoading: false)
+                _ = try await downloadAudioForPlayback(manageLoading: false)
                 Toast.shared.present(title: "\(Texts.NotesPage.loadSuccessFirst) \"\(note.title)\" \(Texts.NotesPage.loadSuccessSecond)")
             } catch(let error) {
                 Toast.shared.present(title: "\(Texts.NotesPage.loadError) \"\(note.title)\"")
                 logger.error("Downloading audio failed: \(error)")
             }
         }
+    }
+
+    internal func downloadAudioForPlayback(manageLoading: Bool = true) async throws -> URL {
+        try await downloadAudio(manageLoading: manageLoading)
     }
 
     @MainActor
@@ -116,11 +120,10 @@ final class NoteShareViewModel: ObservableObject {
     // MARK: - Duration Helpers
     
     internal func getAudioDuration(for note: Note) -> TimeInterval? {
-        if let seconds = note.duration, seconds != -9 {
+        if let seconds = note.duration, seconds > 0, seconds != -9 {
             return TimeInterval(seconds)
         }
-        guard let path = note.audioPath else { return nil }
-        let url = URL(fileURLWithPath: path)
+        guard let url = Self.resolveAudioURL(for: note.audioPath) else { return nil }
         do {
             let player = try AVAudioPlayer(contentsOf: url)
             return player.duration
@@ -128,6 +131,21 @@ final class NoteShareViewModel: ObservableObject {
             logger.error("Failed to get audio duration: \(String(describing: error))")
             return nil
         }
+    }
+
+    private static func resolveAudioURL(for audioPath: String?) -> URL? {
+        guard let audioPath, !audioPath.isEmpty else { return nil }
+
+        let trimmed = audioPath.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("file://") {
+            return URL(string: trimmed)
+        }
+
+        if trimmed.hasPrefix("/") {
+            return URL(fileURLWithPath: trimmed)
+        }
+
+        return AudioRecorderService.url(forFileName: trimmed)
     }
 
     internal func formatDuration(_ interval: TimeInterval?) -> String {
