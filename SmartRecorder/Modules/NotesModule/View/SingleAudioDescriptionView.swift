@@ -57,7 +57,7 @@ struct SingleAudioDescriptionView: View {
             enhancementSection
                 .padding(.bottom, 20)
             
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     if detailsVM.canLoadRemoteDetails {
                         processingSection
@@ -65,6 +65,7 @@ struct SingleAudioDescriptionView: View {
                     }
                     transcriptionSection
                 }
+                .padding(.bottom)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -186,9 +187,7 @@ struct SingleAudioDescriptionView: View {
             statusRow(title: Texts.NotesPage.Summary.transcription, status: detailsVM.transcriptionStatus)
             statusRow(title: Texts.NotesPage.Summary.summarization, status: detailsVM.summarizationStatus)
         }
-        .padding(16)
-        .background(Color.BackgroundColors.card)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.vertical, 8)
     }
 
     private var summarySection: some View {
