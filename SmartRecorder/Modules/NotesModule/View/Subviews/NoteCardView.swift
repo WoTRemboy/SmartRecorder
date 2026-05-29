@@ -14,6 +14,7 @@ struct NoteCardView: View {
     
     @State private var isEditing = false
     @State private var isShowingPlayer = false
+    @State private var downloadedAudioPath: String? = nil
     
     private let note: Note
     private let namespace: Namespace.ID
@@ -60,6 +61,15 @@ struct NoteCardView: View {
                 .foregroundStyle(Color.LabelColors.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .lineLimit(1)
+            if viewModel.accessRole(for: note) != .owner {
+                Text(viewModel.accessRole(for: note).title)
+                    .font(.caption(.semibold))
+                    .foregroundStyle(Color.SupportColors.blue)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color.SupportColors.lightBlue.opacity(0.18))
+                    .clipShape(Capsule())
+            }
             shareMenu
         }
     }
@@ -113,9 +123,25 @@ struct NoteCardView: View {
     
     private func playButtonAction() {
         if isValidAudioPath {
-            viewModel.selectedNote = note
+            viewModel.selectedNote = playableNote
         } else {
-            shareVM.downloadAudio()
+            downloadAudio()
+        }
+    }
+
+    private func downloadAudio() {
+        Task {
+            do {
+                let fileURL = try await shareVM.downloadAudioForPlayback()
+                await MainActor.run {
+                    downloadedAudioPath = fileURL.path
+                    Toast.shared.present(title: "\(Texts.NotesPage.loadSuccessFirst) \"\(note.title)\" \(Texts.NotesPage.loadSuccessSecond)")
+                }
+            } catch {
+                await MainActor.run {
+                    shareVM.errorMessage = error.localizedDescription
+                }
+            }
         }
     }
     
@@ -157,10 +183,20 @@ struct NoteCardView: View {
     }
     
     private var isValidAudioPath: Bool {
-        if let path = note.audioPath, !path.isEmpty {
+        if let path = playableNote.audioPath, !path.isEmpty {
             return true
         }
         return false
+    }
+
+    private var playableNote: Note {
+        guard let downloadedAudioPath, !downloadedAudioPath.isEmpty else {
+            return note
+        }
+
+        var updatedNote = note
+        updatedNote.audioPath = downloadedAudioPath
+        return updatedNote
     }
 }
 

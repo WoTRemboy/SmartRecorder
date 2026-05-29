@@ -78,17 +78,50 @@ final class Texts {
         static let loadSuccessSecond = "завершена"
         static let loadError = "Ошибка загрузки"
 
+        enum Scope {
+            static let owned = "Мои"
+            static let shared = "Доступные"
+        }
+
+        enum Summary {
+            static let processingTitle = "Обработка"
+            static let transcription = "Транскрипция"
+            static let summarization = "Суммаризация"
+            static let title = "Сводка"
+            static let waiting = "Сводка появится здесь после обработки."
+            static let fullTranscription = "Полная расшифровка"
+            static let pending = "В очереди"
+            static let inProgress = "В работе"
+            static let completed = "Готово"
+            static let failed = "Ошибка"
+            static let unknown = "Ожидание"
+        }
+
+        enum Sharing {
+            static let title = "Доступ к записи"
+            static let description = "Получатель сможет открыть запись, прослушать аудио и прочитать расшифровку."
+            static let openAccess = "Открыть доступ"
+            static let emailPlaceholder = "colleague@example.com"
+            static let role = "Роль"
+            static let add = "Поделиться"
+            static let close = "Закрыть"
+            static let sharedUsers = "Пользователи"
+            static let empty = "Доступ пока никому не выдан"
+            static let shareSuccess = "Доступ открыт"
+            static let revokeSuccess = "Доступ отозван"
+        }
+
         enum Enhancement {
-            static let action = "Улучшить перевод"
+            static let action = "Улучшить транскипцию"
             static let subtitle = "Прогонит запись через более точную модель и обновит текст"
             static let processing = "Улучшение..."
             static let successShort = "Успешно"
             static let processingDescription = "Тяжелая модель собирает более чистую и точную расшифровку"
-            static let success = "Перевод улучшен"
+            static let success = "Транскипция улучшена"
             static let successDescription = "Новая версия текста уже сохранена в записи"
 
             enum ErrorAlert {
-                static let title = "Не удалось улучшить перевод"
+                static let title = "Не удалось улучшить"
                 static let ok = "Хорошо"
             }
 
