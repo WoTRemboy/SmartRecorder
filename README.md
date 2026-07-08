@@ -5,7 +5,7 @@
 
 **Transono** - это современное приложение для записи аудио с последующей расшифровкой в текстовые заметки и их удобного экспорта.
 Построено на SwiftUI с Liquid Glass UI, использует современную архитектуру и методы работы с файлами, а также поддерживает выгрузку PDF и аудио.
-Смотреть [Демо](https://drive.google.com/file/d/1UhFqS3OJQBgH6XDt0tYobznkbvbTsryn/view?usp=share_link). Найти в [TestFlight](https://testflight.apple.com/join/SFSgnFag).
+Смотреть [Демо](https://drive.google.com/drive/folders/1Au7ws64LHzV5or4Yi298XzVc4BQrKZDd?usp=sharing).
 
 ## Содержание 📋
 
